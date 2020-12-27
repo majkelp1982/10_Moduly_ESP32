@@ -24,6 +24,12 @@ struct DataRead {
 	byte data[128];
 };
 
+struct DataWritte {
+	int length = 0;
+	int frameNo = 0;
+	byte *data;
+};
+
 class Communication {
 public:
 	Communication(boolean start);
@@ -35,5 +41,7 @@ public:
 bool WiFi_conectionCheck();
 DataRead getDataRead();
 void resetNewData();
+void forceStandardUDP();
+void setUDPdata(int frameNo, byte *data, int length);
 
 #endif /* COMMUNICATION_H_ */

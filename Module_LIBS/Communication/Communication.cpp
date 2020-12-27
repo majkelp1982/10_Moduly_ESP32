@@ -18,7 +18,7 @@
 
 //Fuctions
 bool WiFi_conectionCheck();
-void UDPsendStandardFrame(byte data[]);
+void UDPsendStandardFrame();
 DataRead UDPread();
 void UDPsendDiagnoseFrame();
 DataRead getDataRead();
@@ -29,6 +29,8 @@ WiFiUDP Udp;								// WiFi variable // @suppress("Abstract class cannot be inst
 IPAddress broadcastIP;
 bool flagConnectionWasIntrrupt = true;
 DataRead dataRead;
+DataWritte dataWritte;
+boolean forceUDPStandardFrame = false;
 
 //millis
 unsigned long udpStandardsendMillis = 0;
@@ -43,6 +45,8 @@ Communication::~Communication() {
 void Communication::run() {
 	if (!dataRead.newData)
 		dataRead = UDPread();
+	UDPsendStandardFrame();
+	UDPsendDiagnoseFrame();
 }
 
 void Communication::WiFi_init() {
@@ -54,7 +58,7 @@ void Communication::WiFi_init() {
 bool WiFi_conectionCheck() {
 	Diagnose diagnose = getDiagnose();
 	if (!WiFi.isConnected()) {
-		WiFi.reconnect();
+		//FIXME WiFi.reconnect();
 		if (diagnose.wifiConnected) {
 			diagnose.wifiConnectionInterrupt++;
 			diagnose.wifiConnected = false;
@@ -96,29 +100,43 @@ bool WiFi_conectionCheck() {
 	}
 }
 
-void UDPsendStandardFrame(byte data[]) {
-	int arraySize = sizeof(data)/sizeof(data[0]);
-	byte dataWrite[arraySize+3];
+void forceStandardUDP() {
+	forceUDPStandardFrame = true;
+}
+
+void UDPsendStandardFrame() {
 	// store data write to UDP
 	// return if last telegram were send under delay ago
-	if (sleep(&udpStandardsendMillis, DELAY_BETWEEN_UDP_STANDARD)) return;
+	if ((sleep(&udpStandardsendMillis, DELAY_BETWEEN_UDP_STANDARD))
+			&& (!forceUDPStandardFrame)) return;
+	if (dataWritte.length == 0) return;
+	//FIXME
+	Serial.printf("\n\nilosc danych : %i",dataWritte.length);
+
 	if (!WiFi_conectionCheck()) return;
+	forceUDPStandardFrame = false;
+
+	for (int i=0; i<dataWritte.length; i++) {
+		dataWritte.data[i+3] = dataWritte.data[i];
+	}
 
 	// First three bytes are reserved for device recognized purposes.
-	dataWrite[0] = getModuleType();
-	dataWrite[1] = getModuleNo();
-	dataWrite[2] = 0;						// Frame 0
+	dataWritte.data[0] = getModuleType();
+	dataWritte.data[1] = getModuleNo();
+	dataWritte.data[2] = dataWritte.frameNo;
 
-	for (int i=0; i<arraySize; i++) {
-		dataWrite[i+3] = data[i];
-	}
+	//FIXME
+	Serial.printf("\nSENDED ");
 
 	//Send data packet
 	Udp.beginPacket(broadcastIP, LOCAL_PORT);
-	for (int i=0; i<=(arraySize+3); i++) {
-		Udp.write(dataWrite[i]);
+	for (int i=0; i<(dataWritte.length+3); i++) {
+		Udp.write(dataWritte.data[i]);
+		//FIXME
+		Serial.printf("[%i]", dataWritte.data[i]);
 	}
 	Udp.endPacket();
+	dataWritte.length = 0;
 }
 
 DataRead UDPread() {
@@ -151,22 +169,22 @@ DataRead UDPread() {
 void UDPsendDiagnoseFrame() {
 	if (sleep(&udpDiagnosesendMillis, DELAY_BETWEEN_UDP_DIAGNOSE)) return;
 	if (!WiFi_conectionCheck()) return;
-	byte dataWrite[7];
+	byte dataWritte[7];
 
 	//TODO
 	// First three bytes are reserved for device recognized purposes.
-	dataWrite[0] = getModuleType();
-	dataWrite[1] = getModuleNo();
-	dataWrite[2] = 200;						// Frame 200
-	dataWrite[3] = getDiagnose().ip[0];
-	dataWrite[4] = getDiagnose().ip[1];
-	dataWrite[5] = getDiagnose().ip[2];
-	dataWrite[6] = getDiagnose().ip[3];
+	dataWritte[0] = getModuleType();
+	dataWritte[1] = getModuleNo();
+	dataWritte[2] = 200;						// Frame 200
+	dataWritte[3] = getDiagnose().ip[0];
+	dataWritte[4] = getDiagnose().ip[1];
+	dataWritte[5] = getDiagnose().ip[2];
+	dataWritte[6] = getDiagnose().ip[3];
 
 	//Send data packet
 	Udp.beginPacket(broadcastIP, LOCAL_PORT);
 	for (int i=0; i<=7; i++) {
-		Udp.write(dataWrite[i]);
+		Udp.write(dataWritte[i]);
 	}
 	Udp.endPacket();
 
@@ -180,5 +198,10 @@ void resetNewData() {
 	dataRead.newData = false;
 }
 
+void setUDPdata(int frameNo, byte *data, int length) {
+	dataWritte.data = data;
+	dataWritte.frameNo = frameNo;
+	dataWritte.length = length;
+}
 
 
