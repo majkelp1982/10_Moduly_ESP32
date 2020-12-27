@@ -1,0 +1,44 @@
+Version History
+2020012120
+*zmiana czasu probkowania termometrow
+*zwiekszenie dopuszczalnej liczby bledow
+
+2020012023
+*zmiana strategii odczytu temperatur. Liczenie maxErrorCount
+*status HTML
+*ksiazka logowan
+
+2020011919
+*aktualizacja OTA - diagnose
+*CPU na 80MHz <- przy 80MHz udalo sie przeslac plik OTA
+
+20191224
+*dolaczenie pozostalych czujnikow
+*zmiana wygladu interfejsu web. Teraz pokazuje aktualna wersje oprogramowania
+*przypisanie adresow termometrow do stref
+*dodanie dodatkowej kompensacji - pierwsze odczyty bardzo nie rzeczywiste
+
+20191223
+*dopasowanie pinu do zbudowanego modulu
+*zapis poprawnych adresow termometrow dla 4 stref
+*poprawki komentarzy etc
+
+20190926
+*ramka diagnozy
+
+20190925
+*komunikacja UDP
+
+20190924
+*obsluga eeprom - adresy termometrow
+*glowny program w rozbudowie
+
+20190904
+*dodatnie DateTime
+*zmiana numeru modulu z 9 na 10
+
+20190827
+*dodatnie OTA
+
+20190718
+*nowy modul. Podzial na sterfy calego domu.
