@@ -21,6 +21,8 @@ bool WiFi_conectionCheck();
 void UDPsendStandardFrame(byte data[]);
 DataRead UDPread();
 void UDPsendDiagnoseFrame();
+DataRead getDataRead();
+void resetNewData();
 
 //Standard variable
 WiFiUDP Udp;								// WiFi variable // @suppress("Abstract class cannot be instantiated")
@@ -177,5 +179,6 @@ DataRead getDataRead() {
 void resetNewData() {
 	dataRead.newData = false;
 }
+
 
 
