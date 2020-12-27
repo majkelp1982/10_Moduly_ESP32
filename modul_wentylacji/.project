@@ -42,14 +42,24 @@
 			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/1.0.0/variants/nodemcu-32s</locationURI>
 		</link>
 		<link>
-			<name>libraries/DallasTemperature</name>
+			<name>libraries/Adafruit_BME280</name>
 			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/DallasTemperature/3.8.0</locationURI>
+			<location>C:/Google_Drive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Adafruit_BME280</location>
 		</link>
 		<link>
-			<name>libraries/EEPROM</name>
+			<name>libraries/Adafruit_Unified_Sensor</name>
 			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/1.0.0/libraries/EEPROM</locationURI>
+			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/Adafruit_Unified_Sensor/1.0.2</locationURI>
+		</link>
+		<link>
+			<name>libraries/Basic</name>
+			<type>2</type>
+			<location>C:/Google_Drive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Basic</location>
+		</link>
+		<link>
+			<name>libraries/Communication</name>
+			<type>2</type>
+			<location>C:/Google_Drive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Communication</location>
 		</link>
 		<link>
 			<name>libraries/ESPmDNS</name>
@@ -62,9 +72,19 @@
 			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/1.0.0/libraries/FS</locationURI>
 		</link>
 		<link>
-			<name>libraries/OneWire</name>
+			<name>libraries/OTA</name>
 			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/OneWire/2.3.4</locationURI>
+			<location>C:/Google_Drive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/OTA</location>
+		</link>
+		<link>
+			<name>libraries/SPI</name>
+			<type>2</type>
+			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/1.0.0/libraries/SPI</locationURI>
+		</link>
+		<link>
+			<name>libraries/Status</name>
+			<type>2</type>
+			<location>C:/Google_Drive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Status</location>
 		</link>
 		<link>
 			<name>libraries/Update</name>
@@ -80,6 +100,11 @@
 			<name>libraries/WiFi</name>
 			<type>2</type>
 			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/1.0.0/libraries/WiFi</locationURI>
+		</link>
+		<link>
+			<name>libraries/Wire</name>
+			<type>2</type>
+			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/1.0.0/libraries/Wire</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

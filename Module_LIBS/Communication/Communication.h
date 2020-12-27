@@ -15,19 +15,25 @@
 #include <WiFiUdp.h>
 #include <Status.h>
 
+struct DataRead {
+	boolean newData=false;
+	int deviceType= 0;
+	int deviceNo = 0;
+	int frameNo = 0;
+	int length = 0;
+	byte data[128];
+};
+
 class Communication {
 public:
 	Communication(boolean start);
 	virtual ~Communication();
 	void WiFi_init();
 	void run();
-
-//private:
-//	void UDPsendStandardFrame(byte data[128]);
-//	byte* UDPread();
-//	void UDPsendDiagnoseFrame();
 };
 
 bool WiFi_conectionCheck();
+DataRead getDataRead();
+void resetNewData();
 
 #endif /* COMMUNICATION_H_ */

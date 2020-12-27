@@ -19,13 +19,14 @@
 //Fuctions
 bool WiFi_conectionCheck();
 void UDPsendStandardFrame(byte data[]);
-byte* UDPread();
+DataRead UDPread();
 void UDPsendDiagnoseFrame();
 
 //Standard variable
 WiFiUDP Udp;								// WiFi variable // @suppress("Abstract class cannot be instantiated")
 IPAddress broadcastIP;
 bool flagConnectionWasIntrrupt = true;
+DataRead dataRead;
 
 //millis
 unsigned long udpStandardsendMillis = 0;
@@ -38,7 +39,8 @@ Communication::~Communication() {
 }
 
 void Communication::run() {
-//	UDPread();
+	if (!dataRead.newData)
+		dataRead = UDPread();
 }
 
 void Communication::WiFi_init() {
@@ -117,33 +119,31 @@ void UDPsendStandardFrame(byte data[]) {
 	Udp.endPacket();
 }
 
-byte* UDPread() {
-	byte dataRead[128];						// store data write to UDP
+DataRead UDPread() {
+	DataRead dataRead;
+	dataRead.length = Udp.parsePacket();
 
-	int packetLength = Udp.parsePacket();
+	if (dataRead.length != 0) {
+		Udp.read(dataRead.data,dataRead.length);
+		int deviceType = dataRead.data[0];
+		int deviceNo = dataRead.data[1];
+		int frameNo = dataRead.data[2];
 
-	if (packetLength == 0) return NULL;					// if no packet incoming return
-
-	Udp.read(dataRead,packetLength);
-	int deviceTyp = dataRead[0];
-	int deviceNo = dataRead[1];
-	int frameNo = dataRead[2];
-
-	//Module GLOWNY
-	if (deviceTyp == 1) {
-		int moduleTyp = dataRead[1];
-		int modueNo = dataRead[2];
+		//Module GLOWNY
 		//DateTime synchro
-		if ((moduleTyp == 0) && (modueNo == 0)) {
-			dateTimeSet(dataRead[3], dataRead[4], dataRead[5], dataRead[6], dataRead[7], dataRead[8], dataRead[9]);
-			return 0;
-		}
-
-		if ((moduleTyp == getModuleType()) && (modueNo == getModuleNo())) {
-			return 0;//dataRead;
+		if ((deviceType == 1) && (deviceNo == 0) && (frameNo == 0))
+				dateTimeSet(dataRead.data[3], dataRead.data[4], dataRead.data[5], dataRead.data[6], dataRead.data[7], dataRead.data[8], dataRead.data[9]);
+		else {
+			dataRead.newData = true;
+			dataRead.deviceType=deviceType;
+			dataRead.deviceNo=deviceNo;
+			dataRead.frameNo=frameNo;
+			for (int i=3; i<dataRead.length; i++)
+				dataRead.data[i-3] = dataRead.data[i];
+			dataRead.length = dataRead.length - 3;
 		}
 	}
-	return 0;
+	return dataRead;
 }
 
 void UDPsendDiagnoseFrame() {
@@ -168,6 +168,14 @@ void UDPsendDiagnoseFrame() {
 	}
 	Udp.endPacket();
 
+}
+
+DataRead getDataRead() {
+	return dataRead;
+}
+
+void resetNewData() {
+	dataRead.newData = false;
 }
 
 
