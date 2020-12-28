@@ -58,7 +58,7 @@ void Communication::WiFi_init() {
 bool WiFi_conectionCheck() {
 	Diagnose diagnose = getDiagnose();
 	if (!WiFi.isConnected()) {
-		//FIXME WiFi.reconnect();
+		WiFi.reconnect();
 		if (diagnose.wifiConnected) {
 			diagnose.wifiConnectionInterrupt++;
 			diagnose.wifiConnected = false;
@@ -110,9 +110,6 @@ void UDPsendStandardFrame() {
 	if ((sleep(&udpStandardsendMillis, DELAY_BETWEEN_UDP_STANDARD))
 			&& (!forceUDPStandardFrame)) return;
 	if (dataWritte.length == 0) return;
-	//FIXME
-	Serial.printf("\n\nilosc danych : %i",dataWritte.length);
-
 	if (!WiFi_conectionCheck()) return;
 	forceUDPStandardFrame = false;
 
@@ -159,7 +156,6 @@ void UDPsendDiagnoseFrame() {
 	if (!WiFi_conectionCheck()) return;
 	byte dataWritte[7];
 
-	//TODO
 	// First three bytes are reserved for device recognized purposes.
 	dataWritte[0] = getModuleType();
 	dataWritte[1] = getModuleNo();
@@ -186,15 +182,11 @@ void resetNewData() {
 	dataRead.newData = false;
 }
 
-void setUDPdata(int frameNo, byte data[128], int length) {
+void setUDPdata(int frameNo, byte *data, int length) {
 	for (int i=0; i<length; i++)
 		dataWritte.data[i] = data[i];
 	dataWritte.frameNo = frameNo;
 	dataWritte.length = length;
-
-	//FIXME
-	for (int i=0; i<length; i++)
-		Serial.printf("\nsetUDPdata[%i]=%i",i,dataWritte.data[i]);
 }
 
 

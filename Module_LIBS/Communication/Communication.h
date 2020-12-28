@@ -42,6 +42,6 @@ bool WiFi_conectionCheck();
 DataRead getDataRead();
 void resetNewData();
 void forceStandardUDP();
-void setUDPdata(int frameNo, byte data[128], int length);
+void setUDPdata(int frameNo, byte *data, int length);
 
 #endif /* COMMUNICATION_H_ */

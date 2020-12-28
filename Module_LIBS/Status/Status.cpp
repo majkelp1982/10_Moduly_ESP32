@@ -56,8 +56,6 @@ void Status::addLog(String log) {
 
 void Status::printStatus(int delay) {
 	if (sleep(&lastMillis, delay)) return;
-	//FIXME
-	WiFi_conectionCheck();
 	Serial.print("\n\n");
 	Serial.print(mainText+"\n");
 	Serial.print(dt+"\n");

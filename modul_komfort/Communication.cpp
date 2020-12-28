@@ -179,7 +179,6 @@ void UDPsendDiagnoseFrame(Device *device) {
 	if (Sleep(&udpDiagnosesendMillis, DELAY_BETWEEN_UDP_DIAGNOSE)) return;
 	if (!WiFi_conectionCheck(device)) return;
 
-	//TODO
 	// First three bytes are reserved for device recognized purposes.
 	dataWrite[0] = DEVICE_TYP;
 	dataWrite[1] = DEVICE_NO;

@@ -60,7 +60,7 @@ void module() {
 	device.normalON = normalMode();
 	device.fan = device.normalON | device.humidityAlert;
 
-//FIXME	setUDPdata();
+	setUDPdata();
 	outputs();
 	statusUpdate();
 }
@@ -237,7 +237,7 @@ void readSensors() {
 void statusUpdate() {
 	String status;
 	status = "PARAMETRY PRACY\n";
-	status +="Wentylator: "; status += device.fan ? "W£":"WY"; status +="\tNormalON: "; status += device.normalON ? "TAK":"NIE";
+	status +="Wentylator: "; status += device.fan ? "TAK":"NIE"; status +="\tNormalON: "; status += device.normalON ? "TAK":"NIE";
 	status +="\tHumidityALERT: "; status += device.humidityAlert ? "TAK":"NIE"; status +="\n";
 	status +="Czerpnia:\t T="; status +=device.sensorsBME280[0].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[0].humidity;
 	status +="[%]\tP="; status +=(int)device.sensorsBME280[0].pressure;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[0].faultyReadings ;status +="\n";
@@ -251,18 +251,12 @@ void statusUpdate() {
 }
 
 void getMasterDeviceOrder() {
-	//FIXME
-	Serial.printf("\n\n\nJESTEM 0=%i, 1=%i",UDPdata.data[0],UDPdata.data[1]);
 	if ((UDPdata.data[0] >= 4)
 			&& (UDPdata.data[0] <=15)) {
 		int hour = UDPdata.data[0]-4;
 		device.hour[hour] = UDPdata.data[1];
 		EEpromWrite(hour, UDPdata.data[1]);
 	}
-	//Send immediately standard UDP frame
-	//FIXME
-//	for (int i=0; i<12; i++)
-//		Serial.printf("\nHOUR[%i]=%i",i,device.hour[i]);
 	setUDPdata();
 	forceStandardUDP();
 }
@@ -275,15 +269,10 @@ void readUDPdata() {
 			&& (UDPdata.frameNo == getModuleNo()))
 		getMasterDeviceOrder();
 	resetNewData();
-	//TODO
-//	Serial.printf("\nUDP [%i][%i][%i]\t\tDATA",UDPdata.deviceType,UDPdata.deviceNo,UDPdata.frameNo);
-//	for (int i=0; i<UDPdata.length;i++)
-//		Serial.printf("[%i]",UDPdata.data[i]);
 }
 
 void setUDPdata() {
-	byte dataWrite[128];
-
+	byte dataWrite[13];
 	// First three bytes are reserved for device recognized purposes.
 	dataWrite[0] = (device.fan << 7);
 	dataWrite[1] = device.hour[0];
