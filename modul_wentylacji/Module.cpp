@@ -60,7 +60,7 @@ void module() {
 	device.normalON = normalMode();
 	device.fan = device.normalON | device.humidityAlert;
 
-	setUDPdata();
+//FIXME	setUDPdata();
 	outputs();
 	statusUpdate();
 }
@@ -261,8 +261,8 @@ void getMasterDeviceOrder() {
 	}
 	//Send immediately standard UDP frame
 	//FIXME
-	for (int i=0; i<12; i++)
-		Serial.printf("\nHOUR[%i]=%i",i,device.hour[i]);
+//	for (int i=0; i<12; i++)
+//		Serial.printf("\nHOUR[%i]=%i",i,device.hour[i]);
 	setUDPdata();
 	forceStandardUDP();
 }
@@ -276,9 +276,9 @@ void readUDPdata() {
 		getMasterDeviceOrder();
 	resetNewData();
 	//TODO
-	Serial.printf("\nUDP [%i][%i][%i]\t\tDATA",UDPdata.deviceType,UDPdata.deviceNo,UDPdata.frameNo);
-	for (int i=0; i<UDPdata.length;i++)
-		Serial.printf("[%i]",UDPdata.data[i]);
+//	Serial.printf("\nUDP [%i][%i][%i]\t\tDATA",UDPdata.deviceType,UDPdata.deviceNo,UDPdata.frameNo);
+//	for (int i=0; i<UDPdata.length;i++)
+//		Serial.printf("[%i]",UDPdata.data[i]);
 }
 
 void setUDPdata() {

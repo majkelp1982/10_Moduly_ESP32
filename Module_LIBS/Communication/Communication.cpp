@@ -116,26 +116,14 @@ void UDPsendStandardFrame() {
 	if (!WiFi_conectionCheck()) return;
 	forceUDPStandardFrame = false;
 
-	for (int i=0; i<dataWritte.length; i++) {
-		dataWritte.data[i+3] = dataWritte.data[i];
-	}
-
-	// First three bytes are reserved for device recognized purposes.
-	dataWritte.data[0] = getModuleType();
-	dataWritte.data[1] = getModuleNo();
-	dataWritte.data[2] = dataWritte.frameNo;
-
-	//FIXME
-	Serial.printf("\nSENDED ");
-
-	//Send data packet
 	Udp.beginPacket(broadcastIP, LOCAL_PORT);
-	for (int i=0; i<(dataWritte.length+3); i++) {
+	Udp.write(getModuleType());
+	Udp.write(getModuleNo());
+	Udp.write(dataWritte.frameNo);
+	for (int i=0; i<(dataWritte.length); i++)
 		Udp.write(dataWritte.data[i]);
-		//FIXME
-		Serial.printf("[%i]", dataWritte.data[i]);
-	}
 	Udp.endPacket();
+
 	dataWritte.length = 0;
 }
 
@@ -206,7 +194,7 @@ void setUDPdata(int frameNo, byte data[128], int length) {
 
 	//FIXME
 	for (int i=0; i<length; i++)
-		Serial.printf("\nHOUR[%i]=%i",i,dataWritte.data[i]);
+		Serial.printf("\nsetUDPdata[%i]=%i",i,dataWritte.data[i]);
 }
 
 
