@@ -183,7 +183,7 @@ void UDPsendDiagnoseFrame() {
 
 	//Send data packet
 	Udp.beginPacket(broadcastIP, LOCAL_PORT);
-	for (int i=0; i<=7; i++) {
+	for (int i=0; i<7; i++) {
 		Udp.write(dataWritte[i]);
 	}
 	Udp.endPacket();
@@ -198,10 +198,15 @@ void resetNewData() {
 	dataRead.newData = false;
 }
 
-void setUDPdata(int frameNo, byte *data, int length) {
-	dataWritte.data = data;
+void setUDPdata(int frameNo, byte data[128], int length) {
+	for (int i=0; i<length; i++)
+		dataWritte.data[i] = data[i];
 	dataWritte.frameNo = frameNo;
 	dataWritte.length = length;
+
+	//FIXME
+	for (int i=0; i<length; i++)
+		Serial.printf("\nHOUR[%i]=%i",i,dataWritte.data[i]);
 }
 
 

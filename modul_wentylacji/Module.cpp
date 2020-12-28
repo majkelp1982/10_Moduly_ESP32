@@ -58,6 +58,7 @@ void module() {
 	readUDPdata();
 	//Modes
 	device.normalON = normalMode();
+	device.fan = device.normalON | device.humidityAlert;
 
 	setUDPdata();
 	outputs();
@@ -235,7 +236,9 @@ void readSensors() {
 
 void statusUpdate() {
 	String status;
-	status = "MAIN\n";
+	status = "PARAMETRY PRACY\n";
+	status +="Wentylator: "; status += device.fan ? "W£":"WY"; status +="\tNormalON: "; status += device.normalON ? "TAK":"NIE";
+	status +="\tHumidityALERT: "; status += device.humidityAlert ? "TAK":"NIE"; status +="\n";
 	status +="Czerpnia:\t T="; status +=device.sensorsBME280[0].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[0].humidity;
 	status +="[%]\tP="; status +=(int)device.sensorsBME280[0].pressure;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[0].faultyReadings ;status +="\n";
 	status +="Wyrzutnia:\t T="; status +=device.sensorsBME280[1].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[1].humidity;
@@ -248,76 +251,38 @@ void statusUpdate() {
 }
 
 void getMasterDeviceOrder() {
-	if (UDPdata.data[0] == 4) {
-		device.hour[0] = UDPdata.data[1];
-		EEpromWrite(0, UDPdata.data[1]);
-	}
-	if (UDPdata.data[0] == 5) {
-		device.hour[1] = UDPdata.data[1];
-		EEpromWrite(1, UDPdata.data[1]);
-	}
-	if (UDPdata.data[0] == 6) {
-		device.hour[2] = UDPdata.data[1];
-		EEpromWrite(2, UDPdata.data[1]);
-	}
-	if (UDPdata.data[0] == 7) {
-		device.hour[3] = UDPdata.data[1];
-		EEpromWrite(3, UDPdata.data[1]);
-	}
-	if (UDPdata.data[0] == 8) {
-		device.hour[4] = UDPdata.data[1];
-		EEpromWrite(4, UDPdata.data[1]);
-	}
-	if (UDPdata.data[0] == 9) {
-		device.hour[5] = UDPdata.data[1];
-		EEpromWrite(5, UDPdata.data[1]);
-	}
-	if (UDPdata.data[0] == 10) {
-		device.hour[6] = UDPdata.data[1];
-		EEpromWrite(6, UDPdata.data[1]);
-	}
-	if (UDPdata.data[0] == 11) {
-		device.hour[7] = UDPdata.data[1];
-		EEpromWrite(7, UDPdata.data[1]);
-	}
-	if (UDPdata.data[0] == 12) {
-		device.hour[8] = UDPdata.data[1];
-		EEpromWrite(8, UDPdata.data[1]);
-	}
-	if (UDPdata.data[0] == 13) {
-		device.hour[9] = UDPdata.data[1];
-		EEpromWrite(9, UDPdata.data[1]);
-	}
-	if (UDPdata.data[0] == 14) {
-		device.hour[10] = UDPdata.data[1];
-		EEpromWrite(10, UDPdata.data[1]);
-	}
-	if (UDPdata.data[0] == 15) {
-		device.hour[11] = UDPdata.data[1];
-		EEpromWrite(11, UDPdata.data[1]);
+	//FIXME
+	Serial.printf("\n\n\nJESTEM 0=%i, 1=%i",UDPdata.data[0],UDPdata.data[1]);
+	if ((UDPdata.data[0] >= 4)
+			&& (UDPdata.data[0] <=15)) {
+		int hour = UDPdata.data[0]-4;
+		device.hour[hour] = UDPdata.data[1];
+		EEpromWrite(hour, UDPdata.data[1]);
 	}
 	//Send immediately standard UDP frame
+	//FIXME
+	for (int i=0; i<12; i++)
+		Serial.printf("\nHOUR[%i]=%i",i,device.hour[i]);
+	setUDPdata();
 	forceStandardUDP();
 }
 
 void readUDPdata() {
 	UDPdata = getDataRead();
 	if (!UDPdata.newData) return;
-	resetNewData();
-
 	if ((UDPdata.deviceType == 1)
 			&& (UDPdata.deviceNo == getModuleType())
 			&& (UDPdata.frameNo == getModuleNo()))
 		getMasterDeviceOrder();
-
+	resetNewData();
 	//TODO
-//	Serial.printf("\nUDP [%i][%i][%i]\t\tDATA",UDPdata.deviceType,UDPdata.deviceNo,UDPdata.frameNo);
-//	for (int i=0; i<UDPdata.length;i++)
-//		Serial.printf("[%i]",UDPdata.data[i]);
+	Serial.printf("\nUDP [%i][%i][%i]\t\tDATA",UDPdata.deviceType,UDPdata.deviceNo,UDPdata.frameNo);
+	for (int i=0; i<UDPdata.length;i++)
+		Serial.printf("[%i]",UDPdata.data[i]);
 }
 
 void setUDPdata() {
-	byte dataWrite[13];
+	byte dataWrite[128];
 
 	// First three bytes are reserved for device recognized purposes.
 	dataWrite[0] = (device.fan << 7);

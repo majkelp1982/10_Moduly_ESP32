@@ -6,7 +6,7 @@
 #include "Module.h"
 
 #define FIRMWARE_VERSION	2020122717
-#define MODULE_TYPE			13
+#define MODULE_TYPE			3
 #define MODULE_NO			0
 #define SERIAL_BAUD			921600
 

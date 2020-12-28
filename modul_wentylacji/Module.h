@@ -29,6 +29,7 @@ struct Device {
 	SensorBME280 sensorsBME280[4];
 	bool fan = false;
 	boolean normalON = false;
+	boolean humidityAlert = false;
 	int hour[12];
 };
 
