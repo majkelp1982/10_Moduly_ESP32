@@ -5,6 +5,7 @@ EEPROMClass eeprom;
 
 Device device;
 DataRead UDPdata;
+Servo servo;
 
 //Functions
 void outputs();
@@ -13,6 +14,7 @@ void statusUpdate();
 void readUDPdata();
 boolean normalMode();
 void setUDPdata();
+void bypassSetting();
 
 //Variables
 Adafruit_BME280 bme1(CS_BME280_CZERPNIA, SPI_MOSI, SPI_MISO, SPI_SCK);
@@ -51,18 +53,27 @@ void module_init() {
 
 	//EEprom Scan
 	EEpromScan();
+
+	//Servo init
+	servo.attach(PIN_SERVO);
 }
 
 void module() {
 	readSensors();
 	readUDPdata();
 	//Modes
+	bypassSetting();
 	device.normalON = normalMode();
 	device.fan = device.normalON | device.humidityAlert;
 
 	setUDPdata();
 	outputs();
 	statusUpdate();
+}
+
+void bypassSetting() {
+	//TODO
+	device.bypassOpen = device.normalON;
 }
 
 boolean normalMode() {
@@ -216,6 +227,8 @@ boolean normalMode() {
 }
 
 void outputs() {
+	if (device.bypassOpen) servo.write(0);
+	else servo.write(90);
 }
 
 void readSensors() {

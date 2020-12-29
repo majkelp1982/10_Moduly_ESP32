@@ -2,6 +2,7 @@
 #include <Basic.h>
 #include <Status.h>
 #include "Adafruit_BME280.h"
+#include <Servo.h>
 
 #pragma once
 
@@ -11,6 +12,9 @@
 #define CS_BME280_WYRZUTNIA 				14
 #define CS_BME280_NAWIEW	 				27
 #define CS_BME280_WYWIEW	 				26
+
+//Servo
+#define PIN_SERVO							25
 
 //SPI
 #define SPI_SCK 							18
@@ -30,6 +34,7 @@ struct Device {
 	bool fan = false;
 	boolean normalON = false;
 	boolean humidityAlert = false;
+	boolean bypassOpen = false;
 	int hour[12];
 };
 
