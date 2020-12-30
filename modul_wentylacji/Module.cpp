@@ -15,6 +15,7 @@ void readUDPdata();
 boolean normalMode();
 void setUDPdata();
 void bypassSetting();
+void fan();
 
 //Variables
 Adafruit_BME280 bme1(CS_BME280_CZERPNIA, SPI_MOSI, SPI_MISO, SPI_SCK);
@@ -22,8 +23,15 @@ Adafruit_BME280 bme2(CS_BME280_WYRZUTNIA, SPI_MOSI, SPI_MISO, SPI_SCK);
 Adafruit_BME280 bme3(CS_BME280_NAWIEW, SPI_MOSI, SPI_MISO, SPI_SCK);
 Adafruit_BME280 bme4(CS_BME280_WYWIEW, SPI_MOSI, SPI_MISO, SPI_SCK);
 
+//Fans
+int fanRev1 = 0;
+boolean release1  = true;
+int fanRev2 = 0;
+boolean release2  = true;
+
 //Delays
 unsigned long readSensorMillis = 0;
+unsigned long lastRevsRead = 0;
 
 void EEpromScan() {
 	// Bajty EEPROM //
@@ -54,8 +62,16 @@ void module_init() {
 	//EEprom Scan
 	EEpromScan();
 
-	//Servo init
-	servo.attach(PIN_SERVO);
+	//Bypass initialization
+	servo.attach(PIN_BYPASS);
+
+	//Fan initialization
+	ledcSetup(PWM_CHANNEL, PWM_FREQUENCY, PWM_RESOUTION);
+	ledcAttachPin(PIN_FAN_PWM, PWM_CHANNEL);
+	pinMode(PIN_FAN1_REVS, INPUT_PULLUP);
+	digitalWrite(PIN_FAN1_REVS, HIGH);
+	pinMode(PIN_FAN2_REVS, INPUT_PULLUP);
+	digitalWrite(PIN_FAN2_REVS, HIGH);
 }
 
 void module() {
@@ -64,7 +80,11 @@ void module() {
 	//Modes
 	bypassSetting();
 	device.normalON = normalMode();
-	device.fan = device.normalON | device.humidityAlert;
+	if (device.normalON || device.humidityAlert)
+		device.fanSpeed = 100;
+	else device.fanSpeed = 0;
+
+	fan();
 
 	setUDPdata();
 	outputs();
@@ -73,7 +93,7 @@ void module() {
 
 void bypassSetting() {
 	//TODO
-	device.bypassOpen = device.normalON;
+	device.bypassOpen = false;
 }
 
 boolean normalMode() {
@@ -226,11 +246,6 @@ boolean normalMode() {
 	return normalOn;
 }
 
-void outputs() {
-	if (device.bypassOpen) servo.write(0);
-	else servo.write(90);
-}
-
 void readSensors() {
 	if (sleep(&readSensorMillis, 5)) return;
 	for (int i=0; i<4; i++) {
@@ -250,8 +265,8 @@ void readSensors() {
 void statusUpdate() {
 	String status;
 	status = "PARAMETRY PRACY\n";
-	status +="Wentylator: "; status += device.fan ? "TAK":"NIE"; status +="\tNormalON: "; status += device.normalON ? "TAK":"NIE";
-	status +="\tHumidityALERT: "; status += device.humidityAlert ? "TAK":"NIE"; status +="\n";
+	status +="Wentylatory: "; status += device.fanSpeed; status +="[%]\tObr1: "; status += device.fan1revs; status +="[min-1]\tObr2: "; status += device.fan2revs; status +="[min-1]\n";
+	status +="NormalON: "; status += device.normalON ? "TAK":"NIE"; status +="\tHumidityALERT: "; status += device.humidityAlert ? "TAK":"NIE"; status +="\n";
 	status +="Czerpnia:\t T="; status +=device.sensorsBME280[0].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[0].humidity;
 	status +="[%]\tP="; status +=(int)device.sensorsBME280[0].pressure;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[0].faultyReadings ;status +="\n";
 	status +="Wyrzutnia:\t T="; status +=device.sensorsBME280[1].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[1].humidity;
@@ -285,9 +300,9 @@ void readUDPdata() {
 }
 
 void setUDPdata() {
-	byte dataWrite[13];
+	byte dataWrite[16];
 	// First three bytes are reserved for device recognized purposes.
-	dataWrite[0] = (device.fan << 7);
+	dataWrite[0] = 0;	// TO USE //TODO
 	dataWrite[1] = device.hour[0];
 	dataWrite[2] = device.hour[1];
 	dataWrite[3] = device.hour[2];
@@ -300,9 +315,50 @@ void setUDPdata() {
 	dataWrite[10] = device.hour[9];
 	dataWrite[11] = device.hour[10];
 	dataWrite[12] = device.hour[11];
+	dataWrite[13] = device.fanSpeed;
+	dataWrite[14] = (int)(device.fan1revs/100);
+	dataWrite[15] = (int)(device.fan2revs/100);
 
-	setUDPdata(0, dataWrite,13);
+	setUDPdata(0, dataWrite,16);
 }
+
+void fan() {
+	// parsing 0-100% into 0-255
+	int dutyCycle = (int)((device.fanSpeed/100)*255);
+	ledcWrite(PWM_CHANNEL, dutyCycle);
+
+	//revolution counting
+	if ((digitalRead(PIN_FAN1_REVS) == LOW) && (release1)) {
+		release1 = false;
+		fanRev1++;
+	}
+	if (digitalRead(PIN_FAN1_REVS) == HIGH)
+		release1 = true;
+
+	if ((digitalRead(PIN_FAN2_REVS) == LOW) && (release2)) {
+		release2 = false;
+		fanRev2++;
+	}
+	if (digitalRead(PIN_FAN2_REVS) == HIGH)
+		release2 = true;
+
+	unsigned long currentMillis = millis();
+	if ((currentMillis-lastRevsRead)>=10000) {
+		lastRevsRead = currentMillis;
+		device.fan1revs = (int)(fanRev1*6);
+		device.fan2revs = (int)(fanRev2*6);
+		fanRev1 = 0;
+		fanRev2 = 0;
+		//Fan MAX revs 716
+		//Fan MIN revs 0
+	}
+}
+
+void outputs() {
+	if (device.bypassOpen) servo.write(0);
+	else servo.write(90);
+}
+
 
 
 
