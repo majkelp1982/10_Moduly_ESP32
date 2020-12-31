@@ -1,21 +1,22 @@
 #include "Module.h"
-#include <EEPROM.h>
-
-EEPROMClass eeprom;
 
 Device device;
 DataRead UDPdata;
 Servo servo;
 
 //Functions
-void outputs();
+void firstScan();
 void readSensors();
-void statusUpdate();
 void readUDPdata();
-boolean normalMode();
-void setUDPdata();
+void getMasterDeviceOrder();
+
 void bypassSetting();
+void normalMode();
 void fan();
+
+void outputs();
+void setUDPdata();
+void statusUpdate();
 
 //Variables
 Adafruit_BME280 bme1(CS_BME280_CZERPNIA, SPI_MOSI, SPI_MISO, SPI_SCK);
@@ -33,22 +34,6 @@ boolean release2  = true;
 unsigned long readSensorMillis = 0;
 unsigned long lastRevsRead = 0;
 
-void EEpromScan() {
-	// Bajty EEPROM //
-	// 0 - 11 		: 	device.hour[0] .. device.hour[11]
-	eeprom.begin(1024);						// EEPROM begin
-	delay(100);
-	Serial.print("Getting data from EEprom");
-	for (int i=0; i<12; i++)
-		device.hour[i] = eeprom.read(i);
-}
-
-void EEpromWrite(int pos, int value) {
-	eeprom.begin(1024);										// EEPROM begin
-	eeprom.write(pos,value);
-	eeprom.commit();
-}
-
 void module_init() {
 	//Set CS pins
 	device.sensorsBME280[0].interface= bme1;
@@ -60,7 +45,7 @@ void module_init() {
 		device.sensorsBME280[i].interface.begin();
 
 	//EEprom Scan
-	EEpromScan();
+	firstScan();
 
 	//Bypass initialization
 	servo.attach(PIN_BYPASS);
@@ -75,20 +60,66 @@ void module_init() {
 }
 
 void module() {
+	//Input data
 	readSensors();
 	readUDPdata();
-	//Modes
-	bypassSetting();
-	device.normalON = normalMode();
-	if (device.normalON || device.humidityAlert)
-		device.fanSpeed = 100;
-	else device.fanSpeed = 0;
 
+	//Module events
+	bypassSetting();
+	normalMode();
 	fan();
 
-	setUDPdata();
+	//Output settings
 	outputs();
+	setUDPdata();
 	statusUpdate();
+}
+
+void firstScan() {
+	// Bytes coding EEPROM //
+	// 0 - 11 		: 	device.hour[0] .. device.hour[11]
+
+	//Get data from EEprom
+	uint8_t *EEpromData = EEpromScan();
+	for (int i=0; i<12; i++)
+		device.hour[i] = (int)EEpromData[i];
+}
+
+void readSensors() {
+	if (sleep(&readSensorMillis, 5)) return;
+	for (int i=0; i<4; i++) {
+		device.sensorsBME280[i].temperature = device.sensorsBME280[i].interface.readTemperature();
+		device.sensorsBME280[i].pressure = (int)(device.sensorsBME280[i].interface.readPressure()/100);
+		device.sensorsBME280[i].humidity = (int)device.sensorsBME280[i].interface.readHumidity();
+		if (device.sensorsBME280[i].temperature>35
+				|| device.sensorsBME280[i].temperature<10
+				|| device.sensorsBME280[i].pressure>1050
+				|| device.sensorsBME280[i].pressure<800
+				|| device.sensorsBME280[i].humidity>100
+				|| device.sensorsBME280[i].humidity<15)
+			device.sensorsBME280[i].faultyReadings++;
+	}
+}
+
+void readUDPdata() {
+	UDPdata = getDataRead();
+	if (!UDPdata.newData) return;
+	if ((UDPdata.deviceType == 1)
+			&& (UDPdata.deviceNo == getModuleType())
+			&& (UDPdata.frameNo == getModuleNo()))
+		getMasterDeviceOrder();
+	resetNewData();
+}
+
+void getMasterDeviceOrder() {
+	if ((UDPdata.data[0] >= 4)
+			&& (UDPdata.data[0] <=15)) {
+		int hour = UDPdata.data[0]-4;
+		device.hour[hour] = UDPdata.data[1];
+		EEpromWrite(hour, UDPdata.data[1]);
+	}
+	setUDPdata();
+	forceStandardUDP();
 }
 
 void bypassSetting() {
@@ -96,7 +127,7 @@ void bypassSetting() {
 	device.bypassOpen = false;
 }
 
-boolean normalMode() {
+void normalMode() {
 	bool normalOn = false;
 	DateTime dateTime = getDateTime();
 	if (dateTime.hour == 0) {
@@ -243,60 +274,50 @@ boolean normalMode() {
 		if ((dateTime.minute>=30) && (dateTime.minute<45) && (UDPbitStatus(device.hour[11],1))) normalOn = true;
 		if ((dateTime.minute>=45) && (dateTime.minute<60) && (UDPbitStatus(device.hour[11],0))) normalOn = true;
 	}
-	return normalOn;
+	device.normalON = normalOn;
 }
 
-void readSensors() {
-	if (sleep(&readSensorMillis, 5)) return;
-	for (int i=0; i<4; i++) {
-		device.sensorsBME280[i].temperature = device.sensorsBME280[i].interface.readTemperature();
-		device.sensorsBME280[i].pressure = (int)(device.sensorsBME280[i].interface.readPressure()/100);
-		device.sensorsBME280[i].humidity = (int)device.sensorsBME280[i].interface.readHumidity();
-		if (device.sensorsBME280[i].temperature>35
-				|| device.sensorsBME280[i].temperature<10
-				|| device.sensorsBME280[i].pressure>1050
-				|| device.sensorsBME280[i].pressure<800
-				|| device.sensorsBME280[i].humidity>100
-				|| device.sensorsBME280[i].humidity<15)
-			device.sensorsBME280[i].faultyReadings++;
+void fan() {
+	//revolution counting
+	if ((digitalRead(PIN_FAN1_REVS) == LOW) && (release1)) {
+		release1 = false;
+		fanRev1++;
 	}
-}
+	if (digitalRead(PIN_FAN1_REVS) == HIGH)
+		release1 = true;
 
-void statusUpdate() {
-	String status;
-	status = "PARAMETRY PRACY\n";
-	status +="Wentylatory: "; status += device.fanSpeed; status +="[%]\tObr1: "; status += device.fan1revs; status +="[min-1]\tObr2: "; status += device.fan2revs; status +="[min-1]\n";
-	status +="NormalON: "; status += device.normalON ? "TAK":"NIE"; status +="\tHumidityALERT: "; status += device.humidityAlert ? "TAK":"NIE"; status +="\n";
-	status +="Czerpnia:\t T="; status +=device.sensorsBME280[0].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[0].humidity;
-	status +="[%]\tP="; status +=(int)device.sensorsBME280[0].pressure;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[0].faultyReadings ;status +="\n";
-	status +="Wyrzutnia:\t T="; status +=device.sensorsBME280[1].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[1].humidity;
-	status +="[%]\tP="; status +=(int)device.sensorsBME280[1].pressure;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[1].faultyReadings ;status +="\n";
-	status +="Nawiew:\t\t T="; status +=device.sensorsBME280[2].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[2].humidity;
-	status +="[%]\tP="; status +=(int)device.sensorsBME280[2].pressure;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[2].faultyReadings ;status +="\n";
-	status +="Wywiew:\t\t T="; status +=device.sensorsBME280[3].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[3].humidity;
-	status +="[%]\tP="; status +=(int)device.sensorsBME280[3].pressure;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[3].faultyReadings ;status +="\n";
-	setStatus(status);
-}
-
-void getMasterDeviceOrder() {
-	if ((UDPdata.data[0] >= 4)
-			&& (UDPdata.data[0] <=15)) {
-		int hour = UDPdata.data[0]-4;
-		device.hour[hour] = UDPdata.data[1];
-		EEpromWrite(hour, UDPdata.data[1]);
+	if ((digitalRead(PIN_FAN2_REVS) == LOW) && (release2)) {
+		release2 = false;
+		fanRev2++;
 	}
-	setUDPdata();
-	forceStandardUDP();
+	if (digitalRead(PIN_FAN2_REVS) == HIGH)
+		release2 = true;
+
+	unsigned long currentMillis = millis();
+	if ((currentMillis-lastRevsRead)>=10000) {
+		lastRevsRead = currentMillis;
+		device.fan1revs = (int)(fanRev1*6);
+		device.fan2revs = (int)(fanRev2*6);
+		fanRev1 = 0;
+		fanRev2 = 0;
+		//Fan MAX revs 3716
+		//Fan MIN revs 0
+	}
+
+	if (device.normalON || device.humidityAlert)
+		device.fanSpeed = 80;
+	else device.fanSpeed = 0;
 }
 
-void readUDPdata() {
-	UDPdata = getDataRead();
-	if (!UDPdata.newData) return;
-	if ((UDPdata.deviceType == 1)
-			&& (UDPdata.deviceNo == getModuleType())
-			&& (UDPdata.frameNo == getModuleNo()))
-		getMasterDeviceOrder();
-	resetNewData();
+void outputs() {
+	//Bypass
+	if (device.bypassOpen) servo.write(0);
+	else servo.write(90);
+
+	//Fans
+	// parsing 0-100% into 0-255
+	int dutyCycle = (int)((device.fanSpeed/100)*255);
+	ledcWrite(PWM_CHANNEL, dutyCycle);
 }
 
 void setUDPdata() {
@@ -322,41 +343,20 @@ void setUDPdata() {
 	setUDPdata(0, dataWrite,16);
 }
 
-void fan() {
-	// parsing 0-100% into 0-255
-	int dutyCycle = (int)((device.fanSpeed/100)*255);
-	ledcWrite(PWM_CHANNEL, dutyCycle);
-
-	//revolution counting
-	if ((digitalRead(PIN_FAN1_REVS) == LOW) && (release1)) {
-		release1 = false;
-		fanRev1++;
-	}
-	if (digitalRead(PIN_FAN1_REVS) == HIGH)
-		release1 = true;
-
-	if ((digitalRead(PIN_FAN2_REVS) == LOW) && (release2)) {
-		release2 = false;
-		fanRev2++;
-	}
-	if (digitalRead(PIN_FAN2_REVS) == HIGH)
-		release2 = true;
-
-	unsigned long currentMillis = millis();
-	if ((currentMillis-lastRevsRead)>=10000) {
-		lastRevsRead = currentMillis;
-		device.fan1revs = (int)(fanRev1*6);
-		device.fan2revs = (int)(fanRev2*6);
-		fanRev1 = 0;
-		fanRev2 = 0;
-		//Fan MAX revs 716
-		//Fan MIN revs 0
-	}
-}
-
-void outputs() {
-	if (device.bypassOpen) servo.write(0);
-	else servo.write(90);
+void statusUpdate() {
+	String status;
+	status = "PARAMETRY PRACY\n";
+	status +="Wentylatory: "; status += device.fanSpeed; status +="[%]\tObr1: "; status += device.fan1revs; status +="[min-1]\tObr2: "; status += device.fan2revs; status +="[min-1]\n";
+	status +="NormalON: "; status += device.normalON ? "TAK":"NIE"; status +="\tHumidityALERT: "; status += device.humidityAlert ? "TAK":"NIE"; status +="\n";
+	status +="Czerpnia:\t T="; status +=device.sensorsBME280[0].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[0].humidity;
+	status +="[%]\tP="; status +=(int)device.sensorsBME280[0].pressure;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[0].faultyReadings ;status +="\n";
+	status +="Wyrzutnia:\t T="; status +=device.sensorsBME280[1].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[1].humidity;
+	status +="[%]\tP="; status +=(int)device.sensorsBME280[1].pressure;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[1].faultyReadings ;status +="\n";
+	status +="Nawiew:\t\t T="; status +=device.sensorsBME280[2].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[2].humidity;
+	status +="[%]\tP="; status +=(int)device.sensorsBME280[2].pressure;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[2].faultyReadings ;status +="\n";
+	status +="Wywiew:\t\t T="; status +=device.sensorsBME280[3].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[3].humidity;
+	status +="[%]\tP="; status +=(int)device.sensorsBME280[3].pressure;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[3].faultyReadings ;status +="\n";
+	setStatus(status);
 }
 
 

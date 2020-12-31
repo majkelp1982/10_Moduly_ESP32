@@ -14,6 +14,7 @@
 #include <WiFi.h>
 #include <WiFiUdp.h>
 #include <Status.h>
+#include <EEPROM.h>
 
 struct DataRead {
 	boolean newData=false;
@@ -43,5 +44,7 @@ DataRead getDataRead();
 void resetNewData();
 void forceStandardUDP();
 void setUDPdata(int frameNo, byte *data, int length);
+uint8_t* EEpromScan();
+void EEpromWrite(int pos, int value);
 
 #endif /* COMMUNICATION_H_ */
