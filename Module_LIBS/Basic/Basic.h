@@ -2,6 +2,8 @@
 #define BASIC_H_
 #include "Arduino.h"
 
+#define FIRMWARE_VERSION	2020122717
+
 struct Diagnose {
 	byte ip[4];
 	byte wifiConnectionInterrupt = 0;
@@ -21,7 +23,7 @@ struct DateTime {
 class Basic {
 public:
 	Basic();
-	Basic(unsigned long version, int moduleType, int moduleNo, int serialBaud);
+	Basic(int moduleType, int moduleNo, int serialBaud);
 	~Basic(void);
 	void run();
 private:
@@ -33,7 +35,6 @@ private:
 };
 
 bool sleep(unsigned long *lastMillis, int seconds);
-String getFirmwareVersion();
 int getModuleType();
 int getModuleNo();
 DateTime getDateTime();

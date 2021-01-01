@@ -13,12 +13,10 @@ String serverIndex;		// Server Index Page
 const char* host;
 WebServer server(80);
 unsigned long handleClientMillis;
-unsigned long ver = 0;
 
 void stringInit();
 
-OTA::OTA(unsigned long version) {
-	ver = version;
+OTA::OTA(boolean start) {
 }
 
 OTA::~OTA() {
@@ -32,8 +30,7 @@ void OTA::init() {
 	"<form name=loginForm>"
 	"<h1>ESP32 Login</h1>"
 	"<i>Actual ver. ";
-
-	loginIndex.concat(ver);
+	loginIndex.concat(FIRMWARE_VERSION);
 	String log =
 	"</i>"
 	"<input name=userid placeholder='User ID'> "

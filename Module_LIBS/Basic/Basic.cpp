@@ -1,13 +1,11 @@
 #include "Basic.h"
 
-unsigned long _version = 0;
 int _moduleType = 0;
 int _moduleNo = 0;
 Diagnose diagnose;
 DateTime dateTime;
 
-Basic::Basic(unsigned long version, int moduleType, int moduleNo, int serialBaud) {
-	_version = version;
+Basic::Basic(int moduleType, int moduleNo, int serialBaud) {
 	_moduleType = moduleType;
 	_moduleNo = moduleNo;
 	serialSetup(serialBaud);
@@ -24,7 +22,7 @@ void Basic::serialSetup(int baud) {
 	//Serial init
     Serial.begin(baud);									//Serial port for debug only. No needed. Disable to spare memory afterwards.
     String text = "Start\nVersion ";
-    text +=_version;
+    text += FIRMWARE_VERSION;
     Serial.println(text);
 }
 
@@ -60,10 +58,6 @@ void Basic::dateTimeCalculation() {
 bool UDPbitStatus(byte data, int bytePos) {
 	if (((data >> bytePos) & 1) == 1) return true;
 	else return false;
-}
-
-String getFirmwareVersion() {
-	return ""+_version;
 }
 
 int getModuleType() {

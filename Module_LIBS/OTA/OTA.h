@@ -18,7 +18,7 @@
 
 class OTA {
 public:
-	OTA(unsigned long version);
+	OTA(boolean start);
 	~OTA();
 	void init();
 	void client();
