@@ -44,7 +44,7 @@ DataRead getDataRead();
 void resetNewData();
 void forceStandardUDP();
 void setUDPdata(int frameNo, byte *data, int length);
-uint8_t* EEpromScan();
+void EEpromScan(byte EEpromData[], int size);
 void EEpromWrite(int pos, int value);
 
 #endif /* COMMUNICATION_H_ */

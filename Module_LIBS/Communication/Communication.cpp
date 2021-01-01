@@ -16,9 +16,6 @@
 #define DELAY_BETWEEN_UDP_STANDARD			10		// delay between UDP send [s]
 #define DELAY_BETWEEN_UDP_DIAGNOSE			30		// delay between UDP send [s]
 
-//EEPROM
-#define EEPROM_LENGTH						255		// number of bytes store in EEProm
-
 //Fuctions
 bool WiFi_conectionCheck();
 void UDPsendStandardFrame();
@@ -34,6 +31,7 @@ bool flagConnectionWasIntrrupt = true;
 DataRead dataRead;
 DataWritte dataWritte;
 boolean forceUDPStandardFrame = false;
+int eepromSize = 0;
 
 EEPROMClass eeprom;
 
@@ -195,21 +193,20 @@ void setUDPdata(int frameNo, byte *data, int length) {
 	dataWritte.length = length;
 }
 
-uint8_t* EEpromScan() {
-	uint8_t read[EEPROM_LENGTH];
-	for (int i=0; i<EEPROM_LENGTH; i++)
-		read[i] = 0;
-
-	eeprom.begin(EEPROM_LENGTH);						// EEPROM begin
+void EEpromScan(byte EEpromData[], int size) {
+	eepromSize = size;
+	eeprom.begin(eepromSize);						// EEPROM begin
 	delay(100);
 	Serial.print("Getting data from EEprom");
-	for (int i=0; i<EEPROM_LENGTH; i++)
-		read[i] = eeprom.read(i);
-	return read;
+	for (int i=0; i<eepromSize; i++) {
+		byte data = eeprom.read(i);
+		EEpromData[i] = data;
+		Serial.printf("\nByte[%i]=%i",i,data);
+	}
 }
 
 void EEpromWrite(int pos, int value) {
-	eeprom.begin(EEPROM_LENGTH);						// EEPROM begin
+	eeprom.begin(eepromSize);						// EEPROM begin
 	eeprom.write(pos,value);
 	eeprom.commit();
 }

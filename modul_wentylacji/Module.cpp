@@ -10,8 +10,9 @@ void readSensors();
 void readUDPdata();
 void getMasterDeviceOrder();
 
-void bypassSetting();
 void normalMode();
+void humidityAllert();
+void defrost();
 void fan();
 
 void outputs();
@@ -65,8 +66,9 @@ void module() {
 	readUDPdata();
 
 	//Module events
-	bypassSetting();
 	normalMode();
+	humidityAllert();
+	defrost();
 	fan();
 
 	//Output settings
@@ -80,9 +82,15 @@ void firstScan() {
 	// 0 - 11 		: 	device.hour[0] .. device.hour[11]
 
 	//Get data from EEprom
-	uint8_t *EEpromData = EEpromScan();
-	for (int i=0; i<12; i++)
-		device.hour[i] = (int)EEpromData[i];
+	int size = 12;
+	byte EEpromData[size];
+	EEpromScan(EEpromData, size);
+	Serial.println("\nFirst scan");
+	for (int i=0; i<size; i++) {
+		byte data = EEpromData[i];
+		Serial.printf("\nByte[%i]=%i",i,data);
+		device.hour[i] = data;
+	}
 }
 
 void readSensors() {
@@ -120,11 +128,6 @@ void getMasterDeviceOrder() {
 	}
 	setUDPdata();
 	forceStandardUDP();
-}
-
-void bypassSetting() {
-	//TODO
-	device.bypassOpen = false;
 }
 
 void normalMode() {
@@ -276,6 +279,22 @@ void normalMode() {
 	}
 	device.normalON = normalOn;
 }
+void humidityAllert() {
+	//TODO
+	device.humidityAlert = false;
+}
+void defrost() {
+	// reset defrosting after process time run out
+	if (device.defrost.req && device.defrost.timeLeft<=0)
+		device.defrost.req = false;
+	// it temperature over 0, no risk to recu frozen
+	if (device.sensorsBME280[ID_CZERPNIA].temperature >0) return;
+
+	//TODO
+	if (device.sensorsBME280[ID_CZERPNIA].pressure-device.sensorsBME280[ID_NAWIEW].pressure>device.defrost.hPaDiff) {
+	}
+
+}
 
 void fan() {
 	//revolution counting
@@ -304,9 +323,13 @@ void fan() {
 		//Fan MIN revs 0
 	}
 
-	if (device.normalON || device.humidityAlert)
+	device.fanSpeed = 0;
+	if (device.normalON)
 		device.fanSpeed = 80;
-	else device.fanSpeed = 0;
+	if (device.humidityAlert)
+		device.fanSpeed = 100;
+	if (device.defrost.req)
+		device.fanSpeed = 50;
 }
 
 void outputs() {
@@ -317,11 +340,14 @@ void outputs() {
 	//Fans
 	// parsing 0-100% into 0-255
 	int dutyCycle = (int)((device.fanSpeed/100)*255);
+	if (dutyCycle<0) dutyCycle = 0;
+	if (dutyCycle>255) dutyCycle = 255;
 	ledcWrite(PWM_CHANNEL, dutyCycle);
 }
 
 void setUDPdata() {
-	byte dataWrite[16];
+	int size = 16;
+	byte dataWrite[size];
 	// First three bytes are reserved for device recognized purposes.
 	dataWrite[0] = 0;	// TO USE //TODO
 	dataWrite[1] = device.hour[0];
@@ -340,7 +366,7 @@ void setUDPdata() {
 	dataWrite[14] = (int)(device.fan1revs/100);
 	dataWrite[15] = (int)(device.fan2revs/100);
 
-	setUDPdata(0, dataWrite,16);
+	setUDPdata(0, dataWrite,size);
 }
 
 void statusUpdate() {
@@ -348,6 +374,7 @@ void statusUpdate() {
 	status = "PARAMETRY PRACY\n";
 	status +="Wentylatory: "; status += device.fanSpeed; status +="[%]\tObr1: "; status += device.fan1revs; status +="[min-1]\tObr2: "; status += device.fan2revs; status +="[min-1]\n";
 	status +="NormalON: "; status += device.normalON ? "TAK":"NIE"; status +="\tHumidityALERT: "; status += device.humidityAlert ? "TAK":"NIE"; status +="\n";
+	status +="Odmrazanie: "; status += device.defrost.req ? "TAK":"NIE"; status +="\ttime left: "; status += device.defrost.timeLeft; status +="\t[s] pressure diff: "; status += device.defrost.hPaDiff; status +="[hPa]\n";
 	status +="Czerpnia:\t T="; status +=device.sensorsBME280[0].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[0].humidity;
 	status +="[%]\tP="; status +=(int)device.sensorsBME280[0].pressure;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[0].faultyReadings ;status +="\n";
 	status +="Wyrzutnia:\t T="; status +=device.sensorsBME280[1].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[1].humidity;

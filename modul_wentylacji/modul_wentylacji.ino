@@ -19,14 +19,14 @@ void setup()
 	communication.WiFi_init();
 	ota.init();
 	module_init();
-//	status.addLog("Inicjalizacja zakoñczona");
+	status.addLog("Inicjalizacja zakoñczona");
 }
 
 void loop()
 {
-//	basic.run();
-//	communication.run();
-//	ota.client();
-//	status.printStatus(10);
-//	module();
+	basic.run();
+	communication.run();
+	ota.client();
+	status.printStatus(10);
+	module();
 }

@@ -17,6 +17,11 @@
 #define CS_BME280_WYRZUTNIA 				14
 #define CS_BME280_NAWIEW	 				27
 #define CS_BME280_WYWIEW	 				26
+//BME280 IDs according to array declaration
+#define ID_CZERPNIA							0
+#define ID_WYRZUTNIA						1
+#define ID_NAWIEW							2
+#define ID_WYWIEW							3
 
 //BYPASS
 #define PIN_BYPASS							25
@@ -37,11 +42,18 @@ struct SensorBME280 {
 	unsigned int faultyReadings = 0;		// [units]
 };
 
+struct Defrost {
+	boolean req = false;				// req to set defrost mode in case recuperator is frozen
+	int timeLeft = 0;					// time left to finish defrost process
+	int hPaDiff = 300;					// difference between inlet and out pressure to confirm recu stuck becouse of ice
+};
+
 struct Device {
 	SensorBME280 sensorsBME280[4];
-	boolean normalON = false;
-	boolean humidityAlert = false;
-	boolean bypassOpen = false;
+	boolean normalON = false;			// normal mode
+	boolean humidityAlert = false;		// humidity exceeded
+	boolean bypassOpen = false;			// bypass open in case defrost or cooling in summer night
+	Defrost defrost;					// defrost mode structure
 	int fanSpeed = 0;					// 0-100 [%]
 	int fan1revs = 0;					// revs min-1
 	int fan2revs = 0;					// revs min-1
