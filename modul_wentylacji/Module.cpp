@@ -1,6 +1,7 @@
 #include "Module.h"
 
 Device device;
+Zone zones[7];
 DataRead UDPdata;
 Servo servo;
 
@@ -9,10 +10,12 @@ void firstScan();
 void readSensors();
 void readUDPdata();
 void getMasterDeviceOrder();
+void getComfortParams();
 
 void normalMode();
 void humidityAllert();
 void defrost();
+void bypass();
 void fan();
 
 void outputs();
@@ -34,6 +37,7 @@ boolean release2  = true;
 //Delays
 unsigned long readSensorMillis = 0;
 unsigned long lastRevsRead = 0;
+unsigned long defrostEndMillis = 0;
 
 void module_init() {
 	//Set CS pins
@@ -112,10 +116,15 @@ void readSensors() {
 void readUDPdata() {
 	UDPdata = getDataRead();
 	if (!UDPdata.newData) return;
-	if ((UDPdata.deviceType == 1)
+	if ((UDPdata.deviceType == ID_MOD_MAIN)
 			&& (UDPdata.deviceNo == getModuleType())
 			&& (UDPdata.frameNo == getModuleNo()))
 		getMasterDeviceOrder();
+	if ((UDPdata.deviceType == ID_MOD_COMFORT)
+			&& (UDPdata.deviceNo == 0)
+			&& (UDPdata.frameNo == 0))
+		getComfortParams();
+
 	resetNewData();
 }
 
@@ -128,6 +137,36 @@ void getMasterDeviceOrder() {
 	}
 	setUDPdata();
 	forceStandardUDP();
+}
+
+void getComfortParams(){
+	zones[ID_ZONE_SALON].humidity = UDPdata.data[6];
+	zones[ID_ZONE_SALON].isTemp = UDPdata.data[3]+(UDPdata.data[4]/10);
+	zones[ID_ZONE_SALON].reqTemp = UDPdata.data[5]/2;
+
+	zones[ID_ZONE_LAZDOL].humidity = UDPdata.data[10];
+	zones[ID_ZONE_LAZDOL].isTemp = UDPdata.data[7]+(UDPdata.data[8]/10);
+	zones[ID_ZONE_LAZDOL].reqTemp = UDPdata.data[9]/2;
+
+	zones[ID_ZONE_PRALNIA].humidity = UDPdata.data[14];
+	zones[ID_ZONE_PRALNIA].isTemp = UDPdata.data[11]+(UDPdata.data[12]/10);
+	zones[ID_ZONE_PRALNIA].reqTemp = UDPdata.data[13]/2;
+
+	zones[ID_ZONE_RODZICE].humidity = UDPdata.data[18];
+	zones[ID_ZONE_RODZICE].isTemp = UDPdata.data[15]+(UDPdata.data[16]/10);
+	zones[ID_ZONE_RODZICE].reqTemp = UDPdata.data[17]/2;
+
+	zones[ID_ZONE_NATALIA].humidity = UDPdata.data[22];
+	zones[ID_ZONE_NATALIA].isTemp = UDPdata.data[19]+(UDPdata.data[20]/10);
+	zones[ID_ZONE_NATALIA].reqTemp = UDPdata.data[21]/2;
+
+	zones[ID_ZONE_KAROLINA].humidity = UDPdata.data[26];
+	zones[ID_ZONE_KAROLINA].isTemp = UDPdata.data[23]+(UDPdata.data[24]/10);
+	zones[ID_ZONE_KAROLINA].reqTemp = UDPdata.data[25]/2;
+
+	zones[ID_ZONE_LAZGORA].humidity = UDPdata.data[30];
+	zones[ID_ZONE_LAZGORA].isTemp = UDPdata.data[27]+(UDPdata.data[28]/10);
+	zones[ID_ZONE_LAZGORA].reqTemp = UDPdata.data[29]/2;
 }
 
 void normalMode() {
@@ -279,21 +318,33 @@ void normalMode() {
 	}
 	device.normalON = normalOn;
 }
+
 void humidityAllert() {
 	//TODO
 	device.humidityAlert = false;
 }
+
 void defrost() {
+	unsigned long currentMillis = millis();
+	device.defrost.timeLeft = (int)((defrostEndMillis - currentMillis)/60000);
+	if (device.defrost.timeLeft<0) device.defrost.timeLeft = 0;
+
 	// reset defrosting after process time run out
 	if (device.defrost.req && device.defrost.timeLeft<=0)
 		device.defrost.req = false;
-	// it temperature over 0, no risk to recu frozen
+	// if temperature over 0, no risk to recu frozen
 	if (device.sensorsBME280[ID_CZERPNIA].temperature >0) return;
+	// if req already true, no need to check again
+	if (device.defrost.req) return;
 
-	//TODO
 	if (device.sensorsBME280[ID_CZERPNIA].pressure-device.sensorsBME280[ID_NAWIEW].pressure>device.defrost.hPaDiff) {
+		device.defrost.req = true;
+		defrostEndMillis = currentMillis + (10*60000);
 	}
+}
 
+void bypass() {
+	device.bypassOpen = device.defrost.req;
 }
 
 void fan() {
@@ -383,6 +434,9 @@ void statusUpdate() {
 	status +="[%]\tP="; status +=(int)device.sensorsBME280[2].pressure;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[2].faultyReadings ;status +="\n";
 	status +="Wywiew:\t\t T="; status +=device.sensorsBME280[3].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[3].humidity;
 	status +="[%]\tP="; status +=(int)device.sensorsBME280[3].pressure;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[3].faultyReadings ;status +="\n";
+	for (int i=0; i<7; i++) {
+		status +="Zone["; status +=i; status += "]:\t\t T="; status +=zones[i].isTemp; status +="[stC]\treqT="; status+=zones[i].reqTemp; status +="[stC]\tH="; status +=zones[i].humidity; status +="\n";
+	}
 	setStatus(status);
 }
 

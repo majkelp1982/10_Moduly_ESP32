@@ -7,6 +7,18 @@
 #pragma once
 
 //DEFINES
+//MODULES ID
+#define ID_MOD_MAIN							1
+#define ID_MOD_COMFORT						10
+//ZONES ID
+#define ID_ZONE_SALON						0
+#define ID_ZONE_LAZDOL						1
+#define ID_ZONE_PRALNIA						2
+#define ID_ZONE_RODZICE						3
+#define ID_ZONE_NATALIA						4
+#define ID_ZONE_KAROLINA					5
+#define ID_ZONE_LAZGORA						6
+
 //SPI
 #define SPI_SCK 							18
 #define SPI_MISO 							19
@@ -44,8 +56,8 @@ struct SensorBME280 {
 
 struct Defrost {
 	boolean req = false;				// req to set defrost mode in case recuperator is frozen
-	int timeLeft = 0;					// time left to finish defrost process
-	int hPaDiff = 300;					// difference between inlet and out pressure to confirm recu stuck becouse of ice
+	int timeLeft = 0;					// time left to finish defrost process [min]
+	int hPaDiff = 300;					// difference between inlet and out pressure to confirm recu stuck because of ice [hPa]
 };
 
 struct Device {
@@ -58,6 +70,12 @@ struct Device {
 	int fan1revs = 0;					// revs min-1
 	int fan2revs = 0;					// revs min-1
 	int hour[12];
+};
+
+struct Zone {
+	int humidity = 0;
+	float isTemp = 0.0f;
+	float reqTemp = 0.0f;
 };
 
 void module_init();
