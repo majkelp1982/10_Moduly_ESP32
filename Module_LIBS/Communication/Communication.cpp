@@ -201,7 +201,6 @@ void EEpromScan(byte EEpromData[], int size) {
 	for (int i=0; i<eepromSize; i++) {
 		byte data = eeprom.read(i);
 		EEpromData[i] = data;
-		Serial.printf("\nByte[%i]=%i",i,data);
 	}
 }
 

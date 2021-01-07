@@ -75,6 +75,8 @@ String getHTMLStatus() {
 	for (int i=0; i<mainText.length(); i++)
 		if (mainText[i]=='\n')
 				status +="</p><p>";
+		else if (mainText[i]=='\t')
+			status +="&emsp;";
 		else
 			status += mainText[i];
 	status += "</p>";

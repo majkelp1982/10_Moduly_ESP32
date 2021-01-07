@@ -57,7 +57,7 @@ struct SensorBME280 {
 struct Defrost {
 	boolean req = false;				// req to set defrost mode in case recuperator is frozen
 	int timeLeft = 0;					// time left to finish defrost process [min]
-	int hPaDiff = 300;					// difference between inlet and out pressure to confirm recu stuck because of ice [hPa]
+	int hPaDiff = 250;					// difference between inlet and out pressure to confirm recu stuck because of ice [hPa]
 };
 
 struct Device {

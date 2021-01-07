@@ -22,6 +22,10 @@ void outputs();
 void setUDPdata();
 void statusUpdate();
 
+//help functions
+int get10Temp(float temp);
+int get01Temp(float temp);
+
 //Variables
 Adafruit_BME280 bme1(CS_BME280_CZERPNIA, SPI_MOSI, SPI_MISO, SPI_SCK);
 Adafruit_BME280 bme2(CS_BME280_WYRZUTNIA, SPI_MOSI, SPI_MISO, SPI_SCK);
@@ -92,7 +96,6 @@ void firstScan() {
 	Serial.println("\nFirst scan");
 	for (int i=0; i<size; i++) {
 		byte data = EEpromData[i];
-		Serial.printf("\nByte[%i]=%i",i,data);
 		device.hour[i] = data;
 	}
 }
@@ -129,44 +132,49 @@ void readUDPdata() {
 }
 
 void getMasterDeviceOrder() {
-	if ((UDPdata.data[0] >= 4)
-			&& (UDPdata.data[0] <=15)) {
-		int hour = UDPdata.data[0]-4;
+	//bytes 1-12
+	if ((UDPdata.data[0] >= 1)
+			&& (UDPdata.data[0] <=12)) {
+		int hour = UDPdata.data[0]-1;
 		device.hour[hour] = UDPdata.data[1];
 		EEpromWrite(hour, UDPdata.data[1]);
 	}
+	//byte 33
+	if (UDPdata.data[0] == 33)
+		device.defrost.hPaDiff = UDPdata.data[1]*10;
+
 	setUDPdata();
 	forceStandardUDP();
 }
 
 void getComfortParams(){
-	zones[ID_ZONE_SALON].humidity = UDPdata.data[6];
-	zones[ID_ZONE_SALON].isTemp = UDPdata.data[3]+(UDPdata.data[4]/10);
-	zones[ID_ZONE_SALON].reqTemp = UDPdata.data[5]/2;
+	zones[ID_ZONE_SALON].isTemp = UDPdata.data[0]+(UDPdata.data[1]/10.0);
+	zones[ID_ZONE_SALON].reqTemp = UDPdata.data[2]/2;
+	zones[ID_ZONE_SALON].humidity = UDPdata.data[3];
 
-	zones[ID_ZONE_LAZDOL].humidity = UDPdata.data[10];
-	zones[ID_ZONE_LAZDOL].isTemp = UDPdata.data[7]+(UDPdata.data[8]/10);
-	zones[ID_ZONE_LAZDOL].reqTemp = UDPdata.data[9]/2;
+	zones[ID_ZONE_LAZDOL].isTemp = UDPdata.data[4]+(UDPdata.data[5]/10.0);
+	zones[ID_ZONE_LAZDOL].reqTemp = UDPdata.data[6]/2;
+	zones[ID_ZONE_LAZDOL].humidity = UDPdata.data[7];
 
-	zones[ID_ZONE_PRALNIA].humidity = UDPdata.data[14];
-	zones[ID_ZONE_PRALNIA].isTemp = UDPdata.data[11]+(UDPdata.data[12]/10);
-	zones[ID_ZONE_PRALNIA].reqTemp = UDPdata.data[13]/2;
+	zones[ID_ZONE_PRALNIA].isTemp = UDPdata.data[8]+(UDPdata.data[9]/10.0);
+	zones[ID_ZONE_PRALNIA].reqTemp = UDPdata.data[10]/2;
+	zones[ID_ZONE_PRALNIA].humidity = UDPdata.data[11];
 
-	zones[ID_ZONE_RODZICE].humidity = UDPdata.data[18];
-	zones[ID_ZONE_RODZICE].isTemp = UDPdata.data[15]+(UDPdata.data[16]/10);
-	zones[ID_ZONE_RODZICE].reqTemp = UDPdata.data[17]/2;
+	zones[ID_ZONE_RODZICE].isTemp = UDPdata.data[12]+(UDPdata.data[13]/10.0);
+	zones[ID_ZONE_RODZICE].reqTemp = UDPdata.data[14]/2;
+	zones[ID_ZONE_RODZICE].humidity = UDPdata.data[15];
 
-	zones[ID_ZONE_NATALIA].humidity = UDPdata.data[22];
-	zones[ID_ZONE_NATALIA].isTemp = UDPdata.data[19]+(UDPdata.data[20]/10);
-	zones[ID_ZONE_NATALIA].reqTemp = UDPdata.data[21]/2;
+	zones[ID_ZONE_NATALIA].isTemp = UDPdata.data[16]+(UDPdata.data[17]/10.0);
+	zones[ID_ZONE_NATALIA].reqTemp = UDPdata.data[18]/2;
+	zones[ID_ZONE_NATALIA].humidity = UDPdata.data[19];
 
-	zones[ID_ZONE_KAROLINA].humidity = UDPdata.data[26];
-	zones[ID_ZONE_KAROLINA].isTemp = UDPdata.data[23]+(UDPdata.data[24]/10);
-	zones[ID_ZONE_KAROLINA].reqTemp = UDPdata.data[25]/2;
+	zones[ID_ZONE_KAROLINA].isTemp = UDPdata.data[20]+(UDPdata.data[21]/10.0);
+	zones[ID_ZONE_KAROLINA].reqTemp = UDPdata.data[22]/2;
+	zones[ID_ZONE_KAROLINA].humidity = UDPdata.data[23];
 
-	zones[ID_ZONE_LAZGORA].humidity = UDPdata.data[30];
-	zones[ID_ZONE_LAZGORA].isTemp = UDPdata.data[27]+(UDPdata.data[28]/10);
-	zones[ID_ZONE_LAZGORA].reqTemp = UDPdata.data[29]/2;
+	zones[ID_ZONE_LAZGORA].isTemp = UDPdata.data[24]+(UDPdata.data[25]/10.0);
+	zones[ID_ZONE_LAZGORA].reqTemp = UDPdata.data[26]/2;
+	zones[ID_ZONE_LAZGORA].humidity = UDPdata.data[27];
 }
 
 void normalMode() {
@@ -327,7 +335,7 @@ void humidityAllert() {
 void defrost() {
 	unsigned long currentMillis = millis();
 	device.defrost.timeLeft = (int)((defrostEndMillis - currentMillis)/60000);
-	if (device.defrost.timeLeft<0) device.defrost.timeLeft = 0;
+	if ((device.defrost.timeLeft<0) || !device.defrost.req) device.defrost.timeLeft = 0;
 
 	// reset defrosting after process time run out
 	if (device.defrost.req && device.defrost.timeLeft<=0)
@@ -396,11 +404,33 @@ void outputs() {
 	ledcWrite(PWM_CHANNEL, dutyCycle);
 }
 
+//FAKE DATA TO DELETE ONLY FOR COMMUNICATION TEST
+void fakeDATA() {
+	device.fanSpeed =false;
+	device.normalON = true;
+	device.humidityAlert =false;
+	device.bypassOpen = true;
+	device.defrost.req =false;
+	for (int i=0; i<4; i++) {
+		device.sensorsBME280[i].temperature =1+i+i/10;
+		device.sensorsBME280[i].humidity=1+i*11;
+		device.sensorsBME280[i].pressure=900+i*100;
+	}
+	device.fanSpeed = 65;
+	device.fan1revs=2320;
+	device.fan2revs=2530;
+	device.defrost.timeLeft = 17;
+}
+
 void setUDPdata() {
-	int size = 16;
+	//FAKE DATA
+	//TMP
+	fakeDATA();
+
+	int size = 34;
 	byte dataWrite[size];
 	// First three bytes are reserved for device recognized purposes.
-	dataWrite[0] = 0;	// TO USE //TODO
+	dataWrite[0] = (((device.fanSpeed>0)?1:0)<< 7) | (device.normalON << 6) | (device.humidityAlert<< 5) | (device.bypassOpen << 4) | (device.defrost.req << 3);
 	dataWrite[1] = device.hour[0];
 	dataWrite[2] = device.hour[1];
 	dataWrite[3] = device.hour[2];
@@ -413,9 +443,34 @@ void setUDPdata() {
 	dataWrite[10] = device.hour[9];
 	dataWrite[11] = device.hour[10];
 	dataWrite[12] = device.hour[11];
-	dataWrite[13] = device.fanSpeed;
-	dataWrite[14] = (int)(device.fan1revs/100);
-	dataWrite[15] = (int)(device.fan2revs/100);
+	//BMEs
+	dataWrite[13] = get10Temp(device.sensorsBME280[ID_CZERPNIA].temperature);
+	dataWrite[14] = get01Temp(device.sensorsBME280[ID_CZERPNIA].temperature);
+	dataWrite[15] = device.sensorsBME280[ID_CZERPNIA].humidity;
+	dataWrite[16] = (int)(device.sensorsBME280[ID_CZERPNIA].pressure/10);
+
+	dataWrite[17] = get10Temp(device.sensorsBME280[ID_WYRZUTNIA].temperature);
+	dataWrite[18] = get01Temp(device.sensorsBME280[ID_WYRZUTNIA].temperature);
+	dataWrite[19] = device.sensorsBME280[ID_WYRZUTNIA].humidity;
+	dataWrite[20] = (int)(device.sensorsBME280[ID_WYRZUTNIA].pressure/10);
+
+	dataWrite[21] = get10Temp(device.sensorsBME280[ID_NAWIEW].temperature);
+	dataWrite[22] = get01Temp(device.sensorsBME280[ID_NAWIEW].temperature);
+	dataWrite[23] = device.sensorsBME280[ID_NAWIEW].humidity;
+	dataWrite[24] = (int)(device.sensorsBME280[ID_NAWIEW].pressure/10);
+
+	dataWrite[25] = get10Temp(device.sensorsBME280[ID_WYWIEW].temperature);
+	dataWrite[26] = get01Temp(device.sensorsBME280[ID_WYWIEW].temperature);
+	dataWrite[27] = device.sensorsBME280[ID_WYWIEW].humidity;
+	dataWrite[28] = (int)(device.sensorsBME280[ID_WYWIEW].pressure/10);
+
+	dataWrite[29] = device.fanSpeed;
+	dataWrite[30] = (int)(device.fan1revs/100);
+	dataWrite[31] = (int)(device.fan2revs/100);
+
+	dataWrite[32] = device.defrost.timeLeft;
+	int hPaDiff = (int)(device.defrost.hPaDiff/10);
+	dataWrite[33] = (hPaDiff>255? 255 : hPaDiff);
 
 	setUDPdata(0, dataWrite,size);
 }
@@ -438,6 +493,16 @@ void statusUpdate() {
 		status +="Zone["; status +=i; status += "]:\t\t T="; status +=zones[i].isTemp; status +="[stC]\treqT="; status+=zones[i].reqTemp; status +="[stC]\tH="; status +=zones[i].humidity; status +="\n";
 	}
 	setStatus(status);
+}
+
+//Help functions
+int get10Temp(float temp){
+	return (int)temp;
+}
+
+int get01Temp(float temp) {
+	int temp10 = get10Temp(temp);
+	return (int) ((temp*10)-(temp10*10));
 }
 
 
