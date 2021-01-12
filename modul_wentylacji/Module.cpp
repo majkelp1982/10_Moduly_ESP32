@@ -457,7 +457,7 @@ void statusUpdate() {
 	String status;
 	status = "PARAMETRY PRACY\n";
 	status +="Wentylatory: "; status += device.fanSpeed; status +="[%]\tObr1: "; status += device.fan1revs; status +="[min-1]\tObr2: "; status += device.fan2revs; status +="[min-1]\n";
-	status +="NormalON: "; status += device.normalON ? "TAK":"NIE"; status +="\tHumidityALERT: "; status += device.humidityAlert ? "TAK":"NIE"; status +="\n";
+	status +="NormalON: "; status += device.normalON ? "TAK":"NIE"; status +="\tHumidityALERT: "; status += device.humidityAlert ? "TAK":"NIE"; status +="\tbypass otwarty: "; status += device.bypassOpen ? "TAK":"NIE"; status +="\n";
 	status +="Odmrazanie: "; status += device.defrost.req ? "TAK":"NIE"; status +="\ttime left: "; status += device.defrost.timeLeft; status +="\t[s] pressure diff: "; status += device.defrost.hPaDiff; status +="[hPa]\n";
 	status +="Czerpnia:\t T="; status +=device.sensorsBME280[0].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[0].humidity;
 	status +="[%]\tP="; status +=(int)device.sensorsBME280[0].pressure;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[0].faultyReadings ;status +="\n";
