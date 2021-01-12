@@ -20,15 +20,15 @@
 #define ID_ZONE_LAZGORA						6
 
 //SPI
-#define SPI_SCK 							18
-#define SPI_MISO 							19
-#define SPI_MOSI							23
+#define SPI_SCK 							18 // BME280 PIN SCL
+#define SPI_MISO 							19 // BME280 PIN SDO
+#define SPI_MOSI							23 // BME280 PIN
 
 //BME280 CS PINS(SPI)
-#define CS_BME280_CZERPNIA 					13
-#define CS_BME280_WYRZUTNIA 				14
-#define CS_BME280_NAWIEW	 				27
-#define CS_BME280_WYWIEW	 				26
+#define CS_BME280_CZERPNIA 					13 // BME280 PIN CSB
+#define CS_BME280_WYRZUTNIA 				14 // BME280 PIN CSB
+#define CS_BME280_NAWIEW	 				27 // BME280 PIN CSB
+#define CS_BME280_WYWIEW	 				26 // BME280 PIN CSB
 //BME280 IDs according to array declaration
 #define ID_CZERPNIA							0
 #define ID_WYRZUTNIA						1

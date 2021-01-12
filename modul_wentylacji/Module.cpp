@@ -404,29 +404,7 @@ void outputs() {
 	ledcWrite(PWM_CHANNEL, dutyCycle);
 }
 
-//FAKE DATA TO DELETE ONLY FOR COMMUNICATION TEST
-void fakeDATA() {
-	device.fanSpeed =false;
-	device.normalON = true;
-	device.humidityAlert =false;
-	device.bypassOpen = true;
-	device.defrost.req =false;
-	for (int i=0; i<4; i++) {
-		device.sensorsBME280[i].temperature =1+i+i/10;
-		device.sensorsBME280[i].humidity=1+i*11;
-		device.sensorsBME280[i].pressure=900+i*100;
-	}
-	device.fanSpeed = 65;
-	device.fan1revs=2320;
-	device.fan2revs=2530;
-	device.defrost.timeLeft = 17;
-}
-
 void setUDPdata() {
-	//FAKE DATA
-	//TMP
-	fakeDATA();
-
 	int size = 34;
 	byte dataWrite[size];
 	// First three bytes are reserved for device recognized purposes.
