@@ -24,9 +24,11 @@ void setup()
 
 void loop()
 {
-	basic.run();
-	communication.run();
 	ota.client();
-	status.printStatus(10);
-	module();
+	if (!ota.hasStarted()) {
+		basic.run();
+		communication.run();
+		status.printStatus(10);
+		module();
+	}
 }

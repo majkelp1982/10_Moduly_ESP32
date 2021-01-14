@@ -36,15 +36,17 @@
 #define ID_WYWIEW							3
 
 //BYPASS
-#define PIN_BYPASS							25
-
+#define SERVO_FREQUENCY 					50 		// Hz
+#define SERVO_CHANNEL 						2		// this variable is used to select the channel number
+#define SERVO_RESOUTION 					8 		// resolution of the signal
+#define SERVO_PIN							25 		// GPIO to PWM fan input
 //FAN
 #define PWM_FREQUENCY 						1000 	// Hz
-#define PWM_CHANNEL 						0		// this variable is used to select the channel number
+#define PWM_CHANNEL 						1		// this variable is used to select the channel number
 #define PWM_RESOUTION 						8 		// resolution of the signal
 #define PIN_FAN_PWM							33 		// GPIO to PWM fan input
 #define PIN_FAN1_REVS						32		// FAN1 TACHO SIGNAL
-#define PIN_FAN2_REVS						35		// FAN2 TACHO SIGNAL
+#define PIN_FAN2_REVS						12		// FAN2 TACHO SIGNAL
 
 struct SensorBME280 {
 	float temperature = 0.0f;				// [stC]

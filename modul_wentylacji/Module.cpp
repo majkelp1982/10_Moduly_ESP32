@@ -43,6 +43,9 @@ unsigned long readSensorMillis = 0;
 unsigned long lastRevsRead = 0;
 unsigned long defrostEndMillis = 0;
 
+//TMP
+int lastDutyCycle = 0;
+
 void module_init() {
 	//Set CS pins
 	device.sensorsBME280[0].interface= bme1;
@@ -57,7 +60,8 @@ void module_init() {
 	firstScan();
 
 	//Bypass initialization
-	servo.attach(PIN_BYPASS);
+	ledcSetup(SERVO_CHANNEL, SERVO_FREQUENCY, SERVO_RESOUTION);
+	ledcAttachPin(SERVO_PIN, SERVO_CHANNEL);
 
 	//Fan initialization
 	ledcSetup(PWM_CHANNEL, PWM_FREQUENCY, PWM_RESOUTION);
@@ -77,6 +81,7 @@ void module() {
 	normalMode();
 	humidityAllert();
 	defrost();
+	bypass();
 	fan();
 
 	//Output settings
@@ -88,16 +93,17 @@ void module() {
 void firstScan() {
 	// Bytes coding EEPROM //
 	// 0 - 11 		: 	device.hour[0] .. device.hour[11]
-
+	// 12			:	device.defrost.hPaDiff
 	//Get data from EEprom
-	int size = 12;
+	int size = 13;
 	byte EEpromData[size];
 	EEpromScan(EEpromData, size);
 	Serial.println("\nFirst scan");
 	for (int i=0; i<size; i++) {
 		byte data = EEpromData[i];
-		device.hour[i] = data;
+		device.hour[i] = (byte) data;
 	}
+	device.defrost.hPaDiff = EEpromData[12]*10;
 }
 
 void readSensors() {
@@ -140,8 +146,10 @@ void getMasterDeviceOrder() {
 		EEpromWrite(hour, UDPdata.data[1]);
 	}
 	//byte 33
-	if (UDPdata.data[0] == 33)
+	if (UDPdata.data[0] == 33) {
 		device.defrost.hPaDiff = UDPdata.data[1]*10;
+		EEpromWrite(12, UDPdata.data[1]);
+	}
 
 	setUDPdata();
 	forceStandardUDP();
@@ -329,30 +337,38 @@ void normalMode() {
 
 void humidityAllert() {
 	//TODO
-	device.humidityAlert = false;
+	device.humidityAlert = (device.defrost.hPaDiff==490);
 }
 
 void defrost() {
+	boolean defrostForce = (device.defrost.hPaDiff == 50);
 	unsigned long currentMillis = millis();
 	device.defrost.timeLeft = (int)((defrostEndMillis - currentMillis)/60000);
+
+	//force defrost off
+	if (device.defrost.hPaDiff == 500)
+		device.defrost.timeLeft = 0;
 	if ((device.defrost.timeLeft<0) || !device.defrost.req) device.defrost.timeLeft = 0;
 
 	// reset defrosting after process time run out
 	if (device.defrost.req && device.defrost.timeLeft<=0)
 		device.defrost.req = false;
 	// if temperature over 0, no risk to recu frozen
-	if (device.sensorsBME280[ID_CZERPNIA].temperature >0) return;
+	if ((device.sensorsBME280[ID_CZERPNIA].temperature >0)
+			&& (!defrostForce))
+		return;
 	// if req already true, no need to check again
 	if (device.defrost.req) return;
 
-	if (device.sensorsBME280[ID_CZERPNIA].pressure-device.sensorsBME280[ID_NAWIEW].pressure>device.defrost.hPaDiff) {
+	if ((device.sensorsBME280[ID_CZERPNIA].pressure-device.sensorsBME280[ID_NAWIEW].pressure>=device.defrost.hPaDiff)
+			||(defrostForce)) {
 		device.defrost.req = true;
-		defrostEndMillis = currentMillis + (10*60000);
+		defrostEndMillis = currentMillis + (11*60000);
 	}
 }
 
 void bypass() {
-	device.bypassOpen = device.defrost.req;
+	device.bypassOpen = device.defrost.timeLeft>0;
 }
 
 void fan() {
@@ -384,21 +400,23 @@ void fan() {
 
 	device.fanSpeed = 0;
 	if (device.normalON)
-		device.fanSpeed = 80;
-	if (device.humidityAlert)
-		device.fanSpeed = 100;
+		device.fanSpeed = 10;//50;
 	if (device.defrost.req)
-		device.fanSpeed = 50;
+		device.fanSpeed = 20;//80;
+	if (device.humidityAlert)
+		device.fanSpeed = 25;//100;
 }
 
 void outputs() {
 	//Bypass
-	if (device.bypassOpen) servo.write(0);
-	else servo.write(90);
+	int dutyCycle = 0;
+	if (device.bypassOpen) dutyCycle = 9;
+	else dutyCycle = 17;
+	ledcWrite(SERVO_CHANNEL, dutyCycle);
 
 	//Fans
-	// parsing 0-100% into 0-255
-	int dutyCycle = (int)((device.fanSpeed/100)*255);
+	// parsing 0-100% into 255-0
+	dutyCycle = 255-(int)((device.fanSpeed/100.00)*255);
 	if (dutyCycle<0) dutyCycle = 0;
 	if (dutyCycle>255) dutyCycle = 255;
 	ledcWrite(PWM_CHANNEL, dutyCycle);
@@ -447,7 +465,7 @@ void setUDPdata() {
 	dataWrite[31] = (int)(device.fan2revs/100);
 
 	dataWrite[32] = device.defrost.timeLeft;
-	int hPaDiff = (int)(device.defrost.hPaDiff/10);
+	int hPaDiff = (int)(device.defrost.hPaDiff/10.0);
 	dataWrite[33] = (hPaDiff>255? 255 : hPaDiff);
 
 	setUDPdata(0, dataWrite,size);

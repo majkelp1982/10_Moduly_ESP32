@@ -2,7 +2,7 @@
 #define BASIC_H_
 #include "Arduino.h"
 
-#define FIRMWARE_VERSION	2020122717
+#define FIRMWARE_VERSION	2021011213
 
 struct Diagnose {
 	byte ip[4];

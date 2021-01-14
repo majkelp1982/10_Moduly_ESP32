@@ -13,6 +13,7 @@ String serverIndex;		// Server Index Page
 const char* host;
 WebServer server(80);
 unsigned long handleClientMillis;
+boolean OTAhasStarted = false;
 
 void stringInit();
 
@@ -20,6 +21,10 @@ OTA::OTA(boolean start) {
 }
 
 OTA::~OTA() {
+}
+
+boolean OTA::hasStarted() {
+	return OTAhasStarted;
 }
 
 void OTA::init() {
@@ -61,10 +66,14 @@ void OTA::init() {
 	  server.on("/", HTTP_GET, []() {
 	    server.sendHeader("Connection", "close");
 	    server.send(200, "text/html", loginIndex);
+	    OTAhasStarted = false;
+	    Serial.println("MODULE START!!");
 	  });
 	  server.on("/serverIndex", HTTP_GET, []() {
 	    server.sendHeader("Connection", "close");
 	    server.send(200, "text/html", serverIndex);
+	    OTAhasStarted = true;
+	    Serial.println("MODULE STOP!!");
 	  });
 
 	  server.on("/diagnose", HTTP_GET, []() {
@@ -80,14 +89,14 @@ void OTA::init() {
 	  }, []() {
 	    HTTPUpload& upload = server.upload();
 	    if (upload.status == UPLOAD_FILE_START) {
-	      Serial.printf("Update progress: %s\n", upload.filename.c_str());
-	      if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { //start with max available size
-	        Update.printError(Serial);
+	    	Serial.printf("Update progress: %s\n", upload.filename.c_str());
+	    	if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { //start with max available size
+	    		Update.printError(Serial);
 	      }
 	    } else if (upload.status == UPLOAD_FILE_WRITE) {
 
 	    	//TMP
-	    	Serial.printf("Uploaded : %u\n",upload.totalSize);
+//	    	Serial.printf("Uploaded : %u\n",upload.totalSize);
 	      /* flashing firmware to ESP*/
 	      if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
 	        Update.printError(Serial);
