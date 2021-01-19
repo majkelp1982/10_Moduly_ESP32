@@ -400,17 +400,17 @@ void fan() {
 
 	device.fanSpeed = 0;
 	if (device.normalON)
-		device.fanSpeed = 10;//50;
+		device.fanSpeed = 50;
 	if (device.defrost.req)
-		device.fanSpeed = 20;//80;
+		device.fanSpeed = 80;
 	if (device.humidityAlert)
-		device.fanSpeed = 25;//100;
+		device.fanSpeed = 100;
 }
 
 void outputs() {
 	//Bypass
 	int dutyCycle = 0;
-	if (device.bypassOpen) dutyCycle = 9;
+	if (device.bypassOpen) dutyCycle = 10;
 	else dutyCycle = 17;
 	ledcWrite(SERVO_CHANNEL, dutyCycle);
 

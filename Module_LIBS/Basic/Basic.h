@@ -1,6 +1,7 @@
 #ifndef BASIC_H_
 #define BASIC_H_
 #include "Arduino.h"
+#include <esp_task_wdt.h>
 
 #define FIRMWARE_VERSION	2021011213
 
@@ -26,6 +27,7 @@ public:
 	Basic(int moduleType, int moduleNo, int serialBaud);
 	~Basic(void);
 	void run();
+	void WDT_init();
 private:
 	void dateTimeCalculation();
 	void serialSetup(int baud);

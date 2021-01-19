@@ -20,15 +20,14 @@ void setup()
 	ota.init();
 	module_init();
 	status.addLog("Inicjalizacja zakoñczona");
+	basic.WDT_init();
 }
 
 void loop()
 {
 	ota.client();
-	if (!ota.hasStarted()) {
-		basic.run();
-		communication.run();
-		status.printStatus(10);
-		module();
-	}
+	basic.run();
+	communication.run();
+	status.printStatus(10);
+	module();
 }

@@ -22,7 +22,6 @@ public:
 	~OTA();
 	void init();
 	void client();
-	boolean hasStarted();
 };
 
 #endif /* OTA_H_ */

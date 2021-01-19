@@ -34,7 +34,7 @@ environment/project/io.sloeber.core.toolChain.release.1594058020/A.BUILD.EXTRA_F
 environment/project/io.sloeber.core.toolChain.release.1594058020/A.BUILD.EXTRA_FLAGS/value=-DESP32 -DCORE_DEBUG_LEVEL\=${A.BUILD.CODE_DEBUG} ${A.BUILD.DEFINES}
 environment/project/io.sloeber.core.toolChain.release.1594058020/A.BUILD.FLASH_FREQ/delimiter=;
 environment/project/io.sloeber.core.toolChain.release.1594058020/A.BUILD.FLASH_FREQ/operation=replace
-environment/project/io.sloeber.core.toolChain.release.1594058020/A.BUILD.FLASH_FREQ/value=40m
+environment/project/io.sloeber.core.toolChain.release.1594058020/A.BUILD.FLASH_FREQ/value=80m
 environment/project/io.sloeber.core.toolChain.release.1594058020/A.BUILD.FLASH_MODE/delimiter=;
 environment/project/io.sloeber.core.toolChain.release.1594058020/A.BUILD.FLASH_MODE/operation=replace
 environment/project/io.sloeber.core.toolChain.release.1594058020/A.BUILD.FLASH_MODE/value=dio
@@ -406,7 +406,7 @@ environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.COM_PORT
 environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.COM_PORT/value=COM9
 environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.ECLIPSE_LOCATION/delimiter=;
 environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.ECLIPSE_LOCATION/operation=replace
-environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.ECLIPSE_LOCATION/value=${eclipse_home}
+environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.ECLIPSE_LOCATION/value=C\:\\Sloeber-ESP\\
 environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.EXTRA.ALL/delimiter=;
 environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.EXTRA.ALL/operation=replace
 environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.EXTRA.ALL/value=
@@ -433,7 +433,7 @@ environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.MAKE_LOC
 environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.MAKE_LOCATION/value=C\:\\Sloeber-ESP\\arduinoPlugin\\tools\\make\\
 environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.MENU/delimiter=;
 environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.MENU/operation=replace
-environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.MENU/value=FlashFreq\=40\nUploadSpeed\=921600
+environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.MENU/value=FlashFreq\=80\nUploadSpeed\=921600
 environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.OBJCOPY/delimiter=;
 environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.OBJCOPY/operation=replace
 environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.OBJCOPY/value=${A.RECIPE.OBJCOPY.EEP.PATTERN}\n\t${A.RECIPE.OBJCOPY.HEX.PATTERN}
