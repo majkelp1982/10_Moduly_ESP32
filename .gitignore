@@ -1,6 +1,6 @@
 /Build/*
 /Release/*
-/.settings/*
-.cproject
+#/.settings/*
+#.cproject
 *.ino.cpp
 *desktop.ini
