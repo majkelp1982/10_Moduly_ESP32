@@ -1,44 +1,33 @@
 #include "Arduino.h"
-#include "Basic.h"
-#include "EepromEvent.h"
-#include "Communication.h"
-#include "OTA.h"
+#include <Basic.h>
+#include <OTA.h>
+#include <Status.h>
+#include <Communication.h>
 #include "Module.h"
-#include "Status.h"
 
-Device device;
-DateTime dateTime;
+#define MODULE_TYPE			10
+#define MODULE_NO			0
+#define SERIAL_BAUD			921600
+
+Basic basic(MODULE_TYPE,MODULE_NO,SERIAL_BAUD);
+OTA ota(true);
+Status status(true);
+Communication communication(true);
 
 void setup()
 {
-//	Write values to eeprom
-//	TMPwriteValueToEEPROM();
-	DALLAS18b20ReadDeviceAdresses();
-
-	FirstScan(&device);							// get values from eeprom after startup
-	Serial_Setup(921600);						// serial port init with welcome text
-	Pin_Setup();								// setup hardware pins
-    WiFi_init();								// WiFi initialization
-    OTA_init();									// Over the Air programming
-    Module_init();								// Init sensors for main program
+	communication.WiFi_init();
+	ota.init();
+	module_init();
+	addLog("Inicjalizacja zakoñczona");
+	basic.WDT_init();
 }
 
 void loop()
 {
-	//OTA
-	OTA_client();
-
-	//Real Time
-	DateTimeCalculation(&dateTime);
-
-	//main program
-	Module(&device);
-
-	//Communication
-	UDPsendStandardFrame(&device);
-	UDPsendDiagnoseFrame(&device);
-	UDPread(&device, &dateTime);
-
-	//TEMP
-	printStatus(device, dateTime);
+	ota.client();
+	basic.run();
+	communication.run();
+	status.printStatus(10);
+	module();
 }

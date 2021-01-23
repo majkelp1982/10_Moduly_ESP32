@@ -35,8 +35,8 @@ void setStatus(String text) {
 	statusWIFI +=diagnose.wifiConnectionInterrupt; statusWIFI +="]";
 }
 
-void Status::addLog(String log) {
-	if ((String)log[0] == log) return;
+void addLog(String log) {
+	if (logs[0].substring(logs[0].length()-log.length()) == log) return;
 	for (int i=28; i>=0; i--)
 		logs[i+1] = logs[i];
 	logs[0]= getDateTime().year;

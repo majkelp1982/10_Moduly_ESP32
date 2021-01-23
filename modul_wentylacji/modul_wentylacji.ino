@@ -19,7 +19,7 @@ void setup()
 	communication.WiFi_init();
 	ota.init();
 	module_init();
-	status.addLog("Inicjalizacja zakoñczona");
+	addLog("Inicjalizacja zakoñczona");
 	basic.WDT_init();
 }
 

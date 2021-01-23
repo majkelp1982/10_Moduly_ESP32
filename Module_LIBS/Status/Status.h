@@ -17,10 +17,10 @@ public:
 	Status(boolean start);
 	virtual ~Status();
 	void printStatus(int delay);
-	void addLog(String log);
 };
 
 String getHTMLStatus();
 void setStatus(String text);
+void addLog(String log);
 
 #endif /* STATUS_H_ */
