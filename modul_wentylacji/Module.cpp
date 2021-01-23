@@ -112,8 +112,7 @@ void readSensors() {
 		device.sensorsBME280[i].temperature = device.sensorsBME280[i].interface.readTemperature();
 		device.sensorsBME280[i].pressure = (int)(device.sensorsBME280[i].interface.readPressure()/100);
 		device.sensorsBME280[i].humidity = (int)device.sensorsBME280[i].interface.readHumidity();
-		if (device.sensorsBME280[i].temperature>35
-				|| device.sensorsBME280[i].temperature<10
+		if (device.sensorsBME280[i].temperature>70
 				|| device.sensorsBME280[i].pressure>1050
 				|| device.sensorsBME280[i].pressure<800
 				|| device.sensorsBME280[i].humidity>100
@@ -337,7 +336,7 @@ void normalMode() {
 
 void humidityAllert() {
 	//TODO
-	device.humidityAlert = (device.defrost.hPaDiff==490);
+	device.humidityAlert = (device.defrost.hPaDiff==390);
 }
 
 void defrost() {
@@ -405,6 +404,11 @@ void fan() {
 		device.fanSpeed = 80;
 	if (device.humidityAlert)
 		device.fanSpeed = 100;
+
+	//TMP
+	if (device.defrost.hPaDiff>=400) {
+		device.fanSpeed = device.defrost.hPaDiff - 400;
+	}
 }
 
 void outputs() {
