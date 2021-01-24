@@ -6,6 +6,8 @@ DataRead UDPdata;
 OneWire oneWire(PIN_DS18B20);
 DallasTemperature sensors(&oneWire);					// initialized 1-WIRE for buffers
 
+DHT dht(PIN_DHT_LAZ_DOL, DHTTYPE);
+
 //Functions
 void firstScan();
 void readSensors();
@@ -27,11 +29,29 @@ void module_init() {
 	//EEprom Scan
 	firstScan();
 
-	//Set sensors
+	//Set sensors Dallas DS18B20
 	sensors.begin();
 	sensors.setResolution(10);
 	sensors.setWaitForConversion(false);
+
+	//Set sensors DHT22
+//	device.dhtSensor[ID_SALON](PIN_DHT_SALON, DHTTYPE);
+//	device.dhtSensor[ID_PRALNIA].sensor(PIN_DHT_PRALNIA, DHTTYPE);
+//	device.dhtSensor[ID_LAZ_DOL].sensor(PIN_DHT_LAZ_DOL, DHTTYPE);
+//	device.dhtSensor[ID_RODZICE].sensor(PIN_DHT_RODZICE, DHTTYPE);
+//	device.dhtSensor[ID_NATALIA].sensor(PIN_DHT_NATALIA, DHTTYPE);
+//	device.dhtSensor[ID_KAROLINA].sensor(PIN_DHT_KAROLINA, DHTTYPE);
+//	device.dhtSensor[ID_LAZ_GORA].sensor(PIN_DHT_LAZ_GORA, DHTTYPE);
+
+//	device.dhtZones[ID_SALON].begin();
+//	device.dhtSensor[ID_PRALNIA].sensor.begin();
+//	device.dhtZones[ID_LAZ_DOL].begin();
+//	device.dhtZones[ID_RODZICE].begin();
+//	device.dhtZones[ID_NATALIA].begin();
+//	device.dhtZones[ID_KAROLINA].begin();
+//	device.dhtZones[ID_LAZ_GORA].begin();
 	//TMP
+	dht.begin();
 	diagDALLAS18b20ReadDeviceAdresses();
 }
 
@@ -83,7 +103,6 @@ void readSensors() {
 }
 
 void DALLAS18b20Read () {
-
 	for (int zone=0; zone<ZONE_QUANTITY; zone++) {
 		DeviceAddress deviceAddress;
 		for (int i=0; i<8; i++)
@@ -99,27 +118,40 @@ void DALLAS18b20Read () {
 		if (zone== 5) {a=0.975; 	b=(1+2.5);}			// Zone 5 - Karolina
 		if (zone== 6) {a=0.995; 	b=(-1.2+4.7);}		// Zone 6 - Laz Gora
 		tempC = sensors.getTempC(deviceAddress);
-		device.zone[zone].directRead = tempC;
+		device.zone[zone].tempDirectRead = tempC;
 		if ((tempC<5) || (tempC>100)) {
-			device.zone[zone].errorCount++;
+			device.zone[zone].tempErrorCount++;
 			//zapisz liczbe maksymalna zlych odczytow z rzedu
-			if (device.zone[zone].maxErrorCount < device.zone[zone].errorCount) device.zone[zone].maxErrorCount = device.zone[zone].errorCount;
+			if (device.zone[zone].tempMaxErrorCount < device.zone[zone].tempErrorCount) device.zone[zone].tempMaxErrorCount = device.zone[zone].tempErrorCount;
 			//po x probach nie udanych wysli fa³szyw¹ temperaturê
-			if (device.zone[zone].errorCount > 50) device.zone[zone].isTemp = 10.00;
+			if (device.zone[zone].tempErrorCount > 50) device.zone[zone].isTemp = 10.00;
 		}
 		else {
 			//przelicz temperature wedlug krzywej
 			tempC = a * tempC + b;						// Temperature compensation
 			//zerowanie liczby bledow
-			device.zone[zone].errorCount = 0;
+			device.zone[zone].tempErrorCount = 0;
 			device.zone[zone].isTemp = tempC;
 		}
 	}
 	sensors.requestTemperatures();						// Request temperature
 }
 
+void getHumidity(int zone) {
+	int humidity = (int)dht.readHumidity(); //device.dhtSensor[zone].sensor.readHumidity();
+	device.zone[zone].humidityDirectRead = humidity;
+	if (isnan(humidity))
+		device.zone[zone].humidityErrorCount++;
+	else {
+		device.zone[zone].humidityErrorCount = 0;
+		device.zone[zone].humidity = humidity;
+	}
+	if (device.zone[zone].humidityMaxErrorCount<device.zone[zone].humidityErrorCount)
+		device.zone[zone].humidityMaxErrorCount=device.zone[zone].humidityErrorCount;
+}
+
 void DHT22Read() {
-	//TODO
+	getHumidity(ID_LAZ_DOL);
 }
 
 void readUDPdata() {
@@ -240,11 +272,17 @@ void statusUpdate() {
 		status +=(double)device.zone[i].isTemp;
 		status +="	reqTemp=";
 		status +=(double)device.zone[i].reqTemp;
-		status +="	ErrorMAX[";
-		status +=device.zone[i].maxErrorCount;
+		status +="	TErrMAX[";
+		status +=device.zone[i].tempMaxErrorCount;
 		status +="]";
 		status +="	DirectRead[";
-		status +=device.zone[i].directRead;
+		status +=device.zone[i].tempDirectRead;
+		status +="]";
+		status +="	HErrMAX[";
+		status +=device.zone[i].humidityMaxErrorCount;
+		status +="]";
+		status +="	DirectRead[";
+		status +=device.zone[i].humidityDirectRead;
 		status +="]";
 		status +="	SensorAddr";
 		for (int j=0; j<8; j++) {
