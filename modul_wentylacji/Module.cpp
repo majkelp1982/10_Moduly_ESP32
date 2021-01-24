@@ -347,7 +347,9 @@ void humidityAlert() {
 
 	if (device.humidityAlert.req)
 		device.humidityAlert.endMillis = currentMillis+(HUMIDITY_ALERT_PROCESS_TIME*60000);
-	device.humidityAlert.timeLeft = int((device.humidityAlert.endMillis - currentMillis)/60000);
+	long timeLeftMillis = device.humidityAlert.endMillis - currentMillis;
+	if (timeLeftMillis<0) timeLeftMillis = 0;
+	device.humidityAlert.timeLeft = int((timeLeftMillis)/60000);
 	if ((device.humidityAlert.timeLeft<0) || (device.humidityAlert.endMillis==0)) device.humidityAlert.timeLeft = 0;
 
 }
