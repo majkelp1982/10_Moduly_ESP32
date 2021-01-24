@@ -48,6 +48,10 @@
 #define PIN_FAN1_REVS						32		// FAN1 TACHO SIGNAL
 #define PIN_FAN2_REVS						12		// FAN2 TACHO SIGNAL
 
+//HUMIDITY ALLERT
+#define HUMIDITY_TO_HIGH					70
+#define HUMIDITY_ALERT_PROCESS_TIME			5
+
 struct SensorBME280 {
 	float temperature = 0.0f;				// [stC]
 	int pressure = 0;						// [hPa]
@@ -56,18 +60,19 @@ struct SensorBME280 {
 	unsigned int faultyReadings = 0;		// [units]
 };
 
-struct Defrost {
+struct Mode {
 	boolean req = false;				// req to set defrost mode in case recuperator is frozen
 	int timeLeft = 0;					// time left to finish defrost process [min]
-	int hPaDiff = 250;					// difference between inlet and out pressure to confirm recu stuck because of ice [hPa]
+	int trigger = 0;					// difference between inlet and out pressure to confirm recu stuck because of ice [hPa]
+	unsigned long endMillis = 0;
 };
 
 struct Device {
 	SensorBME280 sensorsBME280[4];
 	boolean normalON = false;			// normal mode
-	boolean humidityAlert = false;		// humidity exceeded
+	Mode humidityAlert;					// humidity mode structure
 	boolean bypassOpen = false;			// bypass open in case defrost or cooling in summer night
-	Defrost defrost;					// defrost mode structure
+	Mode defrost;						// defrost mode structure
 	int fanSpeed = 0;					// 0-100 [%]
 	int fan1revs = 0;					// revs min-1
 	int fan2revs = 0;					// revs min-1
