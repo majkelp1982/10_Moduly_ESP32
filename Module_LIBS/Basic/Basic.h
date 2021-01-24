@@ -4,7 +4,6 @@
 #include <esp_task_wdt.h>
 
 #define FIRMWARE_VERSION	"2021.01.23_beta3"
-
 struct Diagnose {
 	byte ip[4];
 	byte wifiConnectionInterrupt = 0;

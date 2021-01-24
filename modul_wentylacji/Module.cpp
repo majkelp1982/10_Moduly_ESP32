@@ -13,7 +13,7 @@ void getMasterDeviceOrder();
 void getComfortParams();
 
 void normalMode();
-void humidityAllert();
+void humidityAlert();
 void defrost();
 void bypass();
 void fan();
@@ -41,7 +41,6 @@ boolean release2  = true;
 //Delays
 unsigned long readSensorMillis = 0;
 unsigned long lastRevsRead = 0;
-unsigned long defrostEndMillis = 0;
 
 //TMP
 int lastDutyCycle = 0;
@@ -79,7 +78,7 @@ void module() {
 
 	//Module events
 	normalMode();
-	humidityAllert();
+	humidityAlert();
 	defrost();
 	bypass();
 	fan();
@@ -93,7 +92,7 @@ void module() {
 void firstScan() {
 	// Bytes coding EEPROM //
 	// 0 - 11 		: 	device.hour[0] .. device.hour[11]
-	// 12			:	device.defrost.hPaDiff
+	// 12			:	device.defrost.trigger
 	//Get data from EEprom
 	int size = 13;
 	byte EEpromData[size];
@@ -103,7 +102,9 @@ void firstScan() {
 		byte data = EEpromData[i];
 		device.hour[i] = (byte) data;
 	}
-	device.defrost.hPaDiff = EEpromData[12]*10;
+	device.defrost.trigger = EEpromData[12]*10;
+
+	device.humidityAlert.trigger = HUMIDITY_TO_HIGH;
 }
 
 void readSensors() {
@@ -146,7 +147,7 @@ void getMasterDeviceOrder() {
 	}
 	//byte 33
 	if (UDPdata.data[0] == 33) {
-		device.defrost.hPaDiff = UDPdata.data[1]*10;
+		device.defrost.trigger = UDPdata.data[1]*10;
 		EEpromWrite(12, UDPdata.data[1]);
 	}
 
@@ -334,18 +335,30 @@ void normalMode() {
 	device.normalON = normalOn;
 }
 
-void humidityAllert() {
-	//TODO
-	device.humidityAlert = (device.defrost.hPaDiff==390);
+void humidityAlert() {
+	unsigned long currentMillis = millis();
+	device.humidityAlert.req = ((zones[ID_ZONE_SALON].humidity>=device.humidityAlert.trigger)
+					|| (zones[ID_ZONE_PRALNIA].humidity>=device.humidityAlert.trigger)
+					|| (zones[ID_ZONE_LAZDOL].humidity>=device.humidityAlert.trigger)
+					|| (zones[ID_ZONE_RODZICE].humidity>=device.humidityAlert.trigger)
+					|| (zones[ID_ZONE_NATALIA].humidity>=device.humidityAlert.trigger)
+					|| (zones[ID_ZONE_KAROLINA].humidity>=device.humidityAlert.trigger)
+					|| (zones[ID_ZONE_LAZGORA].humidity>=device.humidityAlert.trigger));
+
+	if (device.humidityAlert.req)
+		device.humidityAlert.endMillis = currentMillis+(HUMIDITY_ALERT_PROCESS_TIME*60000);
+	device.humidityAlert.timeLeft = int((device.humidityAlert.endMillis - currentMillis)/60000);
+	if ((device.humidityAlert.timeLeft<0) || (device.humidityAlert.endMillis==0)) device.humidityAlert.timeLeft = 0;
+
 }
 
 void defrost() {
-	boolean defrostForce = (device.defrost.hPaDiff == 50);
+	boolean defrostForce = (device.defrost.trigger == 50);
 	unsigned long currentMillis = millis();
-	device.defrost.timeLeft = (int)((defrostEndMillis - currentMillis)/60000);
+	device.defrost.timeLeft = (int)((device.defrost.endMillis - currentMillis)/60000);
 
 	//force defrost off
-	if (device.defrost.hPaDiff == 500)
+	if (device.defrost.trigger == 500)
 		device.defrost.timeLeft = 0;
 	if ((device.defrost.timeLeft<0) || !device.defrost.req) device.defrost.timeLeft = 0;
 
@@ -359,10 +372,10 @@ void defrost() {
 	// if req already true, no need to check again
 	if (device.defrost.req) return;
 
-	if ((device.sensorsBME280[ID_CZERPNIA].pressure-device.sensorsBME280[ID_NAWIEW].pressure>=device.defrost.hPaDiff)
+	if ((device.sensorsBME280[ID_CZERPNIA].pressure-device.sensorsBME280[ID_NAWIEW].pressure>=device.defrost.trigger)
 			||(defrostForce)) {
 		device.defrost.req = true;
-		defrostEndMillis = currentMillis + (11*60000);
+		device.defrost.endMillis = currentMillis + (11*60000);
 	}
 }
 
@@ -400,14 +413,14 @@ void fan() {
 	device.fanSpeed = 0;
 	if (device.normalON)
 		device.fanSpeed = 50;
-	if (device.defrost.req)
+	if (device.defrost.timeLeft>0)
 		device.fanSpeed = 80;
-	if (device.humidityAlert)
+	if (device.humidityAlert.timeLeft>0)
 		device.fanSpeed = 100;
 
 	//TMP
-	if (device.defrost.hPaDiff>=400) {
-		device.fanSpeed = device.defrost.hPaDiff - 400;
+	if (device.defrost.trigger>=400) {
+		device.fanSpeed = device.defrost.trigger - 400;
 	}
 }
 
@@ -430,7 +443,7 @@ void setUDPdata() {
 	int size = 34;
 	byte dataWrite[size];
 	// First three bytes are reserved for device recognized purposes.
-	dataWrite[0] = (((device.fanSpeed>0)?1:0)<< 7) | (device.normalON << 6) | (device.humidityAlert<< 5) | (device.bypassOpen << 4) | (device.defrost.req << 3);
+	dataWrite[0] = (((device.fanSpeed>0)?1:0)<< 7) | (device.normalON << 6) | (device.humidityAlert.req<< 5) | (device.bypassOpen << 4) | (device.defrost.req << 3);
 	dataWrite[1] = device.hour[0];
 	dataWrite[2] = device.hour[1];
 	dataWrite[3] = device.hour[2];
@@ -469,8 +482,8 @@ void setUDPdata() {
 	dataWrite[31] = (int)(device.fan2revs/100);
 
 	dataWrite[32] = device.defrost.timeLeft;
-	int hPaDiff = (int)(device.defrost.hPaDiff/10.0);
-	dataWrite[33] = (hPaDiff>255? 255 : hPaDiff);
+	int trigger = (int)(device.defrost.trigger/10.0);
+	dataWrite[33] = (trigger>255? 255 : trigger);
 
 	setUDPdata(0, dataWrite,size);
 }
@@ -479,8 +492,9 @@ void statusUpdate() {
 	String status;
 	status = "PARAMETRY PRACY\n";
 	status +="Wentylatory: "; status += device.fanSpeed; status +="[%]\tObr1: "; status += device.fan1revs; status +="[min-1]\tObr2: "; status += device.fan2revs; status +="[min-1]\n";
-	status +="NormalON: "; status += device.normalON ? "TAK":"NIE"; status +="\tHumidityALERT: "; status += device.humidityAlert ? "TAK":"NIE"; status +="\tbypass otwarty: "; status += device.bypassOpen ? "TAK":"NIE"; status +="\n";
-	status +="Odmrazanie: "; status += device.defrost.req ? "TAK":"NIE"; status +="\ttime left: "; status += device.defrost.timeLeft; status +="\t[s] pressure diff: "; status += device.defrost.hPaDiff; status +="[hPa]\n";
+	status +="NormalON: "; status += device.normalON ? "TAK":"NIE"; status +="\tbypass otwarty: "; status += device.bypassOpen ? "TAK":"NIE"; status +="\n";
+	status +="Odmrazanie: "; status += device.defrost.req ? "TAK":"NIE"; status +="\ttime left: "; status += device.defrost.timeLeft; status +="\t[s] trigger: "; status += device.defrost.trigger; status +="[hPa]\n";
+	status +="Humidity Alert: "; status += device.humidityAlert.req ? "TAK":"NIE"; status +="\ttime left: "; status += device.humidityAlert.timeLeft; status +="\t[s] trigger: "; status += device.humidityAlert.trigger; status +="[%]\n";
 	status +="Czerpnia:\t T="; status +=device.sensorsBME280[0].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[0].humidity;
 	status +="[%]\tP="; status +=(int)device.sensorsBME280[0].pressure;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[0].faultyReadings ;status +="\n";
 	status +="Wyrzutnia:\t T="; status +=device.sensorsBME280[1].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[1].humidity;
@@ -492,6 +506,9 @@ void statusUpdate() {
 	for (int i=0; i<7; i++) {
 		status +="Zone["; status +=i; status += "]:\t\t T="; status +=zones[i].isTemp; status +="[stC]\treqT="; status+=zones[i].reqTemp; status +="[stC]\tH="; status +=zones[i].humidity; status +="\n";
 	}
+
+	//TMP
+	status +="\n\ndevice.humidityAlert.endMillis="; status+= device.humidityAlert.endMillis; status +=" current"; status+=(unsigned long)millis();
 	setStatus(status);
 }
 
