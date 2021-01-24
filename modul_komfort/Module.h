@@ -51,13 +51,9 @@ struct Zone {
 	int humidityDirectRead=0;
 };
 
-//struct DHTSensor {
-//	DHT sensor;
-//};
-
 struct Device {
 	Zone zone[ZONE_QUANTITY];
-//	DHTSensor dhtSensor[7];
+	DHT dhtSensor[7];
 };
 
 void module_init();

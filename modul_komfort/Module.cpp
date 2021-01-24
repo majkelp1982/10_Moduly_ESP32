@@ -6,7 +6,13 @@ DataRead UDPdata;
 OneWire oneWire(PIN_DS18B20);
 DallasTemperature sensors(&oneWire);					// initialized 1-WIRE for buffers
 
-DHT dht(PIN_DHT_LAZ_DOL, DHTTYPE);
+DHT dhtSalon(PIN_DHT_SALON, DHTTYPE);
+DHT dhtPralnia(PIN_DHT_PRALNIA, DHTTYPE);
+DHT dhtLazDol(PIN_DHT_LAZ_DOL, DHTTYPE);
+DHT dhtRodzice(PIN_DHT_RODZICE, DHTTYPE);
+DHT dhtNatalia(PIN_DHT_NATALIA, DHTTYPE);
+DHT dhtKarloina(PIN_DHT_KAROLINA, DHTTYPE);
+DHT dhtLazGora(PIN_DHT_LAZ_GORA, DHTTYPE);
 
 //Functions
 void firstScan();
@@ -35,23 +41,22 @@ void module_init() {
 	sensors.setWaitForConversion(false);
 
 	//Set sensors DHT22
-//	device.dhtSensor[ID_SALON](PIN_DHT_SALON, DHTTYPE);
-//	device.dhtSensor[ID_PRALNIA].sensor(PIN_DHT_PRALNIA, DHTTYPE);
-//	device.dhtSensor[ID_LAZ_DOL].sensor(PIN_DHT_LAZ_DOL, DHTTYPE);
-//	device.dhtSensor[ID_RODZICE].sensor(PIN_DHT_RODZICE, DHTTYPE);
-//	device.dhtSensor[ID_NATALIA].sensor(PIN_DHT_NATALIA, DHTTYPE);
-//	device.dhtSensor[ID_KAROLINA].sensor(PIN_DHT_KAROLINA, DHTTYPE);
-//	device.dhtSensor[ID_LAZ_GORA].sensor(PIN_DHT_LAZ_GORA, DHTTYPE);
+	device.dhtSensor[ID_SALON] = dhtSalon;
+	device.dhtSensor[ID_PRALNIA] = dhtPralnia;
+	device.dhtSensor[ID_LAZ_DOL] = dhtLazDol;
+	device.dhtSensor[ID_RODZICE] = dhtRodzice;
+	device.dhtSensor[ID_NATALIA] = dhtNatalia;
+	device.dhtSensor[ID_KAROLINA] = dhtKarloina;
+	device.dhtSensor[ID_LAZ_GORA] = dhtLazGora;
 
-//	device.dhtZones[ID_SALON].begin();
-//	device.dhtSensor[ID_PRALNIA].sensor.begin();
-//	device.dhtZones[ID_LAZ_DOL].begin();
-//	device.dhtZones[ID_RODZICE].begin();
-//	device.dhtZones[ID_NATALIA].begin();
-//	device.dhtZones[ID_KAROLINA].begin();
-//	device.dhtZones[ID_LAZ_GORA].begin();
-	//TMP
-	dht.begin();
+	device.dhtSensor[ID_SALON].begin();
+	device.dhtSensor[ID_PRALNIA].begin();
+	device.dhtSensor[ID_LAZ_DOL].begin();
+	device.dhtSensor[ID_RODZICE].begin();
+	device.dhtSensor[ID_NATALIA].begin();
+	device.dhtSensor[ID_KAROLINA].begin();
+	device.dhtSensor[ID_LAZ_GORA].begin();
+
 	diagDALLAS18b20ReadDeviceAdresses();
 }
 
@@ -138,23 +143,23 @@ void DALLAS18b20Read () {
 }
 
 void getHumidity(int zone) {
-	int humidity = (int)dht.readHumidity(); //device.dhtSensor[zone].sensor.readHumidity();
-	if ((humidity>=70)
-			&& (device.zone[zone].humidity<70)) {
-		String log = "Strefa[";
-		log+=zone;
-		log +="] alert[";
-		log +=humidity;
-		log +="] poprzedni odczyt=";
-		log +=device.zone[zone].humidity;
-		addLog(log);
-	}
+	int humidity = (int)device.dhtSensor[zone].readHumidity();
 	device.zone[zone].humidityDirectRead = humidity;
 	if (isnan(humidity)
 			|| (humidity<15)
 			|| (humidity>100))
 		device.zone[zone].humidityErrorCount++;
 	else {
+		if ((humidity>=70)
+				&& (device.zone[zone].humidity<70)) {
+			String log = "Strefa[";
+			log+=zone;
+			log +="] alert[";
+			log +=humidity;
+			log +="] poprzedni odczyt=";
+			log +=device.zone[zone].humidity;
+			addLog(log);
+		}
 		device.zone[zone].humidityErrorCount = 0;
 		device.zone[zone].humidity = humidity;
 	}
@@ -164,6 +169,7 @@ void getHumidity(int zone) {
 
 void DHT22Read() {
 	getHumidity(ID_LAZ_DOL);
+	//TODO list to extend
 }
 
 void readUDPdata() {
