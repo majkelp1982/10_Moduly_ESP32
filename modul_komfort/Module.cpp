@@ -139,8 +139,20 @@ void DALLAS18b20Read () {
 
 void getHumidity(int zone) {
 	int humidity = (int)dht.readHumidity(); //device.dhtSensor[zone].sensor.readHumidity();
+	if ((humidity>=70)
+			&& (device.zone[zone].humidity<70)) {
+		String log = "Strefa[";
+		log+=zone;
+		log +="] alert[";
+		log +=humidity;
+		log +="] poprzedni odczyt=";
+		log +=device.zone[zone].humidity;
+		addLog(log);
+	}
 	device.zone[zone].humidityDirectRead = humidity;
-	if (isnan(humidity))
+	if (isnan(humidity)
+			|| (humidity<15)
+			|| (humidity>100))
 		device.zone[zone].humidityErrorCount++;
 	else {
 		device.zone[zone].humidityErrorCount = 0;
