@@ -31,6 +31,10 @@ void diagDALLAS18b20ReadDeviceAdresses();
 //Delays
 unsigned long dallasSensorReadMillis = 0;
 
+//TMP
+DeviceAddress tmpAddresses[8];
+int count = 0;
+
 void module_init() {
 	//EEprom Scan
 	firstScan();
@@ -57,7 +61,6 @@ void module_init() {
 	device.dhtSensor[ID_KAROLINA].begin();
 	device.dhtSensor[ID_LAZ_GORA].begin();
 
-	diagDALLAS18b20ReadDeviceAdresses();
 }
 
 void module() {
@@ -100,11 +103,12 @@ void firstScan() {
 void readSensors() {
 	if (sleep(&dallasSensorReadMillis, DELAY_SENSORS_READ)) return;
 
-	//DIAG TMP
-	diagDALLAS18b20ReadDeviceAdresses();
-
 	DALLAS18b20Read();
 	DHT22Read();
+
+	//TMP
+	count++;
+	if (count == 3) diagDALLAS18b20ReadDeviceAdresses();
 }
 
 void DALLAS18b20Read () {
@@ -310,15 +314,22 @@ void statusUpdate() {
 		}
 		status +="\n";
 	}
+	status +="\nAddresses read from BUS:";
+	for (int i=1; i<=ZONE_QUANTITY; i++) {
+		status += "\n";
+		for (int j=0; j<8; j++) {
+			status += "[";
+			status += tmpAddresses[i][j];
+			status += "]";
+		}
+
+	}
 	setStatus(status);
 }
 
 //DIAGNOSTIC HELP FUNCTIONS
 void diagDALLAS18b20ReadDeviceAdresses() {
-	DeviceAddress tempDeviceAddress;
-	Serial.printf("\nZnaleziono %d sensorow",sensors.getDeviceCount());
-	for (int i=0; i<sensors.getDeviceCount(); i++) {
-		sensors.getAddress(tempDeviceAddress,i);
-		Serial.printf("\nFound on BUS [%d] Address [%d][%d][%d][%d][%d][%d][%d][%d]",i,tempDeviceAddress[0],tempDeviceAddress[1],tempDeviceAddress[2],tempDeviceAddress[3],tempDeviceAddress[4],tempDeviceAddress[5],tempDeviceAddress[6],tempDeviceAddress[7]);
-	}
+	for (int i=0; i<ZONE_QUANTITY; i++)
+		sensors.getAddress(tmpAddresses[i],i);
+	count = 0;
 }

@@ -22,7 +22,7 @@
 
 //DALLAS 1-wire
 #define DELAY_SENSORS_READ					10			// delay between sensors reading [s]
-#define PIN_DS18B20							23
+#define PIN_DS18B20							21
 
 //DHT HUMIDITY SENSORS
 #define DHTTYPE 							11  		//DHT 11
