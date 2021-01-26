@@ -49,8 +49,8 @@
 #define PIN_FAN2_REVS						12		// FAN2 TACHO SIGNAL
 
 //HUMIDITY ALLERT
-#define HUMIDITY_TO_HIGH					70
-#define HUMIDITY_ALERT_PROCESS_TIME			5
+#define HUMIDITY_TO_HIGH					80
+#define HUMIDITY_ALERT_PROCESS_TIME			10
 
 struct SensorBME280 {
 	float temperature = 0.0f;				// [stC]
@@ -77,6 +77,8 @@ struct Device {
 	int fan1revs = 0;					// revs min-1
 	int fan2revs = 0;					// revs min-1
 	int hour[12];
+	int efficency = 0;
+	int efficencyMAX = 0;
 };
 
 struct Zone {

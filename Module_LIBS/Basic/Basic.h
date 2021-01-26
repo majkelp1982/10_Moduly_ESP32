@@ -3,7 +3,7 @@
 #include "Arduino.h"
 #include <esp_task_wdt.h>
 
-#define FIRMWARE_VERSION	"2021.01.23_02_humidityAllert3"
+#define FIRMWARE_VERSION	"2021.01.23_02_humidityAlert9"
 
 struct Diagnose {
 	byte ip[4];

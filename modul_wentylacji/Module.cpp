@@ -17,6 +17,7 @@ void humidityAlert();
 void defrost();
 void bypass();
 void fan();
+void efficency();
 
 void outputs();
 void setUDPdata();
@@ -41,6 +42,7 @@ boolean release2  = true;
 //Delays
 unsigned long readSensorMillis = 0;
 unsigned long lastRevsRead = 0;
+unsigned long efficencyDelayMillis = 0;
 
 //TMP
 int lastDutyCycle = 0;
@@ -82,6 +84,7 @@ void module() {
 	defrost();
 	bypass();
 	fan();
+	efficency();
 
 	//Output settings
 	outputs();
@@ -418,12 +421,25 @@ void fan() {
 	if (device.defrost.timeLeft>0)
 		device.fanSpeed = 80;
 	if (device.humidityAlert.timeLeft>0)
-		device.fanSpeed = 100;
+		device.fanSpeed = 70;
 
 	//TMP
 	if (device.defrost.trigger>=400) {
 		device.fanSpeed = device.defrost.trigger - 400;
 	}
+}
+
+void efficency() {
+	if ((device.fanSpeed==0)
+			|| millis()<60000) {
+		device.efficency = 0;
+		efficencyDelayMillis = millis();
+		return;
+	} else
+		if (sleep(&efficencyDelayMillis, 60)) return;
+	device.efficency = (int)(device.sensorsBME280[ID_NAWIEW].temperature*100/device.sensorsBME280[ID_WYWIEW].temperature);
+	if (device.efficency>device.efficencyMAX)
+		device.efficencyMAX = device.efficency;
 }
 
 void outputs() {
@@ -432,7 +448,6 @@ void outputs() {
 	if (device.bypassOpen) dutyCycle = 10;
 	else dutyCycle = 17;
 	ledcWrite(SERVO_CHANNEL, dutyCycle);
-
 	//Fans
 	// parsing 0-100% into 255-0
 	dutyCycle = 255-(int)((device.fanSpeed/100.00)*255);
@@ -493,7 +508,8 @@ void setUDPdata() {
 void statusUpdate() {
 	String status;
 	status = "PARAMETRY PRACY\n";
-	status +="Wentylatory: "; status += device.fanSpeed; status +="[%]\tObr1: "; status += device.fan1revs; status +="[min-1]\tObr2: "; status += device.fan2revs; status +="[min-1]\n";
+	status +="Wentylatory: "; status += device.fanSpeed; status +="[%]\tObr1: "; status += device.fan1revs; status +="[min-1]\tObr2: "; status += device.fan2revs;
+	status +="[min-1] EFEKTYWNOSC:"; status += device.efficency; status +="[%] MAX:"; status += device.efficencyMAX; status +="[%]\n";
 	status +="NormalON: "; status += device.normalON ? "TAK":"NIE"; status +="\tbypass otwarty: "; status += device.bypassOpen ? "TAK":"NIE"; status +="\n";
 	status +="Odmrazanie: "; status += device.defrost.req ? "TAK":"NIE"; status +="\ttime left: "; status += device.defrost.timeLeft; status +="\t[s] trigger: "; status += device.defrost.trigger; status +="[hPa]\n";
 	status +="Humidity Alert: "; status += device.humidityAlert.req ? "TAK":"NIE"; status +="\ttime left: "; status += device.humidityAlert.timeLeft; status +="\t[s] trigger: "; status += device.humidityAlert.trigger; status +="[%]\n";
@@ -508,9 +524,6 @@ void statusUpdate() {
 	for (int i=0; i<7; i++) {
 		status +="Zone["; status +=i; status += "]:\t\t T="; status +=zones[i].isTemp; status +="[stC]\treqT="; status+=zones[i].reqTemp; status +="[stC]\tH="; status +=zones[i].humidity; status +="\n";
 	}
-
-	//TMP
-	status +="\n\ndevice.humidityAlert.endMillis="; status+= device.humidityAlert.endMillis; status +=" current"; status+=(unsigned long)millis();
 	setStatus(status);
 }
 
