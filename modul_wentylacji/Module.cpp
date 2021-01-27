@@ -105,9 +105,9 @@ void firstScan() {
 		byte data = EEpromData[i];
 		device.hour[i] = (byte) data;
 	}
-	device.defrost.trigger = EEpromData[12]*10;
+	device.defrost.trigger = EEpromData[12];
 
-	device.humidityAlert.trigger = HUMIDITY_TO_HIGH;
+	device.humidityAlert.trigger = EEpromData[13];
 }
 
 void readSensors() {
@@ -150,11 +150,15 @@ void getMasterDeviceOrder() {
 	}
 	//byte 33
 	if (UDPdata.data[0] == 33) {
-		device.defrost.trigger = UDPdata.data[1]*10;
+		device.humidityAlert.trigger = UDPdata.data[1];
 		EEpromWrite(12, UDPdata.data[1]);
 	}
 
-	setUDPdata();
+	//byte 35
+	if (UDPdata.data[0] == 33) {
+		device.defrost.trigger = UDPdata.data[1];
+		EEpromWrite(13, UDPdata.data[1]);
+	}	setUDPdata();
 	forceStandardUDP();
 }
 
@@ -432,14 +436,28 @@ void fan() {
 void efficency() {
 	if ((device.fanSpeed==0)
 			|| millis()<60000) {
-		device.efficency = 0;
+		device.efficency.is = 0;
 		efficencyDelayMillis = millis();
 		return;
 	} else
 		if (sleep(&efficencyDelayMillis, 60)) return;
-	device.efficency = (int)(device.sensorsBME280[ID_NAWIEW].temperature*100/device.sensorsBME280[ID_WYWIEW].temperature);
-	if (device.efficency>device.efficencyMAX)
-		device.efficencyMAX = device.efficency;
+	// https://www.engineeringtoolbox.com/heat-recovery-efficiency-d_201.html
+	// ut = (t2 - t1) / (t3 - t1)  (nawiew-czerpnia)/(wywiew-czerpnia
+	float nawiew = device.sensorsBME280[ID_NAWIEW].temperature;
+	float czerpnia = device.sensorsBME280[ID_CZERPNIA].temperature;
+	float wywiew = device.sensorsBME280[ID_WYWIEW].temperature;
+
+	float licznik = (nawiew-czerpnia);
+	float mianownik = (wywiew-czerpnia);
+	if (mianownik==0)
+		mianownik = 0.01f;
+
+	device.efficency.is = (int)(licznik*100/mianownik);
+	if (device.efficency.is>device.efficency.max)
+		device.efficency.max = device.efficency.is;
+	if (device.efficency.is<device.efficency.min)
+		device.efficency.min = device.efficency.is;
+
 }
 
 void outputs() {
@@ -457,7 +475,7 @@ void outputs() {
 }
 
 void setUDPdata() {
-	int size = 34;
+	int size = 37;
 	byte dataWrite[size];
 	// First three bytes are reserved for device recognized purposes.
 	dataWrite[0] = (((device.fanSpeed>0)?1:0)<< 7) | (device.normalON << 6) | (device.humidityAlert.req<< 5) | (device.bypassOpen << 4) | (device.defrost.req << 3);
@@ -502,14 +520,19 @@ void setUDPdata() {
 	int trigger = (int)(device.defrost.trigger/10.0);
 	dataWrite[33] = (trigger>255? 255 : trigger);
 
+	dataWrite[34] = device.humidityAlert.timeLeft;
+	dataWrite[35] = device.humidityAlert.trigger;
+
+	dataWrite[36] = device.efficency.is;
+
 	setUDPdata(0, dataWrite,size);
 }
 
 void statusUpdate() {
 	String status;
 	status = "PARAMETRY PRACY\n";
-	status +="Wentylatory: "; status += device.fanSpeed; status +="[%]\tObr1: "; status += device.fan1revs; status +="[min-1]\tObr2: "; status += device.fan2revs;
-	status +="[min-1] EFEKTYWNOSC:"; status += device.efficency; status +="[%] MAX:"; status += device.efficencyMAX; status +="[%]\n";
+	status +="Wentylatory: "; status += device.fanSpeed; status +="[%]\tObr1: "; status += device.fan1revs; status +="[min-1]\tObr2: "; status += device.fan2revs; status +="[min-1]\n";
+	status +="EFF:"; status += device.efficency.is; status +="[%] MIN:"; status += device.efficency.min; status +="[%] MAX:"; status += device.efficency.max; status +="[%]\n:";
 	status +="NormalON: "; status += device.normalON ? "TAK":"NIE"; status +="\tbypass otwarty: "; status += device.bypassOpen ? "TAK":"NIE"; status +="\n";
 	status +="Odmrazanie: "; status += device.defrost.req ? "TAK":"NIE"; status +="\ttime left: "; status += device.defrost.timeLeft; status +="\t[s] trigger: "; status += device.defrost.trigger; status +="[hPa]\n";
 	status +="Humidity Alert: "; status += device.humidityAlert.req ? "TAK":"NIE"; status +="\ttime left: "; status += device.humidityAlert.timeLeft; status +="\t[s] trigger: "; status += device.humidityAlert.trigger; status +="[%]\n";

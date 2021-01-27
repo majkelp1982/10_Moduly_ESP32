@@ -67,6 +67,12 @@ struct Mode {
 	unsigned long endMillis = 0;
 };
 
+struct Value {
+	int is = 0;
+	int min = 0;
+	int max = 0;
+};
+
 struct Device {
 	SensorBME280 sensorsBME280[4];
 	boolean normalON = false;			// normal mode
@@ -77,8 +83,7 @@ struct Device {
 	int fan1revs = 0;					// revs min-1
 	int fan2revs = 0;					// revs min-1
 	int hour[12];
-	int efficency = 0;
-	int efficencyMAX = 0;
+	Value efficency;
 };
 
 struct Zone {
