@@ -60,6 +60,8 @@ void module_init() {
 	//EEprom Scan
 	firstScan();
 
+	device.efficency.is=0;
+
 	//Bypass initialization
 	ledcSetup(SERVO_CHANNEL, SERVO_FREQUENCY, SERVO_RESOUTION);
 	ledcAttachPin(SERVO_PIN, SERVO_CHANNEL);
@@ -97,11 +99,11 @@ void firstScan() {
 	// 0 - 11 		: 	device.hour[0] .. device.hour[11]
 	// 12			:	device.defrost.trigger
 	//Get data from EEprom
-	int size = 13;
+	int size = 1024;
 	byte EEpromData[size];
 	EEpromScan(EEpromData, size);
 	Serial.println("\nFirst scan");
-	for (int i=0; i<size; i++) {
+	for (int i=0; i<12; i++) {
 		byte data = EEpromData[i];
 		device.hour[i] = (byte) data;
 	}
@@ -150,13 +152,13 @@ void getMasterDeviceOrder() {
 	}
 	//byte 33
 	if (UDPdata.data[0] == 33) {
-		device.humidityAlert.trigger = UDPdata.data[1];
+		device.defrost.trigger = UDPdata.data[1];
 		EEpromWrite(12, UDPdata.data[1]);
 	}
 
 	//byte 35
-	if (UDPdata.data[0] == 33) {
-		device.defrost.trigger = UDPdata.data[1];
+	if (UDPdata.data[0] == 35) {
+		device.humidityAlert.trigger = UDPdata.data[1];
 		EEpromWrite(13, UDPdata.data[1]);
 	}	setUDPdata();
 	forceStandardUDP();
@@ -362,30 +364,25 @@ void humidityAlert() {
 }
 
 void defrost() {
-	boolean defrostForce = (device.defrost.trigger == 50);
 	unsigned long currentMillis = millis();
-	device.defrost.timeLeft = (int)((device.defrost.endMillis - currentMillis)/60000);
+	device.defrost.req = ((device.efficency.is>0) && (device.efficency.is <=device.defrost.trigger));
+	if (device.defrost.req) {
+		String info = "Wymuszenie rozmra¿ania EFF=";
+		info +=device.efficency.is;
+		info +="%";
+		addLog(info);
+	}
+	if (device.defrost.req)	device.defrost.endMillis = currentMillis + (11*60000);
+
+	long timeLeftMillis = device.defrost.endMillis - currentMillis;
+	if (timeLeftMillis<0) timeLeftMillis = 0;
+
+	device.defrost.timeLeft = int((timeLeftMillis)/60000);
+	if ((device.defrost.timeLeft<=0) || (device.defrost.endMillis==0)) device.defrost.timeLeft = 0;
 
 	//force defrost off
-	if (device.defrost.trigger == 500)
+	if (device.defrost.trigger == 100)
 		device.defrost.timeLeft = 0;
-	if ((device.defrost.timeLeft<0) || !device.defrost.req) device.defrost.timeLeft = 0;
-
-	// reset defrosting after process time run out
-	if (device.defrost.req && device.defrost.timeLeft<=0)
-		device.defrost.req = false;
-	// if temperature over 0, no risk to recu frozen
-	if ((device.sensorsBME280[ID_CZERPNIA].temperature >0)
-			&& (!defrostForce))
-		return;
-	// if req already true, no need to check again
-	if (device.defrost.req) return;
-
-	if ((device.sensorsBME280[ID_CZERPNIA].pressure-device.sensorsBME280[ID_NAWIEW].pressure>=device.defrost.trigger)
-			||(defrostForce)) {
-		device.defrost.req = true;
-		device.defrost.endMillis = currentMillis + (11*60000);
-	}
 }
 
 void bypass() {
@@ -422,20 +419,16 @@ void fan() {
 	device.fanSpeed = 0;
 	if (device.normalON)
 		device.fanSpeed = 50;
-	if (device.defrost.timeLeft>0)
-		device.fanSpeed = 80;
 	if (device.humidityAlert.timeLeft>0)
 		device.fanSpeed = 70;
-
-	//TMP
-	if (device.defrost.trigger>=400) {
-		device.fanSpeed = device.defrost.trigger - 400;
-	}
+	if (device.defrost.timeLeft>0)
+		device.fanSpeed = 80;
 }
 
 void efficency() {
 	if ((device.fanSpeed==0)
-			|| millis()<60000) {
+			|| millis()<60000
+			|| device.bypassOpen) {
 		device.efficency.is = 0;
 		efficencyDelayMillis = millis();
 		return;
@@ -455,9 +448,9 @@ void efficency() {
 	device.efficency.is = (int)(licznik*100/mianownik);
 	if (device.efficency.is>device.efficency.max)
 		device.efficency.max = device.efficency.is;
-	if (device.efficency.is<device.efficency.min)
+	if ((device.efficency.is<device.efficency.min)
+			|| device.efficency.min ==0)
 		device.efficency.min = device.efficency.is;
-
 }
 
 void outputs() {
@@ -466,6 +459,7 @@ void outputs() {
 	if (device.bypassOpen) dutyCycle = 10;
 	else dutyCycle = 17;
 	ledcWrite(SERVO_CHANNEL, dutyCycle);
+
 	//Fans
 	// parsing 0-100% into 255-0
 	dutyCycle = 255-(int)((device.fanSpeed/100.00)*255);
@@ -517,8 +511,7 @@ void setUDPdata() {
 	dataWrite[31] = (int)(device.fan2revs/100);
 
 	dataWrite[32] = device.defrost.timeLeft;
-	int trigger = (int)(device.defrost.trigger/10.0);
-	dataWrite[33] = (trigger>255? 255 : trigger);
+	dataWrite[33] = device.defrost.trigger;
 
 	dataWrite[34] = device.humidityAlert.timeLeft;
 	dataWrite[35] = device.humidityAlert.trigger;
@@ -534,8 +527,8 @@ void statusUpdate() {
 	status +="Wentylatory: "; status += device.fanSpeed; status +="[%]\tObr1: "; status += device.fan1revs; status +="[min-1]\tObr2: "; status += device.fan2revs; status +="[min-1]\n";
 	status +="EFF:"; status += device.efficency.is; status +="[%] MIN:"; status += device.efficency.min; status +="[%] MAX:"; status += device.efficency.max; status +="[%]\n:";
 	status +="NormalON: "; status += device.normalON ? "TAK":"NIE"; status +="\tbypass otwarty: "; status += device.bypassOpen ? "TAK":"NIE"; status +="\n";
-	status +="Odmrazanie: "; status += device.defrost.req ? "TAK":"NIE"; status +="\ttime left: "; status += device.defrost.timeLeft; status +="\t[s] trigger: "; status += device.defrost.trigger; status +="[hPa]\n";
-	status +="Humidity Alert: "; status += device.humidityAlert.req ? "TAK":"NIE"; status +="\ttime left: "; status += device.humidityAlert.timeLeft; status +="\t[s] trigger: "; status += device.humidityAlert.trigger; status +="[%]\n";
+	status +="Odmrazanie: "; status += device.defrost.req ? "TAK":"NIE"; status +="\ttime left: "; status += device.defrost.timeLeft; status +="[min]\ttrigger EFF: "; status += device.defrost.trigger; status +="[%]\n";
+	status +="Humidity Alert: "; status += device.humidityAlert.req ? "TAK":"NIE"; status +="\ttime left: "; status += device.humidityAlert.timeLeft; status +="[min]\ttrigger: "; status += device.humidityAlert.trigger; status +="[%]\n";
 	status +="Czerpnia:\t T="; status +=device.sensorsBME280[0].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[0].humidity;
 	status +="[%]\tP="; status +=(int)device.sensorsBME280[0].pressure;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[0].faultyReadings ;status +="\n";
 	status +="Wyrzutnia:\t T="; status +=device.sensorsBME280[1].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[1].humidity;
