@@ -381,8 +381,10 @@ void defrost() {
 	if ((device.defrost.timeLeft<=0) || (device.defrost.endMillis==0)) device.defrost.timeLeft = 0;
 
 	//force defrost off
-	if (device.defrost.trigger == 100)
+	if (device.defrost.trigger == 0) {
 		device.defrost.timeLeft = 0;
+		device.defrost.endMillis = currentMillis;
+	}
 }
 
 void bypass() {
@@ -426,6 +428,12 @@ void fan() {
 }
 
 void efficency() {
+	//efficency reset
+	if (device.defrost.req == 1) {
+		device.efficency.max = 0;
+		device.efficency.min = 100;
+	}
+
 	if ((device.fanSpeed==0)
 			|| millis()<60000
 			|| device.bypassOpen) {
