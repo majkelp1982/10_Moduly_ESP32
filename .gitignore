@@ -2,5 +2,5 @@
 /Release/*
 #/.settings/*
 #.cproject
-*.ino.cpp
+#*.ino.cpp
 *desktop.ini
