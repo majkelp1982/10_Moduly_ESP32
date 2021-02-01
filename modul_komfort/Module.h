@@ -26,7 +26,7 @@
 
 //DHT HUMIDITY SENSORS
 #define DHTTYPE 							11  		//DHT 11
-#define PIN_DHT_SALON						0
+#define PIN_DHT_SALON						14
 #define PIN_DHT_PRALNIA						0
 #define PIN_DHT_LAZ_DOL						13
 #define PIN_DHT_RODZICE						0
@@ -40,15 +40,14 @@
 //Struktura strefy
 struct Zone {
 	DeviceAddress deviceAddress;			//Address DB18b20 1-wire
-	int tempErrorCount = 0;					// number of faulty reading
-	int tempMaxErrorCount = 0;				// number of faulty reading
-	int humidityErrorCount = 0;				// number of faulty reading
-	int humidityMaxErrorCount = 0;			// number of faulty reading
+	int dallasErrorCount = 0;				// number of faulty reading
+	int dallasMaxErrorCount = 0;			// number of faulty reading
+	int dhtErrorCount = 0;				// number of faulty reading
+	int dhtMaxErrorCount = 0;			// number of faulty reading
 	float isTemp=0;
 	float reqTemp=0;
 	int humidity=0;
-	float tempDirectRead=0;
-	int humidityDirectRead=0;
+	float dhtTemp = 0.0f;
 };
 
 struct Device {

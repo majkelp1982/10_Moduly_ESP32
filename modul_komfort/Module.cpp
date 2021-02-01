@@ -27,6 +27,7 @@ void statusUpdate();
 
 //DIAGNOSTIC HELP FUNCTIONS
 void diagDALLAS18b20ReadDeviceAdresses();
+void TMPWritteValuesToEEprom();
 
 //Delays
 unsigned long dallasSensorReadMillis = 0;
@@ -98,6 +99,9 @@ void firstScan() {
 			Serial.printf("[%d]",device.zone[i].deviceAddress[j]);
 		}
 	}
+
+	//TEMP
+	//TMPWritteValuesToEEprom();
 }
 
 void readSensors() {
@@ -119,7 +123,7 @@ void DALLAS18b20Read () {
 		float tempC = 0;
 		float a=0;
 		float b=0;
-		if (zone== 0) {a=0.99;		b=(0.5+2.8);}		// Zone 0 - Salon, kuchnia, klatka, przedpokój
+		if (zone== 0) {a=0.99;		b=(6.2);}			// Zone 0 - Salon, kuchnia, klatka, przedpokój
 		if (zone== 1) {a=0.995;		b=(0+2.2);}			// Zone 1 - Pralnia, warsztat
 		if (zone== 2) {a=1.07;		b=(-4.5+2.7);}		// Zone 2 - £azienka dó³,gabinet
 		if (zone== 3) {a=0.98;		b=(2.1+4.4);}		// Zone 3 - rodzice
@@ -127,19 +131,18 @@ void DALLAS18b20Read () {
 		if (zone== 5) {a=0.975; 	b=(1+2.5);}			// Zone 5 - Karolina
 		if (zone== 6) {a=0.995; 	b=(-1.2+4.7);}		// Zone 6 - Laz Gora
 		tempC = sensors.getTempC(deviceAddress);
-		device.zone[zone].tempDirectRead = tempC;
 		if ((tempC<5) || (tempC>100)) {
-			device.zone[zone].tempErrorCount++;
+			device.zone[zone].dallasErrorCount++;
 			//zapisz liczbe maksymalna zlych odczytow z rzedu
-			if (device.zone[zone].tempMaxErrorCount < device.zone[zone].tempErrorCount) device.zone[zone].tempMaxErrorCount = device.zone[zone].tempErrorCount;
+			if (device.zone[zone].dallasMaxErrorCount < device.zone[zone].dallasErrorCount) device.zone[zone].dallasMaxErrorCount = device.zone[zone].dallasErrorCount;
 			//po x probach nie udanych wysli fa³szyw¹ temperaturê
-			if (device.zone[zone].tempErrorCount > 50) device.zone[zone].isTemp = 10.00;
+			if (device.zone[zone].dallasErrorCount > 50) device.zone[zone].isTemp = 10.00;
 		}
 		else {
 			//przelicz temperature wedlug krzywej
 			tempC = a * tempC + b;						// Temperature compensation
 			//zerowanie liczby bledow
-			device.zone[zone].tempErrorCount = 0;
+			device.zone[zone].dallasErrorCount = 0;
 			device.zone[zone].isTemp = tempC;
 		}
 	}
@@ -148,14 +151,13 @@ void DALLAS18b20Read () {
 
 void getHumidity(int zone) {
 	int humidity = (int)device.dhtSensor[zone].readHumidity();
-	device.zone[zone].humidityDirectRead = humidity;
 	if (isnan(humidity)
 			|| (humidity<15)
 			|| (humidity>100))
-		device.zone[zone].humidityErrorCount++;
+		device.zone[zone].dhtErrorCount++;
 	else {
-		if ((humidity>=70)
-				&& (device.zone[zone].humidity<70)) {
+		if ((humidity>=80)
+				&& (device.zone[zone].humidity<80)) {
 			String log = "Strefa[";
 			log+=zone;
 			log +="] alert[";
@@ -164,14 +166,18 @@ void getHumidity(int zone) {
 			log +=device.zone[zone].humidity;
 			addLog(log);
 		}
-		device.zone[zone].humidityErrorCount = 0;
+		device.zone[zone].dhtErrorCount = 0;
 		device.zone[zone].humidity = humidity;
 	}
-	if (device.zone[zone].humidityMaxErrorCount<device.zone[zone].humidityErrorCount)
-		device.zone[zone].humidityMaxErrorCount=device.zone[zone].humidityErrorCount;
+	if (device.zone[zone].dhtMaxErrorCount<device.zone[zone].dhtErrorCount)
+		device.zone[zone].dhtMaxErrorCount=device.zone[zone].dhtErrorCount;
+
+	//second temperature to compare
+	device.zone[zone].dhtTemp = device.dhtSensor[zone].readTemperature();
 }
 
 void DHT22Read() {
+	getHumidity(ID_SALON);
 	getHumidity(ID_LAZ_DOL);
 	//TODO list to extend
 }
@@ -286,43 +292,29 @@ void statusUpdate() {
 	String status;
 	status = "MAIN\n";
 	for (int i=0; i<ZONE_QUANTITY; i++) {
-		status +="Zone[";
+		status +="\nZone[";
 		status +=i;
-		status +="]	hum=";
+		status +="]\tH=";
 		status +=(int)device.zone[i].humidity;
-		status +="	isTemp=";
+		status +="\tT=";
 		status +=(double)device.zone[i].isTemp;
-		status +="	reqTemp=";
+		status +="\treqT=";
 		status +=(double)device.zone[i].reqTemp;
-		status +="	TErrMAX[";
-		status +=device.zone[i].tempMaxErrorCount;
+		status +="\tdhtT=";
+		status +=(double)device.zone[i].dhtTemp;
+		status +="\tdallasErrMAX[";
+		status +=device.zone[i].dallasMaxErrorCount;
 		status +="]";
-		status +="	DirectRead[";
-		status +=device.zone[i].tempDirectRead;
-		status +="]";
-		status +="	HErrMAX[";
-		status +=device.zone[i].humidityMaxErrorCount;
-		status +="]";
-		status +="	DirectRead[";
-		status +=device.zone[i].humidityDirectRead;
-		status +="]";
-		status +="	SensorAddr";
+		status +="\tdhtErrMAX[";
+		status +=device.zone[i].dhtMaxErrorCount;
+		status +="]\t";
+		status +="Addr";
 		for (int j=0; j<8; j++) {
 			status +="[";
 			status +=device.zone[i].deviceAddress[j];
 			status +="]";
 		}
 		status +="\n";
-	}
-	status +="\nAddresses read from BUS:";
-	for (int i=1; i<=ZONE_QUANTITY; i++) {
-		status += "\n";
-		for (int j=0; j<8; j++) {
-			status += "[";
-			status += tmpAddresses[i][j];
-			status += "]";
-		}
-
 	}
 	setStatus(status);
 }
@@ -332,4 +324,29 @@ void diagDALLAS18b20ReadDeviceAdresses() {
 	for (int i=0; i<ZONE_QUANTITY; i++)
 		sensors.getAddress(tmpAddresses[i],i);
 	count = 0;
+}
+
+
+void TMPWritteValuesToEEprom() {
+	DeviceAddress tempAddresses[7] = {
+			{40,7,0,7,151,237,1,237},		// SALON
+			{40,2,0,7,104,63,1,29},			// PRALNIA
+			{40,255,2,62,96,23,5,142},		// LAZIENKA DOL
+			{40,2,0,7,201,119,1,173},		// RODZICE
+			{40,2,0,7,38,42,1,203},			// NATALIA
+			{40,2,0,7,192,72,1,22},			// KATOLINA
+			{40,7,0,7,141,124,1,202}		// LAZIENKA GORA
+	};
+
+	int offset = 50;
+	//ADDRESS IS SAVING
+	for (int zoneNo=0; zoneNo<ZONE_QUANTITY; zoneNo++) {
+		Serial.printf("\nZone[%d]\t", zoneNo);
+		for (int i=0; i<8; i++) {
+			EEpromWrite((offset+(8*zoneNo+i)),tempAddresses[zoneNo][i]);
+			Serial.printf("[%d][%d]\t",offset+(8*zoneNo+i),tempAddresses[zoneNo][i]);
+			delay(100);
+		}
+	delay(100);
+	}
 }
