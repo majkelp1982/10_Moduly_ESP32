@@ -13,7 +13,7 @@
 //SPI
 #define SPI_SCK 							18 // BME280 PIN SCL
 #define SPI_MISO 							19 // BME280 PIN SDO
-#define SPI_MOSI							23 // BME280 PIN
+#define SPI_MOSI							23 // BME280 PIN SDA
 
 //BME280 CS PIN(SPI)
 #define CS_BME280							13 // BME280 PIN CSB
@@ -30,14 +30,12 @@ struct SensorBME280 {
 };
 
 struct SensorSDS011 {
-	int mode = 1;	// 1 - wakeup	2- sleep;
 	unsigned long modeTimeLeft;
 	int pm25 = 0;
 	int pm10 = 0;
-	unsigned long timeWakeUp;
 	SDS011 interface;
 	unsigned int faultyReadings = 0;		// [units]
-	int sleepTime = 60;						// time in [s] when sensor stay sleep
+	int sleepTime = 600;					// time in [s] when sensor stay sleep
 	int standUpTime = 10;					// time in [s] when sensor after wake up need to stable parameters
 };
 

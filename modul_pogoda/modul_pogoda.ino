@@ -5,7 +5,7 @@
 #include <Communication.h>
 #include "Module.h"
 
-#define MODULE_TYPE			1
+#define MODULE_TYPE			11
 #define MODULE_NO			0
 #define SERIAL_BAUD			921600
 

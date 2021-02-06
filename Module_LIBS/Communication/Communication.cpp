@@ -35,12 +35,15 @@ int eepromSize = 0;
 
 EEPROMClass eeprom;
 
+boolean _debug = false;
+
 
 //millis
 unsigned long udpStandardsendMillis = 0;
 unsigned long udpDiagnosesendMillis = 0;
 
-Communication::Communication(boolean start) {
+Communication::Communication(boolean debug) {
+	_debug = debug;
 }
 
 Communication::~Communication() {
@@ -121,8 +124,12 @@ void UDPsendStandardFrame() {
 	Udp.write(getModuleType());
 	Udp.write(getModuleNo());
 	Udp.write(dataWritte.frameNo);
-	for (int i=0; i<(dataWritte.length); i++)
+	if (_debug) Serial.printf("\n[%d][%d][%d]",getModuleType(),getModuleNo(), dataWritte.frameNo);
+	for (int i=0; i<(dataWritte.length); i++) {
 		Udp.write(dataWritte.data[i]);
+		if (_debug)
+			Serial.printf("[%d]",dataWritte.data[i]);
+	}
 	Udp.endPacket();
 
 	dataWritte.length = 0;

@@ -56,13 +56,13 @@ void readSensors() {
 void readBME280() {
 	if (sleep(&readSensorMillis, 5)) return;
 	float temperature = device.sensorBME280.interface.readTemperature();
-	int pressure = (int)(device.sensorBME280.interface.readPressure());
+	int pressure = (int)(device.sensorBME280.interface.readPressure()/100);
 	int humidity = (int)device.sensorBME280.interface.readHumidity();
-	if (device.sensorBME280.temperature>70
-			|| device.sensorBME280.pressure>1050
-			|| device.sensorBME280.pressure<800
-			|| device.sensorBME280.humidity>100
-			|| device.sensorBME280.humidity<15)
+	if (temperature>70
+			|| pressure>1050
+			|| pressure<800
+			|| humidity>100
+			|| humidity<15)
 		device.sensorBME280.faultyReadings++;
 	else {
 		device.sensorBME280.temperature = temperature;
@@ -93,8 +93,11 @@ void readSDS011() {
 				device.sensorSDS011.interface.sleep();
 			}
 			else
-				device.sensorSDS011.faultyReadings++;
-		}
+				// if after 4 seconds of stable work sensor still doesn't work properly add  error and switch to sleep
+				if (modeSwitchTime>(device.sensorSDS011.standUpTime+4)) {
+					device.sensorSDS011.faultyReadings++;
+				}
+			}
 	}
 }
 
@@ -113,16 +116,19 @@ void getMasterDeviceOrder() {
 }
 
 void setUDPdata() {
-	int size = 37;
+	int size = 9;
 	byte dataWrite[size];
 	// First three bytes are reserved for device recognized purposes.
 	//BMEs
 	dataWrite[0] = get10Temp(device.sensorBME280.temperature);
 	dataWrite[1] = get01Temp(device.sensorBME280.temperature);
 	dataWrite[2] = device.sensorBME280.humidity;
-	dataWrite[3] = (int)(device.sensorBME280.pressure/10);
-	dataWrite[4] = (int)(device.sensorBME280.pressure/10);
-	dataWrite[5] = (int)(device.sensorBME280.pressure/10);
+	dataWrite[3] = (byte)(device.sensorBME280.pressure>>8);
+	dataWrite[4] = (byte)(device.sensorBME280.pressure);
+	dataWrite[5] = (byte)(device.sensorSDS011.pm25>>8);
+	dataWrite[6] = (byte)(device.sensorSDS011.pm25);
+	dataWrite[7] = (byte)(device.sensorSDS011.pm10>>8);
+	dataWrite[8] = (byte)(device.sensorSDS011.pm10);
 
 	setUDPdata(0, dataWrite,size);
 }
@@ -130,14 +136,11 @@ void setUDPdata() {
 void statusUpdate() {
 	String status;
 	status = "PARAMETRY \n";
-	status +="BME280\tT="; status +=device.sensorBME280.temperature; status +="[stC]\tH="; status +=(int)device.sensorBME280.humidity;
-	status +="[%]\tP="; status +=(int)device.sensorBME280.pressure;status +="[hPa] Faulty="; status +=(int)device.sensorBME280.faultyReadings ;status +="\n";
-	status +="SDS011\t Mode="; status+= (device.sensorSDS011.mode==MODE_SLEEP)? "SLEEP":"WAKEUP"; status +="\t TimeLeft="; status +=device.sensorSDS011.modeTimeLeft; status+="[s]\n";
-	status +="PM2.5="; status +=device.sensorSDS011.pm25; status +="[ug/m3]\tPM10="; status +=(int)device.sensorSDS011.pm10; status +="[ug/m3]\t Faulty="; status +=(int)device.sensorSDS011.faultyReadings ;status +="\n";
+	status +="BME280\t\tT="; status +=device.sensorBME280.temperature; status +="[stC]\t\tH="; status +=(int)device.sensorBME280.humidity;
+	status +="[%]\t\tP="; status +=(int)device.sensorBME280.pressure;status +="[hPa]\t\tFaulty="; status +=(int)device.sensorBME280.faultyReadings ;status +="\n";
+	status +="SDS011\t\tMode="; status+= (device.sensorSDS011.interface.mode==MODE_SLEEP)? "SLEEP":"WAKEUP"; status +="\t\tTimeLeft="; status +=device.sensorSDS011.modeTimeLeft; status+="[s]\n";
+	status +="\t\tPM2.5="; status +=device.sensorSDS011.pm25; status +="[ug/m3]\t\tPM10="; status +=(int)device.sensorSDS011.pm10; status +="[ug/m3]\t\tFaulty="; status +=(int)device.sensorSDS011.faultyReadings ;status +="\n";
 
-	status +=device.sensorSDS011.interface.modeTime;
-	status +="\n";
-	status +=(unsigned long)(device.sensorSDS011.interface.modeTime/1000);
 	setStatus(status);
 }
 
