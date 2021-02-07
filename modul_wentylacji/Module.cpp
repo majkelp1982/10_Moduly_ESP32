@@ -23,10 +23,6 @@ void outputs();
 void setUDPdata();
 void statusUpdate();
 
-//help functions
-int get10Temp(float temp);
-int get01Temp(float temp);
-
 //Variables
 Adafruit_BME280 bme1(CS_BME280_CZERPNIA, SPI_MOSI, SPI_MISO, SPI_SCK);
 Adafruit_BME280 bme2(CS_BME280_WYRZUTNIA, SPI_MOSI, SPI_MISO, SPI_SCK);
@@ -549,16 +545,6 @@ void statusUpdate() {
 		status +="Zone["; status +=i; status += "]:\t\t T="; status +=zones[i].isTemp; status +="[stC]\treqT="; status+=zones[i].reqTemp; status +="[stC]\tH="; status +=zones[i].humidity; status +="\n";
 	}
 	setStatus(status);
-}
-
-//Help functions
-int get10Temp(float temp){
-	return (int)temp;
-}
-
-int get01Temp(float temp) {
-	int temp10 = get10Temp(temp);
-	return (int) ((temp*10)-(temp10*10));
 }
 
 
