@@ -3,7 +3,7 @@
 #include "Arduino.h"
 #include <esp_task_wdt.h>
 
-#define FIRMWARE_VERSION	"2021.02.01_00"
+#define FIRMWARE_VERSION	"2021.02.01_00_pogodowy1"
 
 struct Diagnose {
 	byte ip[4];
@@ -44,5 +44,9 @@ Diagnose getDiagnose();
 void setDiagnose(Diagnose diag);
 void dateTimeSet(int year, int month, int day, int weekDay, int hour, int minute, int second);
 bool UDPbitStatus(byte data, int bytePos);
+
+//Help functions get byte from float number
+byte get10Temp(float temp);
+byte get01Temp(float temp);
 
 #endif /* BASIC_H_ */

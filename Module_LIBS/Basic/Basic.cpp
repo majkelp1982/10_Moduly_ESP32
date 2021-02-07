@@ -66,6 +66,21 @@ bool UDPbitStatus(byte data, int bytePos) {
 	else return false;
 }
 
+//Help functions
+byte get10Temp(float temp){
+	byte value;
+	// when value under 0 add sign bit
+	if (temp<0) value=(1<<7);
+	else value = 0;
+	return (byte)(value+abs(temp));
+}
+
+byte get01Temp(float temp) {
+	byte temp10 = get10Temp(abs(temp));
+	return (byte) ((abs(temp)*10)-(temp10*10));
+}
+
+
 int getModuleType() {
 	return _moduleType;
 }

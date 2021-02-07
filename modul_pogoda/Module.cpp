@@ -13,10 +13,6 @@ void getMasterDeviceOrder();
 void setUDPdata();
 void statusUpdate();
 
-//help functions
-int get10Temp(float temp);
-int get01Temp(float temp);
-
 //Variables
 Adafruit_BME280 bme1(CS_BME280, SPI_MOSI, SPI_MISO, SPI_SCK);
 SDS011 sds011(SERIAL2_RX, SERIAL2_TX);
@@ -143,17 +139,3 @@ void statusUpdate() {
 
 	setStatus(status);
 }
-
-//Help functions
-int get10Temp(float temp){
-	return (int)temp;
-}
-
-int get01Temp(float temp) {
-	int temp10 = get10Temp(temp);
-	return (int) ((temp*10)-(temp10*10));
-}
-
-
-
-
