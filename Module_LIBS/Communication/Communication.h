@@ -16,6 +16,8 @@
 #include <Status.h>
 #include <EEPROM.h>
 
+#define MAX_DATA_SIZE		128
+
 struct DataRead {
 	boolean newData=false;
 	int deviceType= 0;
@@ -28,7 +30,8 @@ struct DataRead {
 struct DataWritte {
 	int length = 0;
 	int frameNo = 0;
-	byte data[128];
+	byte data[MAX_DATA_SIZE];
+	byte lastData[MAX_DATA_SIZE];
 };
 
 class Communication {

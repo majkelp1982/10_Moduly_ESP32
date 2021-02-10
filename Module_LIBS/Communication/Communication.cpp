@@ -194,8 +194,13 @@ void resetNewData() {
 }
 
 void setUDPdata(int frameNo, byte *data, int length) {
-	for (int i=0; i<length; i++)
+	for (int i=0; i<length; i++) {
 		dataWritte.data[i] = data[i];
+		//if data was changed since last time force to send UDP frame
+		if (dataWritte.data[i] != dataWritte.lastData[i])
+			forceStandardUDP();
+		dataWritte.lastData[i] = dataWritte.data[i];
+	}
 	dataWritte.frameNo = frameNo;
 	dataWritte.length = length;
 }
