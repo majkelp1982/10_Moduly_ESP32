@@ -3,7 +3,10 @@
 #include "Arduino.h"
 #include <esp_task_wdt.h>
 
-#define FIRMWARE_VERSION	"2021.02.01_00_wentylacja_uzaleznienie_jak_pow"
+#define VERSION				"2021.02.01_00"
+#define BETA_VERSION		"force_UDPsend_when_data_changed"
+
+#define FIRMWARE_VERSION	VERSION "_" BETA_VERSION
 
 struct Diagnose {
 	byte ip[4];

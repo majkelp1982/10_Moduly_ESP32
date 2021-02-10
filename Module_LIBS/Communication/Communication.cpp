@@ -108,7 +108,8 @@ bool WiFi_conectionCheck() {
 }
 
 void forceStandardUDP() {
-	forceUDPStandardFrame = true;
+	if (WiFi.isConnected())
+		forceUDPStandardFrame = true;
 }
 
 void UDPsendStandardFrame() {
@@ -199,6 +200,7 @@ void setUDPdata(int frameNo, byte *data, int length) {
 		//if data was changed since last time force to send UDP frame
 		if (dataWritte.data[i] != dataWritte.lastData[i])
 			forceStandardUDP();
+		{}
 		dataWritte.lastData[i] = dataWritte.data[i];
 	}
 	dataWritte.frameNo = frameNo;
