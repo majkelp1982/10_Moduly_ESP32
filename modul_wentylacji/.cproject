@@ -35,10 +35,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/SPI/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/Wire/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/EEPROM}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/DallasTemperature}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/OneWire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/Servo}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/FreeRTOS/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.1557751461" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
@@ -60,10 +57,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/SPI/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/Wire/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/EEPROM}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/DallasTemperature}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/OneWire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/Servo}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/FreeRTOS/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.1711104110" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
@@ -85,10 +79,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/SPI/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/Wire/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/EEPROM}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/DallasTemperature}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/OneWire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/Servo}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/FreeRTOS/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.259696098" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>

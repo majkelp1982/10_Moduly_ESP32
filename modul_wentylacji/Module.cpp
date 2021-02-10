@@ -2,6 +2,7 @@
 
 Device device;
 Zone zones[7];
+AirPollution airPollution;
 DataRead UDPdata;
 Servo servo;
 
@@ -11,6 +12,7 @@ void readSensors();
 void readUDPdata();
 void getMasterDeviceOrder();
 void getComfortParams();
+void getAirParams();
 
 void normalMode();
 void humidityAlert();
@@ -134,6 +136,10 @@ void readUDPdata() {
 			&& (UDPdata.deviceNo == 0)
 			&& (UDPdata.frameNo == 0))
 		getComfortParams();
+	if ((UDPdata.deviceType == ID_MOD_WEATHER)
+			&& (UDPdata.deviceNo == 0)
+			&& (UDPdata.frameNo == 0))
+		getAirParams();
 
 	resetNewData();
 }
@@ -190,8 +196,14 @@ void getComfortParams(){
 	zones[ID_ZONE_LAZGORA].humidity = UDPdata.data[27];
 }
 
+void getAirParams(){
+	airPollution.pm25 = (UDPdata.data[5]<<8) + (UDPdata.data[6]);
+	airPollution.pm10 = (UDPdata.data[7]<<8) + (UDPdata.data[8]);
+}
+
 void normalMode() {
 	bool normalOn = false;
+
 	DateTime dateTime = getDateTime();
 	if (dateTime.hour == 0) {
 		if ((dateTime.minute>=0) && (dateTime.minute<15) && (UDPbitStatus(device.hour[0],7))) normalOn = true;
@@ -337,6 +349,12 @@ void normalMode() {
 		if ((dateTime.minute>=30) && (dateTime.minute<45) && (UDPbitStatus(device.hour[11],1))) normalOn = true;
 		if ((dateTime.minute>=45) && (dateTime.minute<60) && (UDPbitStatus(device.hour[11],0))) normalOn = true;
 	}
+
+	//don't turn on in normal mode ventilation if air is dusty
+	if ((airPollution.pm10>150)
+			|| airPollution.pm25>150)
+		normalOn = false;
+
 	device.normalON = normalOn;
 }
 
@@ -544,6 +562,7 @@ void statusUpdate() {
 	for (int i=0; i<7; i++) {
 		status +="Zone["; status +=i; status += "]:\t\t T="; status +=zones[i].isTemp; status +="[stC]\treqT="; status+=zones[i].reqTemp; status +="[stC]\tH="; status +=zones[i].humidity; status +="\n";
 	}
+	status +="Air\tPM2.5="; status+=airPollution.pm25; status +="[ug/m3]\t PM10="; status +=airPollution.pm10; status+="[ug/m3]\n";
 	setStatus(status);
 }
 

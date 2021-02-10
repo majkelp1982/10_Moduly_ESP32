@@ -10,6 +10,7 @@
 //MODULES ID
 #define ID_MOD_MAIN							1
 #define ID_MOD_COMFORT						10
+#define ID_MOD_WEATHER						11
 //ZONES ID
 #define ID_ZONE_SALON						0
 #define ID_ZONE_LAZDOL						1
@@ -90,6 +91,11 @@ struct Zone {
 	int humidity = 0;
 	float isTemp = 0.0f;
 	float reqTemp = 0.0f;
+};
+
+struct AirPollution {
+	int pm25=0;
+	int pm10=0;
 };
 
 void module_init();
