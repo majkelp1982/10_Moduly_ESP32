@@ -3,8 +3,8 @@
 #include "Arduino.h"
 #include <esp_task_wdt.h>
 
-#define VERSION				"2021.02.01_00"
-#define BETA_VERSION		"force_UDPsend_when_data_changed"
+#define VERSION				"2021.02.10_00"
+#define BETA_VERSION		""
 
 #define FIRMWARE_VERSION	VERSION "_" BETA_VERSION
 
