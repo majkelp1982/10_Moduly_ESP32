@@ -1,50 +1,33 @@
 #include "Arduino.h"
-#include "Basic.h"
-#include "EepromEvent.h"
-#include "Communication.h"
-#include "OTA.h"
+#include <Basic.h>
+#include <OTA.h>
+#include <Status.h>
+#include <Communication.h>
 #include "Module.h"
-#include "Status.h"
 
-DateTime dateTime;
-Device device;
+#define MODULE_TYPE			14
+#define MODULE_NO			0
+#define SERIAL_BAUD			921600
+
+Basic basic(MODULE_TYPE,MODULE_NO,SERIAL_BAUD);
+OTA ota(true);
+Status status(true);
+Communication communication(true);
 
 void setup()
 {
-	Serial_Setup(921600);						// serial port init with welcome text
-	//	Write values to eeprom
-	//  TMPwriteValueToEEPROM();
-
-	FirstScan(&device);							// get values from eeprom after startup
-	Serial.println("First scan done");
-	Pin_Setup();								// setup hardware pins
-	Serial.println("Pin setup done");
-	WiFi_init();								// WiFi initialization
-	Serial.println("WiFi init done");
-	OTA_init();									// Over the Air programming
-	Serial.println("OTA done");
-	Module_init();								// Init sensors for main program
-	Serial.println("Module init done ");
-	Valves_init(&device);
-	Serial.println("Valves init done");
+	communication.WiFi_init();
+	ota.init();
+	module_init();
+	addLog("Inicjalizacja zakoñczona");
+	basic.WDT_init();
 }
 
 void loop()
 {
-	//OTA
-	OTA_client();
-
-	//Real Time
-	DateTimeCalculation(&dateTime);
-
-	//main program
-	Module(&device,dateTime);
-
-	//Communication
-	UDPsendStandardFrame(&device);
-	UDPsendDiagnoseFrame(&device);
-	UDPread(&device, &dateTime);
-
-	//TEMP
-	printStatus(device, dateTime);
+	ota.client();
+	basic.run();
+	communication.run();
+	status.printStatus(10);
+	module();
 }
