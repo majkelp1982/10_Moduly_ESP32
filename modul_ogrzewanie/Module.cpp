@@ -380,11 +380,11 @@ void getComfortParams(){
 	device.zone[ID_SALON].isTemp = UDPdata.data[0]+(UDPdata.data[1]/10.0);
 	device.zone[ID_SALON].reqTemp = UDPdata.data[2]/2;
 
-	device.zone[ID_LAZ_DOL].isTemp = UDPdata.data[4]+(UDPdata.data[5]/10.0);
-	device.zone[ID_LAZ_DOL].reqTemp = UDPdata.data[6]/2;
+	device.zone[ID_PRALNIA].isTemp = UDPdata.data[4]+(UDPdata.data[5]/10.0);
+	device.zone[ID_PRALNIA].reqTemp = UDPdata.data[6]/2;
 
-	device.zone[ID_PRALNIA].isTemp = UDPdata.data[8]+(UDPdata.data[9]/10.0);
-	device.zone[ID_PRALNIA].reqTemp = UDPdata.data[10]/2;
+	device.zone[ID_LAZ_DOL].isTemp = UDPdata.data[8]+(UDPdata.data[9]/10.0);
+	device.zone[ID_LAZ_DOL].reqTemp = UDPdata.data[10]/2;
 
 	device.zone[ID_RODZICE].isTemp = UDPdata.data[12]+(UDPdata.data[13]/10.0);
 	device.zone[ID_RODZICE].reqTemp = UDPdata.data[14]/2;

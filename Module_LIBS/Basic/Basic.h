@@ -4,9 +4,9 @@
 #include <esp_task_wdt.h>
 
 #define VERSION				"2021.02.10_00"
-#define BETA_VERSION		""
+#define BETA_VERSION		"ogrzewanie1"
 
-#define FIRMWARE_VERSION	VERSION "_" BETA_VERSION
+#define FIRMWARE_VERSION	VERSION BETA_VERSION
 
 struct Diagnose {
 	byte ip[4];
