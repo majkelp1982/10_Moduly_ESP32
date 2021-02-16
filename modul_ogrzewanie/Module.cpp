@@ -545,7 +545,7 @@ void buffers() {
 		reqCOload = true;
 	}
 
-	if ((device.tBuffCOgora.isTemp<device.reqTempBuforCO) || (device.tBuffCOsrodek.isTemp<=device.reqTempBuforCO-TEMP_CO_HYSTERESIS)) {
+	if ((device.tBuffCOgora.isTemp<device.reqTempBuforCO-(TEMP_CO_HYSTERESIS/2)) || (device.tBuffCOsrodek.isTemp<=device.reqTempBuforCO-TEMP_CO_HYSTERESIS)) {
 		//TMP
 		if (!reqCOload) {
 			String temp;
@@ -604,7 +604,7 @@ void buffers() {
 	}
 
 	// jesli temperatura w srodku spadnie lub dol bedzie ponizej 20st wlacz grzanie CWU
-	if ((device.tBuffCWUsrodek.isTemp<(device.reqTempBuforCWU-TEMP_CWU_HYSTERESIS)) || (device.tBuffCWUdol.isTemp<15)) {
+	if (((device.tBuffCWUsrodek.isTemp<(device.reqTempBuforCWU-TEMP_CWU_HYSTERESIS)) && (device.tBuffCWUsrodek.isTemp<48)) || (device.tBuffCWUdol.isTemp<15)) {
 		if (!reqCWUload) {
 			String temp;
 			temp = "CWU - dogrzewanie -";
@@ -621,11 +621,16 @@ void buffers() {
 		reqCWUload = true;
 	}
 	// force to load CWU during day in cheap tariff
-	if ((getDateTime().hour == 13) && (getDateTime().minute <2)) {
+	if ((getDateTime().hour == 14) && (getDateTime().minute == 30)) {
 		if (!reqCWUload) addLog("CWU - dogrzewanie poludniowe");
 		reqCWUload = true;
 	}
 
+	// force to load CWU during night in cheap tariff
+	if ((getDateTime().hour == 4) && (getDateTime().minute == 30)) {
+		if (!reqCWUload) addLog("CWU - dogrzewanie nocne");
+		reqCWUload = true;
+	}
 	//Sprawdzanie temperatury tylko na gorze przy warunku ze na dole przekroczyla pewna stala wartosc
 	if (((device.tBuffCWUdol.isTemp>=43) || (device.tBuffCWUdol.isTemp>=device.reqTempBuforCWU))
 			&& (device.tBuffCWUsrodek.isTemp>=device.reqTempBuforCWU)
@@ -648,13 +653,18 @@ void buffers() {
 	}
 
 	//Antylegionellia
-	if ((getDateTime().weekDay==6) && (getDateTime().hour==1) && (getDateTime().minute<10)) {
+	if ((getDateTime().weekDay==6) && (getDateTime().hour==1) && (getDateTime().minute==1)) {
 		if (!device.antyLegionellia) addLog("Antylegionellia - Start");
 		device.antyLegionellia = true;
 	}
 
 	if ((getDateTime().weekDay==6) && (getDateTime().hour==12) && (getDateTime().minute<20)) {
 		if (device.antyLegionellia) addLog("Antylegionellia - Koniec");
+		device.antyLegionellia = false;
+	}
+
+	if ((getDateTime().weekDay < 6) && (getDateTime().hour==5) && (getDateTime().minute==59)) {
+		if (device.antyLegionellia) addLog("Antylegionellia - Wy³¹czenie przed koñcem taryfy nocnej");
 		device.antyLegionellia = false;
 	}
 

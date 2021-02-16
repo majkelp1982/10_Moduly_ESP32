@@ -3,8 +3,8 @@
 #include "Arduino.h"
 #include <esp_task_wdt.h>
 
-#define VERSION				"2021.02.10_00"
-#define BETA_VERSION		"ogrzewanie1"
+#define VERSION				"2021.02.10"
+#define BETA_VERSION		"_ogrzewanie_CO_CWU_LOAD"
 
 #define FIRMWARE_VERSION	VERSION BETA_VERSION
 
