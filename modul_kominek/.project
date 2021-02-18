@@ -44,7 +44,7 @@
 		<link>
 			<name>libraries/Adafruit_BME280</name>
 			<type>2</type>
-			<location>C:/Google_Drive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Adafruit_BME280</location>
+			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Adafruit_BME280</location>
 		</link>
 		<link>
 			<name>libraries/Adafruit_Unified_Sensor</name>
@@ -54,12 +54,12 @@
 		<link>
 			<name>libraries/Basic</name>
 			<type>2</type>
-			<location>C:/Google_Drive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Basic</location>
+			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Basic</location>
 		</link>
 		<link>
 			<name>libraries/Communication</name>
 			<type>2</type>
-			<location>C:/Google_Drive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Communication</location>
+			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Communication</location>
 		</link>
 		<link>
 			<name>libraries/DallasTemperature</name>
@@ -70,6 +70,11 @@
 			<name>libraries/EEPROM</name>
 			<type>2</type>
 			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/1.0.0/libraries/EEPROM</locationURI>
+		</link>
+		<link>
+			<name>libraries/ESP_SH1106_OLED</name>
+			<type>2</type>
+			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/ESP_SH1106_OLED</location>
 		</link>
 		<link>
 			<name>libraries/ESPmDNS</name>
@@ -84,7 +89,7 @@
 		<link>
 			<name>libraries/OTA</name>
 			<type>2</type>
-			<location>C:/Google_Drive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/OTA</location>
+			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/OTA</location>
 		</link>
 		<link>
 			<name>libraries/OneWire</name>
@@ -99,12 +104,12 @@
 		<link>
 			<name>libraries/Servo</name>
 			<type>2</type>
-			<location>C:/Google_Drive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Servo</location>
+			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Servo</location>
 		</link>
 		<link>
 			<name>libraries/Status</name>
 			<type>2</type>
-			<location>C:/Google_Drive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Status</location>
+			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Status</location>
 		</link>
 		<link>
 			<name>libraries/Update</name>
