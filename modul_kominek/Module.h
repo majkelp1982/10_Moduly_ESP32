@@ -39,11 +39,10 @@
 #define pinSW 					22
 
 //Alarm spiker
-#define pinSPIKER				15
+#define pinSPIKER				0//TODO
 
 //PUMP
 #define pinPUMP					32
-#define pinSPIKER				0//TODO
 
 //THROTTLE
 #define SERVO_FREQUENCY 					50 		// Hz
