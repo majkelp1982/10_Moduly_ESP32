@@ -23,7 +23,7 @@
 
 //DALLAS 1-wire
 #define DELAY_SENSORS_READ					10			// delay between sensors reading [s]
-#define PIN_DS18B20							21
+#define PIN_DS18B20							13
 
 //PINS
 //OLED
@@ -34,12 +34,27 @@
 #define OLED_SDA	23	//
 
 //rotary encoder
-#define inCLK					16
-#define inDT					17
-#define inSW 					22
+#define pinCLK					16
+#define pinDT					17
+#define pinSW 					22
 
 //Alarm spiker
-#define outSPIKER				15
+#define pinSPIKER				15
+
+//PUMP
+#define pinPUMP					32
+#define pinSPIKER				0//TODO
+
+//THROTTLE
+#define SERVO_FREQUENCY 					50 		// Hz
+#define SERVO_CHANNEL 						2		// this variable is used to select the channel number
+#define SERVO_RESOUTION 					8 		// resolution of the signal
+#define THROTTLE_PIN						25 		// GPIO to PWM fan input
+
+
+//Information number
+#define INFO_MAX				6
+
 
 struct Thermometer {						// Thermometer
 	DeviceAddress deviceAddress;
@@ -50,7 +65,8 @@ struct Thermometer {						// Thermometer
 
 struct HeatingModule {
 	bool pumpInHouse = false;
-	float tBuffCOgora = 0;
+	int tBuffCOgora = 0;
+	int tBuffCOdol = 0;
 	unsigned long paramsLastTimeRead = 0;
 };
 
@@ -61,31 +77,36 @@ struct Message {
 };
 
 struct Info {
-	int type;		// 1-warning	2- ALARM!!!
-	String mess1;
-	String mess2;
-	String mess3;
-	bool active;
+	int type = 0;		// 1-warning	2- ALARM!!!
+	String mess1 = "";
+	String mess2 = "";
+	String mess3 = "";
+	bool active = false;
 };
 
-struct Display {
+struct Screen {
 	String header;
 	Message top;
 	Message bottom;
-	Info info[5];
+	Info info[INFO_MAX];
+	int activeScreen = 1;
 };
 
 struct Device {
 	int mode = 0;							//	0-CZUWANIE, 1-ROZPALANIE, 2-GRZANIE, 3-GASZENIE
 	bool alarm = false;
 	bool warning = false;
+	bool settingsActive = false;
 	bool pump = false;
+	bool buzzer = false;
 	bool fireAlarm = false;
 	Thermometer thermo[3];
 	int reqTemp;
+	int lowestTemp = 0;
 	int throttle = 0;
-	int minutesOnFire = 0;
-	float mode1StartTemperature = 0;
+	unsigned long startMillis = 0;
+	int startTemp = 0;
+	bool reqTempReached;
 };
 
 void module_init();

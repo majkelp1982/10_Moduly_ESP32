@@ -4,7 +4,7 @@
 #include <esp_task_wdt.h>
 
 #define VERSION				"2021.02.10_00"
-#define BETA_VERSION		"ogrzewanie1"
+#define BETA_VERSION		"kominek"
 
 #define FIRMWARE_VERSION	VERSION BETA_VERSION
 
@@ -22,6 +22,12 @@ struct DateTime {
 	int hour=12;
 	int minute=0;
 	int second=0;
+};
+
+struct PinInput {
+	bool lastState = false;
+	bool isState = false;
+	unsigned long lastRead = 0;
 };
 
 class Basic {
@@ -47,6 +53,7 @@ Diagnose getDiagnose();
 void setDiagnose(Diagnose diag);
 void dateTimeSet(int year, int month, int day, int weekDay, int hour, int minute, int second);
 bool UDPbitStatus(byte data, int bytePos);
+void getPinState(PinInput *pinInput, int pin, bool edge);
 
 //Help functions get byte from float number
 byte get10Temp(float temp);

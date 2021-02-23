@@ -39,6 +39,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_kominek/libraries/WebServer/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_kominek/libraries/FS/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_kominek/libraries/ESP_SH1106_OLED}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_kominek/libraries/SH1106}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.1520321019" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
@@ -64,6 +65,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_kominek/libraries/WebServer/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_kominek/libraries/FS/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_kominek/libraries/ESP_SH1106_OLED}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_kominek/libraries/SH1106}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.203852107" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
@@ -89,6 +91,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_kominek/libraries/WebServer/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_kominek/libraries/FS/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_kominek/libraries/ESP_SH1106_OLED}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_kominek/libraries/SH1106}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.1535562376" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>

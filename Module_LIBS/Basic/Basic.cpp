@@ -114,3 +114,18 @@ void setDiagnose(Diagnose diag) {
 	diagnose = diag;
 }
 
+void getPinState(PinInput *pinInput, int pin, bool edge) {
+	unsigned long currentMillis = millis();
+	if ((!edge) && (currentMillis-pinInput->lastRead<5))
+		return;
+	bool pinState = !digitalRead(pin);
+	pinInput->isState = pinState;
+	if ((edge) && (pinInput->isState) && (pinInput->lastState)) {
+		pinInput->isState = 0;
+		pinInput->lastState = 1;
+	}
+	else
+		pinInput->lastState  = pinState;
+	pinInput->lastRead = currentMillis;
+}
+
