@@ -105,7 +105,7 @@ void firstScan() {
 }
 
 void readSensors() {
-	if (sleep(&dallasSensorReadMillis, DELAY_SENSORS_READ)) return;
+	if ((sleep(&dallasSensorReadMillis, DELAY_SENSORS_READ)) && (millis()>5000)) return;
 
 	DALLAS18b20Read();
 	DHT22Read();

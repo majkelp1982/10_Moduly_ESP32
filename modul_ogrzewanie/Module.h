@@ -79,7 +79,7 @@
 #define TEMP_MIN_ON_DISTRIBUTOR				33
 #define TEMP_CO_EMERGENCY_HYSTERESIS		2
 #define TEMP_CWU_HYSTERESIS					3
-#define TEMP_CO_HYSTERESIS					3
+#define TEMP_CO_HYSTERESIS					5
 
 //MODE
 #define HEAT_PUMP							1
