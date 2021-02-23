@@ -21,7 +21,7 @@
 #define ID_LAZ_GORA							6
 
 //DALLAS 1-wire
-#define DELAY_SENSORS_READ					10			// delay between sensors reading [s]
+#define DELAY_SENSORS_READ					600			// delay between sensors reading [s]
 #define PIN_DS18B20							21
 
 //DHT HUMIDITY SENSORS
