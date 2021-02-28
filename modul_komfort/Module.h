@@ -21,18 +21,19 @@
 #define ID_LAZ_GORA							6
 
 //DALLAS 1-wire
-#define DELAY_SENSORS_READ					600			// delay between sensors reading [s]
+#define DELAY_SENSORS_READ					20			// delay between sensors reading [s]
 #define PIN_DS18B20							21
 
 //DHT HUMIDITY SENSORS
 #define DHTTYPE 							11  		//DHT 11
+//DHT PINS
 #define PIN_DHT_SALON						14
-#define PIN_DHT_PRALNIA						0
+#define PIN_DHT_PRALNIA						34
 #define PIN_DHT_LAZ_DOL						13
-#define PIN_DHT_RODZICE						0
-#define PIN_DHT_NATALIA						0
-#define PIN_DHT_KAROLINA					0
-#define PIN_DHT_LAZ_GORA					0
+#define PIN_DHT_RODZICE						35
+#define PIN_DHT_NATALIA						33
+#define PIN_DHT_KAROLINA					25
+#define PIN_DHT_LAZ_GORA					26
 
 //CONST
 #define	ZONE_QUANTITY						7			// quantity of zones

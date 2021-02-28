@@ -45,7 +45,7 @@ void module_init() {
 	sensors.setResolution(10);
 	sensors.setWaitForConversion(false);
 
-	//Set sensors DHT22
+	//Set sensors DHT11
 	device.dhtSensor[ID_SALON] = dhtSalon;
 	device.dhtSensor[ID_PRALNIA] = dhtPralnia;
 	device.dhtSensor[ID_LAZ_DOL] = dhtLazDol;
@@ -109,10 +109,6 @@ void readSensors() {
 
 	DALLAS18b20Read();
 	DHT22Read();
-
-	//TMP
-	count++;
-	if (count == 3) diagDALLAS18b20ReadDeviceAdresses();
 }
 
 void DALLAS18b20Read () {
@@ -179,6 +175,11 @@ void getHumidity(int zone) {
 void DHT22Read() {
 	getHumidity(ID_SALON);
 	getHumidity(ID_LAZ_DOL);
+	getHumidity(ID_PRALNIA);
+	getHumidity(ID_LAZ_GORA);
+	getHumidity(ID_KAROLINA);
+	getHumidity(ID_NATALIA);
+	getHumidity(ID_RODZICE);
 	//TODO list to extend
 }
 
@@ -266,7 +267,7 @@ void getMasterDeviceOrder() {
 }
 
 void setUDPdata() {
-	int size = 27;
+	int size = 28;
 	byte dataWrite[size];
 
 	byte temperature1_0 = 0;
