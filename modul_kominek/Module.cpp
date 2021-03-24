@@ -175,21 +175,7 @@ void module() {
 
 void readSensors() {
 	if (sleep(&dallasSensorReadMillis, DELAY_SENSORS_READ)) return;
-	DALLAS18b20Read();
-
-	//TMP
-//	String numberStr = Serial.readString();
-//	int code = atoi(numberStr.c_str());
-//
-//	if (code!=0) {
-//		Serial.println(code);
-//		if (code<=4) tmpSensorActive = code-1;
-//		else
-//			if (tmpSensorActive<3)
-//				device.thermo[tmpSensorActive].isTemp=code;
-//			else
-//				device.reqTemp=code;
-//	}
+//	DALLAS18b20Read();
 }
 
 void DALLAS18b20Read () {
@@ -241,6 +227,16 @@ void getMasterDeviceOrder() {
 		device.reqTemp = UDPdata.data[1];
 		EEpromWrite(24, UDPdata.data[1]);
 	}
+
+	//TMP
+	if (UDPdata.data[0] == 3)
+		device.thermo[0].isTemp = UDPdata.data[1];
+
+	if (UDPdata.data[0] == 4)
+		device.thermo[1].isTemp = UDPdata.data[1];
+
+	if (UDPdata.data[0] == 5)
+		device.thermo[2].isTemp = UDPdata.data[1];
 }
 
 void getHeatingParams() {
@@ -347,26 +343,25 @@ void buzzer() {
 	if (device.alarm)
 		device.buzzer = blink2Hz();
 	if (device.warning)
-		device.buzzer = blink2Hz() && (getDateTime().second==1);
+		device.buzzer = blink2Hz() && (getDateTime().second%10==0);
 }
 
 void showMessage(Info info) {
-	device.alarm = false;
-	device.warning = false;
+	display.displayOn();
 	display.clear();
 	display.setTextAlignment(TEXT_ALIGN_LEFT);
 	display.setFont(ArialMT_Plain_10);
-	if (blink2Hz()) {
-		if (info.type == ALARM) {
-			printCenter(64,0,"!!!ALARM!!!");
-			device.alarm = true;
-		}
-		if (info.type == WARN) {
-			printCenter(64, 0, "OSTRZEZENIE");
-			device.warning = true;
-		}
-		display.drawRect(0, 15, 128, 1);
+	String message;
+	if (info.type == ALARM) {
+		message = "!!!ALARM!!!";
+		device.alarm = true;
 	}
+	if (info.type == WARN) {
+		message = "OSTRZEZENIE";
+		device.warning = true;
+	}
+	if (blink2Hz())
+		printCenter(64,0,message);
 	printCenter(64,18,info.mess1);
 	printCenter(64,29,info.mess2);
 	printCenter(64,40,info.mess3);
@@ -444,6 +439,10 @@ void displayEvents(){
 	if (info.active) {
 		showMessage(info);
 		return;
+	}
+	else {
+		device.alarm = false;
+		device.warning = false;
 	}
 	if (device.settingsActive) {
 		showSettings();
@@ -565,12 +564,12 @@ void statusUpdate() {
 
 void outputs() {
 	digitalWrite(pinPUMP, !device.pump);
-	digitalWrite(pinSPIKER, !device.buzzer);
+	digitalWrite(pinSPIKER, device.buzzer);
 
 	//Throttle
 	// parsing 0-100% into 0-90 degree
-	int min = 10;			// 0 degree
-	int max = 17;			// 90 degree
+	int min = 9;			// 0 degree
+	int max = 21;			// 90 degree
 	int dutyCycle = min+(int)(device.throttle*((max-min)/100.00));
 	if (dutyCycle<0) dutyCycle = 0;
 	if (dutyCycle>255) dutyCycle = 255;

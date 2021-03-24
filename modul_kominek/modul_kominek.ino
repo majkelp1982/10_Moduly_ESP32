@@ -37,6 +37,6 @@ void loop()
 	ota.client();
 	basic.run();
 	communication.run();
-	status.printStatus(10);
+	status.printStatus(1);
 	module();
 }

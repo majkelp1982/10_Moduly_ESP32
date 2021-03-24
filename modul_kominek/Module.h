@@ -9,21 +9,21 @@
 
 //DEFINES
 //MODULES ID
-#define ID_MOD_MAIN							1
-#define ID_MOD_HEATING						14
+#define ID_MOD_MAIN				1
+#define ID_MOD_HEATING			14
 
 //Alarms
-#define WARN								1
-#define ALARM								2
+#define WARN					1
+#define ALARM					2
 
 //DALLAS ID
-#define ID_INLET							0
-#define ID_OUTLET							1
-#define ID_CHIMNEY							2
+#define ID_INLET				0
+#define ID_OUTLET				1
+#define ID_CHIMNEY				2
 
 //DALLAS 1-wire
-#define DELAY_SENSORS_READ					10			// delay between sensors reading [s]
-#define PIN_DS18B20							13
+#define DELAY_SENSORS_READ		10			// delay between sensors reading [s]
+#define PIN_DS18B20				13
 
 //PINS
 //OLED
@@ -39,16 +39,16 @@
 #define pinSW 					22
 
 //Alarm spiker
-#define pinSPIKER				0//TODO
+#define pinSPIKER				15
 
 //PUMP
 #define pinPUMP					32
 
 //THROTTLE
-#define SERVO_FREQUENCY 					50 		// Hz
-#define SERVO_CHANNEL 						2		// this variable is used to select the channel number
-#define SERVO_RESOUTION 					8 		// resolution of the signal
-#define THROTTLE_PIN						25 		// GPIO to PWM fan input
+#define SERVO_FREQUENCY 		50 		// Hz
+#define SERVO_CHANNEL 			2		// this variable is used to select the channel number
+#define SERVO_RESOUTION 		8 		// resolution of the signal
+#define THROTTLE_PIN			25 		// GPIO to PWM fan input
 
 
 //Information number
