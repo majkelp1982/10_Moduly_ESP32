@@ -19,13 +19,19 @@
 #define pinAIR_PUMP					0
 #define pinWATER_PUMP				0
 
+//HC-SR04 Ultrasonic Sensor
+#define pinTRIG						0
+#define pinECHO						0
+
 struct Device {
 	bool airPump = false;
 	bool waterPump = false;
-	int isWaterLevel;
+	byte isWaterLevel;
 	byte maxWaterLevel;
 	byte minWaterLevel;
 	byte airInterval;
+	byte zeroReference;
+	unsigned long lastStateChange = 0;
 };
 
 void module_init();

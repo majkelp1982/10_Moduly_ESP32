@@ -47,6 +47,7 @@ void firstScan() {
 	device.maxWaterLevel = EEpromData[0];
 	device.minWaterLevel = EEpromData[1];
 	device.airInterval = EEpromData[2];
+	device.zeroReference = EEpromData[3];
 
 }
 
@@ -71,6 +72,7 @@ void module() {
 
 void readSensor() {
 	if (sleep(&sensorReadMillis, DELAY_SENSOR_READ)) return;
+
 	//TODO
 }
 
@@ -85,74 +87,70 @@ void readUDPdata() {
 }
 
 void getMasterDeviceOrder() {
-	//TODO
-//	if (UDPdata.data[0] == 2) {
-//		device.reqTemp = UDPdata.data[1];
-//		EEpromWrite(24, UDPdata.data[1]);
-//	}
-//
-//	//TMP
-//	if (UDPdata.data[0] == 3)
-//		device.thermo[0].isTemp = UDPdata.data[1];
-//
-//	if (UDPdata.data[0] == 4)
-//		device.thermo[1].isTemp = UDPdata.data[1];
-//
-//	if (UDPdata.data[0] == 5)
-//		device.thermo[2].isTemp = UDPdata.data[1];
+	if (UDPdata.data[0] == 5) {
+		device.maxWaterLevel = UDPdata.data[1];
+		EEpromWrite(0, UDPdata.data[1]);
+	}
+	if (UDPdata.data[0] == 6) {
+		device.minWaterLevel = UDPdata.data[1];
+		EEpromWrite(1, UDPdata.data[1]);
+	}
+	if (UDPdata.data[0] == 7) {
+		device.airInterval= UDPdata.data[1];
+		EEpromWrite(2, UDPdata.data[1]);
+	}
+	if (UDPdata.data[0] == 8) {
+		device.zeroReference = UDPdata.data[1];
+		EEpromWrite(3, UDPdata.data[1]);
+	}
 }
 
 void pumps() {
-	//TODO
-//	device.pump = false;
-//	if (device.mode == 2)
-//		device.pump = true;
-//
-//	if (device.mode == 3)
-//		device.pump = true;
-//
-//	if (screen.info[0].active)
-//		device.pump = true;
-//
-//	if (screen.info[1].active)
-//		device.pump = true;
+	//Air Pump
+	unsigned long lastStateChange = millis() - device.lastStateChange;
+	if (device.airInterval<1)
+		device.airInterval = 1;
+	if ((int)(lastStateChange/60000)>=device.airInterval) {
+		device.lastStateChange = millis();
+		device.airPump = !device.airPump;
+	}
+
+	//Water Pump
+	if (device.isWaterLevel>=device.maxWaterLevel)
+		device.waterPump = true;
+	if (device.isWaterLevel<=device.minWaterLevel)
+		device.waterPump = false;
 }
 
 void setUDPdata() {
-	int size = 5;
+	int size = 6;
 	byte dataWrite[size];
 	dataWrite[0] = (device.airPump << 7) | (device.waterPump << 6);
 	dataWrite[1] = device.isWaterLevel;
 	dataWrite[2] = (byte)device.maxWaterLevel;
 	dataWrite[3] = (byte)device.minWaterLevel;
 	dataWrite[4] = (byte)device.airInterval;
+	dataWrite[5] = (byte)device.zeroReference;
 	setUDPdata(0, dataWrite,size);
 }
 
 void statusUpdate() {
 	String status;
-	//TODO
-//	status +="STAN";
-//	if (device.mode == 0) status += "\tCZUWANIE";
-//	if (device.mode == 1) status += "\tROZPALANIE";
-//	if (device.mode == 2) status += "\tGRZANIE";
-//	if (device.mode == 3) status += "\tWYGASZANIE";
-//	status += "\tPompa["; status += device.pump; status+="]";
-//	status += "\tPrzepustnica["; status += device.throttle; status+="]";
-//	status += "\tStartTemp["; status += device.startTemp; status+="]";
-//	status += "\nAlarm["; status += device.alarm; status+="]";
-//	status += "\tWarning["; status += device.warning; status+="]";
-//	status += "\tFireAlarm["; status += device.fireAlarm; status+="]";
-//	status += "\tLowestTemp["; status += device.lowestTemp; status+="]";
-//	status += "\nPARAMETRY";
-//	status +="\nTemp.ustawiona\tT="; status +=device.reqTemp; status +="[stC]";
-//	status +="\nTemp.WE\t\tT="; status +=device.thermo[ID_INLET].isTemp; status +="[stC]";
-//	status +="\nTemp.WY\t\tT="; status +=device.thermo[ID_OUTLET].isTemp; status +="[stC]";
-//	status +="\nTemp.KOMIN\tT="; status +=device.thermo[ID_CHIMNEY].isTemp; status +="[stC]\n";
+	status +="POMPY";
+	status += "\tAirPump["; status += device.airPump; status+="]";
+	status += "\tWaterPump["; status += device.waterPump; status+="]";
+	status +="\nWODA";
+	status += "\tisLevel["; status += device.isWaterLevel; status+="]";
+	status += "\maxLevel["; status += device.maxWaterLevel; status+="]";
+	status += "\minLevel["; status += device.minWaterLevel; status+="]";
+	status += "\zeroReference["; status += device.zeroReference; status+="]";
+	status +="\nNAPOWIETRZANIE";
+	status += "\tinterwal["; status += device.airInterval; status+="]";
 	setStatus(status);
 }
 
 void outputs() {
-	//TODO
+	digitalWrite(pinAIR_PUMP, !device.airPump);
+	digitalWrite(pinWATER_PUMP, !device.waterPump);
 }
 
