@@ -72,13 +72,20 @@ void module() {
 
 void readSensor() {
 	if (sleep(&sensorReadMillis, DELAY_SENSOR_READ)) return;
-
-	//TODO
+	digitalWrite(pinTRIG, LOW);
+	delayMicroseconds(2);
+	digitalWrite(pinTRIG, HIGH);
+	delayMicroseconds(15);
+	digitalWrite(pinTRIG, LOW);
+	digitalWrite(pinECHO, HIGH);
+	long time = pulseIn(pinECHO, HIGH);
+	device.isWaterLevel = (int)(time / 58);
 }
 
 void readUDPdata() {
 	UDPdata = getDataRead();
 	if (!UDPdata.newData) return;
+	debug("readUDPdata-new data");
 	if ((UDPdata.deviceType == ID_MOD_MAIN)
 			&& (UDPdata.deviceNo == getModuleType())
 			&& (UDPdata.frameNo == getModuleNo()))
@@ -87,6 +94,10 @@ void readUDPdata() {
 }
 
 void getMasterDeviceOrder() {
+	String message ="getMasterDeviceOrder data0="+UDPdata.data[0];
+	message.concat(" data1=");
+	message.concat(UDPdata.data[1]);
+	debug(message);
 	if (UDPdata.data[0] == 5) {
 		device.maxWaterLevel = UDPdata.data[1];
 		EEpromWrite(0, UDPdata.data[1]);
@@ -140,12 +151,13 @@ void statusUpdate() {
 	status += "\tAirPump["; status += device.airPump; status+="]";
 	status += "\tWaterPump["; status += device.waterPump; status+="]";
 	status +="\nWODA";
-	status += "\tisLevel["; status += device.isWaterLevel; status+="]";
-	status += "\maxLevel["; status += device.maxWaterLevel; status+="]";
-	status += "\minLevel["; status += device.minWaterLevel; status+="]";
-	status += "\zeroReference["; status += device.zeroReference; status+="]";
+	status += "\tisLevel[-"; status += device.isWaterLevel; status+="]cm";
+	status += "\tmaxLevel[-"; status += device.maxWaterLevel; status+="]cm";
+	status += "\tminLevel[-"; status += device.minWaterLevel; status+="]cm";
+	status += "\tzeroReference[-"; status += device.zeroReference; status+="]cm";
 	status +="\nNAPOWIETRZANIE";
-	status += "\tinterwal["; status += device.airInterval; status+="]";
+	status += "\tinterwal["; status += device.airInterval; status+="]min";
+	status += "\tlastStateChange["; status += (int)((millis() - device.lastStateChange)/1000); status+="]s";
 	setStatus(status);
 }
 

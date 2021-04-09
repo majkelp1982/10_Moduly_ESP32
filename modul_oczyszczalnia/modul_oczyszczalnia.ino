@@ -11,8 +11,8 @@
 
 Basic basic(MODULE_TYPE,MODULE_NO,SERIAL_BAUD);
 OTA ota(true);
-Status status(true);
-Communication communication(true);
+Status status(false);
+Communication communication(false);
 
 void setup()
 {

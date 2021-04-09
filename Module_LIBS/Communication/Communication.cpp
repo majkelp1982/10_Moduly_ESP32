@@ -158,6 +158,13 @@ DataRead UDPread() {
 			for (int i=3; i<dataRead.length; i++)
 				dataRead.data[i-3] = dataRead.data[i];
 			dataRead.length = dataRead.length - 3;
+
+			if (_debug) {
+				Serial.printf("\n[%d][%d][%d]",deviceType,deviceNo, frameNo);
+				for (int i=0; i<(dataRead.length); i++)
+					Serial.printf("[%d]",dataRead.data[i]);
+				Serial.println();
+			}
 		}
 	}
 	return dataRead;

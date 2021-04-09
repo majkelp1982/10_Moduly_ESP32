@@ -12,8 +12,10 @@ String dt;
 String statusWIFI;
 String logs[30];
 unsigned long lastMillis = 0;
+bool debugMode = false;
 
-Status::Status(boolean start) {
+Status::Status(boolean debug) {
+	debugMode = debug;
 }
 
 Status::~Status() {
@@ -52,6 +54,11 @@ void addLog(String log) {
 	logs[0] += getDateTime().second;
 	logs[0] += " ";
 	logs[0] += log;
+}
+
+void debug(String message) {
+	if (debugMode)
+		Serial.println("DEBUG: "+message);
 }
 
 void Status::printStatus(int delay) {
