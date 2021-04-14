@@ -99,6 +99,8 @@ void readSR04Sensor() {
 		device.isWaterLevel = calc;
 	}
 	device.isWaterLevelZeroRef = device.isWaterLevel - device.zeroReference;
+	if (device.isWaterLevelZeroRef>0)
+		device.isWaterLevelZeroRef = 0;
 }
 
 void readLimitSensor() {
@@ -167,11 +169,11 @@ void setUDPdata() {
 	int size = 6;
 	byte dataWrite[size];
 	dataWrite[0] = (device.airPump << 7) | (device.waterPump << 6) | (device.limitSensor << 5);
-	dataWrite[1] = device.isWaterLevel;
-	dataWrite[2] = (byte)device.maxWaterLevel;
-	dataWrite[3] = (byte)device.minWaterLevel;
-	dataWrite[4] = (byte)device.airInterval;
-	dataWrite[5] = (byte)device.zeroReference;
+	dataWrite[1] = (byte)abs(device.isWaterLevelZeroRef);
+	dataWrite[2] = (byte)abs(device.maxWaterLevel);
+	dataWrite[3] = (byte)abs(device.minWaterLevel);
+	dataWrite[4] = (byte)abs(device.zeroReference);
+	dataWrite[5] = (byte)device.airInterval;
 	setUDPdata(0, dataWrite,size);
 }
 
