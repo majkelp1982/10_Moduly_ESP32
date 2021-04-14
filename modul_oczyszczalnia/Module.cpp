@@ -7,6 +7,8 @@ DataRead UDPdata;
 void firstScan();
 void pinDef();
 void readSensor();
+void readLimitSensor();
+void readSR04Sensor();
 void readUDPdata();
 void getMasterDeviceOrder();
 
@@ -44,16 +46,24 @@ void firstScan() {
 	EEpromScan(EEpromData, size);
 	Serial.println("\nFirst scan");
 
-	device.maxWaterLevel = EEpromData[0];
-	device.minWaterLevel = EEpromData[1];
-	device.airInterval = EEpromData[2];
-	device.zeroReference = EEpromData[3];
+	device.maxWaterLevel = -1*EEpromData[0];
+	device.minWaterLevel = -1*EEpromData[1];
+	device.zeroReference = -1*EEpromData[2];
+	device.airInterval = EEpromData[3];
 
 }
 
 void pinDef() {
+	//PUMPS
 	pinMode (pinAIR_PUMP,OUTPUT);	digitalWrite(pinAIR_PUMP, LOW);
 	pinMode (pinWATER_PUMP,OUTPUT);	digitalWrite(pinWATER_PUMP, LOW);
+
+	//SENSOR
+	pinMode (pinECHO,INPUT);
+	pinMode (pinTRIG,OUTPUT);
+
+	//LIMIT SENSOR
+	pinMode (pinECHO,INPUT_PULLDOWN);
 }
 
 void module() {
@@ -71,6 +81,11 @@ void module() {
 }
 
 void readSensor() {
+	readLimitSensor();
+	readSR04Sensor();
+}
+
+void readSR04Sensor() {
 	if (sleep(&sensorReadMillis, DELAY_SENSOR_READ)) return;
 	digitalWrite(pinTRIG, LOW);
 	delayMicroseconds(2);
@@ -79,7 +94,17 @@ void readSensor() {
 	digitalWrite(pinTRIG, LOW);
 	digitalWrite(pinECHO, HIGH);
 	long time = pulseIn(pinECHO, HIGH);
-	device.isWaterLevel = (int)(time / 58);
+	int calc = -1*(int)(time / 58);
+	if (calc != 0) {
+		device.isWaterLevel = calc;
+	}
+	device.isWaterLevelZeroRef = device.isWaterLevel - device.zeroReference;
+}
+
+void readLimitSensor() {
+	device.limitSensor = digitalRead(pinLIMIT);
+	if (device.limitSensor)
+		addLog("ALARM! Limit sensor aktywny!");
 }
 
 void readUDPdata() {
@@ -101,17 +126,22 @@ void getMasterDeviceOrder() {
 	if (UDPdata.data[0] == 5) {
 		device.maxWaterLevel = UDPdata.data[1];
 		EEpromWrite(0, UDPdata.data[1]);
+		device.maxWaterLevel = -1*device.maxWaterLevel;
 	}
 	if (UDPdata.data[0] == 6) {
 		device.minWaterLevel = UDPdata.data[1];
 		EEpromWrite(1, UDPdata.data[1]);
+		device.minWaterLevel = -1*device.minWaterLevel;
 	}
 	if (UDPdata.data[0] == 7) {
-		device.airInterval= UDPdata.data[1];
+		device.zeroReference = UDPdata.data[1];
 		EEpromWrite(2, UDPdata.data[1]);
+		device.zeroReference = -1*device.zeroReference;
 	}
 	if (UDPdata.data[0] == 8) {
-		device.zeroReference = UDPdata.data[1];
+		device.airInterval= UDPdata.data[1];
+		if (device.airInterval <1)
+			device.airInterval = 1;
 		EEpromWrite(3, UDPdata.data[1]);
 	}
 }
@@ -127,16 +157,16 @@ void pumps() {
 	}
 
 	//Water Pump
-	if (device.isWaterLevel>=device.maxWaterLevel)
+	if (device.isWaterLevelZeroRef>=device.maxWaterLevel)
 		device.waterPump = true;
-	if (device.isWaterLevel<=device.minWaterLevel)
+	if (device.isWaterLevelZeroRef<=device.minWaterLevel)
 		device.waterPump = false;
 }
 
 void setUDPdata() {
 	int size = 6;
 	byte dataWrite[size];
-	dataWrite[0] = (device.airPump << 7) | (device.waterPump << 6);
+	dataWrite[0] = (device.airPump << 7) | (device.waterPump << 6) | (device.limitSensor << 5);
 	dataWrite[1] = device.isWaterLevel;
 	dataWrite[2] = (byte)device.maxWaterLevel;
 	dataWrite[3] = (byte)device.minWaterLevel;
@@ -151,10 +181,12 @@ void statusUpdate() {
 	status += "\tAirPump["; status += device.airPump; status+="]";
 	status += "\tWaterPump["; status += device.waterPump; status+="]";
 	status +="\nWODA";
-	status += "\tisLevel[-"; status += device.isWaterLevel; status+="]cm";
-	status += "\tmaxLevel[-"; status += device.maxWaterLevel; status+="]cm";
-	status += "\tminLevel[-"; status += device.minWaterLevel; status+="]cm";
-	status += "\tzeroReference[-"; status += device.zeroReference; status+="]cm";
+	status += "\tisLevel["; status += device.isWaterLevel; status+="]cm";
+	status += "\tisLevelZeroRef["; status += device.isWaterLevelZeroRef; status+="]cm";
+	status += "\tmaxLevel["; status += device.maxWaterLevel; status+="]cm";
+	status += "\tminLevel["; status += device.minWaterLevel; status+="]cm";
+	status += "\tzeroReference["; status += device.zeroReference; status+="]cm";
+	status += "\tLimitSensor["; device.limitSensor?status += "NIE":status += "TAK"; status+="]cm";
 	status +="\nNAPOWIETRZANIE";
 	status += "\tinterwal["; status += device.airInterval; status+="]min";
 	status += "\tlastStateChange["; status += (int)((millis() - device.lastStateChange)/1000); status+="]s";
@@ -162,7 +194,7 @@ void statusUpdate() {
 }
 
 void outputs() {
-	digitalWrite(pinAIR_PUMP, !device.airPump);
-	digitalWrite(pinWATER_PUMP, !device.waterPump);
+	digitalWrite(pinAIR_PUMP, device.airPump);
+	digitalWrite(pinWATER_PUMP, device.waterPump);
 }
 

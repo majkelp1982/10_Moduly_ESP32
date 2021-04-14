@@ -4,11 +4,12 @@
 #include <DallasTemperature.h>
 #include <OneWire.h>
 #include <SH1106.h>
+#include <UltrasonicSensor.h>
 
 #pragma once
 
 //DELAY
-#define DELAY_SENSOR_READ			10
+#define DELAY_SENSOR_READ			2
 
 //DEFINES
 //MODULES ID
@@ -16,21 +17,26 @@
 
 //PINS
 //PUMPS
-#define pinAIR_PUMP					0
-#define pinWATER_PUMP				0
+#define pinAIR_PUMP					13
+#define pinWATER_PUMP				12
 
 //HC-SR04 Ultrasonic Sensor
-#define pinTRIG						0
-#define pinECHO						0
+#define pinECHO						23
+#define pinTRIG						22
+
+//LIMIT SENSOR
+#define pinLIMIT					5
 
 struct Device {
-	bool airPump = false;
+	bool airPump = true;
 	bool waterPump = false;
-	byte isWaterLevel;
-	byte maxWaterLevel;
-	byte minWaterLevel;
+	bool limitSensor = false;
+	int isWaterLevelZeroRef;
+	int maxWaterLevel;
+	int minWaterLevel;
+	int zeroReference;
+	int isWaterLevel;
 	byte airInterval;
-	byte zeroReference;
 	unsigned long lastStateChange = 0;
 };
 

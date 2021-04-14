@@ -38,6 +38,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_oczyszczalnia/libraries/DallasTemperature}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_oczyszczalnia/libraries/OneWire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_oczyszczalnia/libraries/SH1106}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_oczyszczalnia/libraries/UltrasonicSensor/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.1870071433" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
@@ -62,6 +63,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_oczyszczalnia/libraries/DallasTemperature}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_oczyszczalnia/libraries/OneWire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_oczyszczalnia/libraries/SH1106}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_oczyszczalnia/libraries/UltrasonicSensor/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.304174426" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
@@ -86,6 +88,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_oczyszczalnia/libraries/DallasTemperature}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_oczyszczalnia/libraries/OneWire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_oczyszczalnia/libraries/SH1106}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_oczyszczalnia/libraries/UltrasonicSensor/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.1049535838" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>
