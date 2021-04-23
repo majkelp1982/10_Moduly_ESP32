@@ -4,7 +4,7 @@
 #include <esp_task_wdt.h>
 
 #define VERSION				"2021.02.10"
-#define BETA_VERSION		""
+#define BETA_VERSION		"speed100"
 
 #define FIRMWARE_VERSION	VERSION BETA_VERSION
 
