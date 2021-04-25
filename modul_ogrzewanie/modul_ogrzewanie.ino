@@ -9,7 +9,7 @@
 #define MODULE_NO			0
 #define SERIAL_BAUD			921600
 
-Basic basic(MODULE_TYPE,MODULE_NO,SERIAL_BAUD);
+Basic basic(MODULE_TYPE,MODULE_NO, "modul_ogrzewanie", SERIAL_BAUD);
 OTA ota(true);
 Status status(true);
 Communication communication(true);
