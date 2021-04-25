@@ -77,11 +77,6 @@
 			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/1.0.0/libraries/FS</locationURI>
 		</link>
 		<link>
-			<name>libraries/FreeRTOS</name>
-			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/FreeRTOS/10.4.3-3</locationURI>
-		</link>
-		<link>
 			<name>libraries/OTA</name>
 			<type>2</type>
 			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/OTA</location>
