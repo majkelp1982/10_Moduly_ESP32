@@ -3,8 +3,8 @@
 #include "Arduino.h"
 #include <esp_task_wdt.h>
 
-#define VERSION				"2021.02.10"
-#define BETA_VERSION		"speed100"
+#define VERSION				"2021.04.25"
+#define BETA_VERSION		""
 
 #define FIRMWARE_VERSION	VERSION BETA_VERSION
 
