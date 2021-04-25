@@ -3,7 +3,7 @@
 #include "Arduino.h"
 #include <esp_task_wdt.h>
 
-#define VERSION				"2021.02.10"
+#define VERSION				"2021.04.25"
 #define BETA_VERSION		"komfortDHT14"
 
 #define FIRMWARE_VERSION	VERSION BETA_VERSION
@@ -34,7 +34,7 @@ struct PinInput {
 class Basic {
 public:
 	Basic();
-	Basic(int moduleType, int moduleNo, int serialBaud);
+	Basic(int moduleType, int moduleNo, String modulName, int serialBaud);
 	~Basic(void);
 	void run();
 	void WDT_init();
@@ -49,6 +49,7 @@ private:
 bool sleep(unsigned long *lastMillis, int seconds);
 int getModuleType();
 int getModuleNo();
+String getModuleName();
 DateTime getDateTime();
 Diagnose getDiagnose();
 void setDiagnose(Diagnose diag);

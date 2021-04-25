@@ -439,6 +439,10 @@ void fan() {
 		device.fanSpeed = 70;
 	if (device.defrost.timeLeft>0)
 		device.fanSpeed = 80;
+	if (device.humidityAlert.timeLeft>0)
+		device.fanSpeed = 70;
+	if (device.humidityAlert.req)
+		device.fanSpeed = 100;
 }
 
 void efficency() {
