@@ -29,21 +29,26 @@ void OTA::init() {
 	loginIndex =
 	"<form name=loginForm>"
 	"<h1>ESP32 Login</h1>"
+	"<h2>";
+	loginIndex.concat(getModuleName());
+	String log = "</h2>"
 	"<i>Actual ver. ";
+
+	loginIndex.concat(log);
 	loginIndex.concat(FIRMWARE_VERSION);
-	String log =
+	log =
 	"</i>"
 	"<input name=userid placeholder='User ID'> "
 	"<input name=pwd placeholder=Password type=Password> "
 	"<input type=submit onclick=check(this.form) class=btn value=Login>"
+	"<input type=button onclick=window.open('/diagnose') class=btn value=Diag>"
 	"</form>"
 	"<script>"
 	"function check(form) {"
 	"if(form.userid.value=='admin' && form.pwd.value=='admin')"
 	"{window.open('/serverIndex')}"
 	"else"
-//	"{alert('Error Password or Username')}"
-	"{window.open('/diagnose')}"
+	"{alert('Error Password or Username')}"
 	"}"
 	"</script>" + style;
 
@@ -121,7 +126,7 @@ void stringInit() {
 	serverIndex =
 	"<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>"
 	"<form method='POST' action='#' enctype='multipart/form-data' id='upload_form'>"
-	"<input type='file' name='update' id='file' onchange='sub(this)' style=display:none>"
+	"<input type='file' accept='.bin' name='update' id='file' onchange='sub(this)' style=display:none>"
 	"<label id='file-input' for='file'>   Choose file...</label>"
 	"<input type='submit' class=btn value='Update'>"
 	"<br><br>"
@@ -130,7 +135,13 @@ void stringInit() {
 	"<script>"
 	"function sub(obj){"
 	"var fileName = obj.value.split('\\\\');"
-	"document.getElementById('file-input').innerHTML = '   '+ fileName[fileName.length-1];"
+	"var moduleName = '";
+	serverIndex.concat(getModuleName());
+	String log = ".bin';"
+	"if (moduleName.localeCompare(fileName[fileName.length - 1])==0) {"
+    "console.log(fileName[fileName.length - 1]);"
+	"document.getElementById('file-input').innerHTML = '   ' + fileName[fileName.length - 1];}"
+	"else alert('Wrong file name. Expected '+moduleName);"
 	"};"
 	"$('form').submit(function(e){"
 	"e.preventDefault();"
@@ -161,5 +172,6 @@ void stringInit() {
 	"});"
 	"});"
 	"</script>" + style;
+	serverIndex.concat(log);
 }
 

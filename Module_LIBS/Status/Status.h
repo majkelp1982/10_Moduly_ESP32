@@ -22,5 +22,6 @@ public:
 String getHTMLStatus();
 void setStatus(String text);
 void addLog(String log);
+void debug(String message);
 
 #endif /* STATUS_H_ */

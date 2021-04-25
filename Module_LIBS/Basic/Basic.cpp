@@ -2,12 +2,14 @@
 
 int _moduleType = 0;
 int _moduleNo = 0;
+String _moduleName = "";
 Diagnose diagnose;
 DateTime dateTime;
 
-Basic::Basic(int moduleType, int moduleNo, int serialBaud) {
+Basic::Basic(int moduleType, int moduleNo, String modulName, int serialBaud) {
 	_moduleType = moduleType;
 	_moduleNo = moduleNo;
+	_moduleName = modulName;
 	serialSetup(serialBaud);
 }
 
@@ -87,6 +89,10 @@ int getModuleType() {
 
 int getModuleNo() {
 	return _moduleNo;
+}
+
+String getModuleName() {
+	return _moduleName;
 }
 
 bool sleep(unsigned long *lastMillis, int seconds) {
