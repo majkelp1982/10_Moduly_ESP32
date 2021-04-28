@@ -173,7 +173,17 @@ DataRead UDPread() {
 void UDPsendDiagnoseFrame() {
 	if (sleep(&udpDiagnosesendMillis, DELAY_BETWEEN_UDP_DIAGNOSE)) return;
 	if (!WiFi_conectionCheck()) return;
-	byte dataWritte[7];
+	byte dataWritte[8];
+
+	int signal=0;
+	for (int i=0; i<5; i++) {
+		int rssi = WiFi.RSSI();
+		signal += abs(rssi);
+	}
+	//avr. RSSI WiFi signal
+	Diagnose diag = getDiagnose();
+	diag.signal = (byte)(signal/5);
+	setDiagnose(diag);
 
 	// First three bytes are reserved for device recognized purposes.
 	dataWritte[0] = getModuleType();
@@ -183,6 +193,7 @@ void UDPsendDiagnoseFrame() {
 	dataWritte[4] = getDiagnose().ip[1];
 	dataWritte[5] = getDiagnose().ip[2];
 	dataWritte[6] = getDiagnose().ip[3];
+	dataWritte[7] = getDiagnose().signal;
 
 	//Send data packet
 	Udp.beginPacket(broadcastIP, LOCAL_PORT);

@@ -4,7 +4,7 @@
 #include <esp_task_wdt.h>
 
 #define VERSION				"2021.04.25"
-#define BETA_VERSION		""
+#define BETA_VERSION		"_RSSI_WiFi_Signal"
 
 #define FIRMWARE_VERSION	VERSION BETA_VERSION
 
@@ -13,6 +13,7 @@ struct Diagnose {
 	byte ip[4];
 	byte wifiConnectionInterrupt = 0;
 	byte wifiConnected = false;
+	byte signal = 0;
 };
 
 struct DateTime {
