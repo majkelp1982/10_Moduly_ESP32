@@ -13,6 +13,7 @@ struct Diagnose {
 	byte ip[4];
 	byte wifiConnectionInterrupt = 0;
 	byte wifiConnected = false;
+	byte signal = 0;
 };
 
 struct DateTime {
