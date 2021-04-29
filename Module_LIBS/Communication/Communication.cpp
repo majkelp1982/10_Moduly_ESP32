@@ -197,7 +197,7 @@ void UDPsendDiagnoseFrame() {
 
 	//Send data packet
 	Udp.beginPacket(broadcastIP, LOCAL_PORT);
-	for (int i=0; i<7; i++) {
+	for (int i=0; i<8; i++) {
 		Udp.write(dataWritte[i]);
 	}
 	Udp.endPacket();
