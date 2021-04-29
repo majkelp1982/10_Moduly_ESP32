@@ -34,7 +34,7 @@ void setStatus(String text) {
 	statusWIFI +=diagnose.ip[1]; statusWIFI +="."; statusWIFI +=diagnose.ip[2];
 	statusWIFI +="."; statusWIFI +=diagnose.ip[3]; statusWIFI +="]";
 	if (diagnose.wifiConnected) statusWIFI +=" Connected[true] Connect_interrupted["; else statusWIFI +=" Connected[false] Connect_interrupted[";
-	statusWIFI +=diagnose.wifiConnectionInterrupt; statusWIFI +="]";
+	statusWIFI +=diagnose.wifiConnectionInterrupt; statusWIFI +="] RSSI[-"; statusWIFI +=diagnose.signal; statusWIFI +="]";
 }
 
 void addLog(String log) {
