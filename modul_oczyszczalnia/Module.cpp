@@ -96,7 +96,7 @@ void readSR04Sensor() {
 	delayMicroseconds(15);
 	digitalWrite(pinTRIG, LOW);
 	digitalWrite(pinECHO, HIGH);
-	long time = pulseIn(pinECHO, HIGH);
+	long time = pulseIn(pinECHO, HIGH, 14500);
 	int calc = -1*(int)(time / 58);
 	if (calc != 0) {
 		device.isWaterLevel = calc;
@@ -104,6 +104,8 @@ void readSR04Sensor() {
 	device.isWaterLevelZeroRef = device.isWaterLevel - device.zeroReference;
 	if (device.isWaterLevelZeroRef>0)
 		device.isWaterLevelZeroRef = 0;
+	if (device.isWaterLevelZeroRef<-250)
+		device.isWaterLevelZeroRef = -250;
 }
 
 void readLimitSensor() {

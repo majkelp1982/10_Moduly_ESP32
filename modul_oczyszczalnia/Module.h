@@ -9,7 +9,7 @@
 #pragma once
 
 //DELAY
-#define DELAY_SENSOR_READ			10
+#define DELAY_SENSOR_READ			5
 #define DELAY_LIMIT_READ			10					// IMPORTANT!! After Limit sensor turning on water pump. 10s needed for pump to get rid of large amount of water
 
 //DEFINES
