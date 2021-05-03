@@ -4,7 +4,7 @@
 #include <esp_task_wdt.h>
 
 #define VERSION				"2021.04.25"
-#define BETA_VERSION		"_RSSI_WiFi_Signal"
+#define BETA_VERSION		"_uruchomienie2"
 
 #define FIRMWARE_VERSION	VERSION BETA_VERSION
 

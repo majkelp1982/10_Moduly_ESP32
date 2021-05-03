@@ -9,7 +9,8 @@
 #pragma once
 
 //DELAY
-#define DELAY_SENSOR_READ			2
+#define DELAY_SENSOR_READ			10
+#define DELAY_LIMIT_READ			10					// IMPORTANT!! After Limit sensor turning on water pump. 10s needed for pump to get rid of large amount of water
 
 //DEFINES
 //MODULES ID
@@ -25,7 +26,7 @@
 #define pinTRIG						22
 
 //LIMIT SENSOR
-#define pinLIMIT					5
+#define pinLIMIT					21
 
 struct Device {
 	bool airPump = true;
