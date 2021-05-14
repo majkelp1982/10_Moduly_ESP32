@@ -8,6 +8,7 @@
 //DEFINES
 //MODULES ID
 #define ID_MOD_MAIN							1
+#define ID_MOD_WEATHER						11
 
 //PINs
 #define pinZERO_CROSSING					5
@@ -32,7 +33,7 @@ struct Time {
 
 struct Device {
 	dimmerLamp lights[4];
-	byte lightSensor = 98;
+	byte lightSensor = 20;
 	byte turnOnLightLevel;
 	byte standByIntensLevel;
 	Time offTime;

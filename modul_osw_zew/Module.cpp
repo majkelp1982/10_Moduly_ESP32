@@ -13,10 +13,9 @@ unsigned long sensorReadMillis = 0;
 
 //Functions
 void firstScan();
-void pinDef();
-void readSensor();
 void readUDPdata();
 void getMasterDeviceOrder();
+void getWeatherParams();
 
 void dimmers();
 void outputs();
@@ -39,8 +38,6 @@ void module_init() {
 
 	//EEprom scan
 	firstScan();
-	//pin definitions
-	pinDef();
 }
 
 void firstScan() {
@@ -61,7 +58,6 @@ void pinDef() {
 
 void module() {
 	//Input data
-	readSensor();
 	readUDPdata();
 
 	//Main
@@ -72,12 +68,6 @@ void module() {
 	statusUpdate();
 }
 
-void readSensor() {
-	if (sleep(&sensorReadMillis, DELAY_SENSOR_READ)) return;
-//	int value = analogRead(pinSENSOR);
-//	device.lightSensor = (byte)((100/255) * value);
-}
-
 void readUDPdata() {
 	UDPdata = getDataRead();
 	if (!UDPdata.newData) return;
@@ -85,6 +75,10 @@ void readUDPdata() {
 			&& (UDPdata.deviceNo == getModuleType())
 			&& (UDPdata.frameNo == getModuleNo()))
 		getMasterDeviceOrder();
+	if ((UDPdata.deviceType == ID_MOD_WEATHER)
+			&& (UDPdata.deviceNo == 0)
+			&& (UDPdata.frameNo == 0))
+		getWeatherParams();
 	resetNewData();
 }
 
@@ -110,11 +104,10 @@ void getMasterDeviceOrder() {
 		device.offTime.minute = UDPdata.data[1];
 		EEpromWrite(3, UDPdata.data[1]);
 	}
+}
 
-	//TMP
-	if (UDPdata.data[0] == 9) {
-		device.lightSensor = UDPdata.data[1];
-	}
+void getWeatherParams() {
+	device.lightSensor = UDPdata.data[9];
 }
 
 void dimmers() {
@@ -123,7 +116,7 @@ void dimmers() {
 	if ((device.turnOnLightLevel != 0) && (device.standByIntensLevel != 0))
 		intens = ((device.turnOnLightLevel-device.lightSensor)*device.standByIntensLevel)/(device.turnOnLightLevel);
 	else
-		if (device.lightSensor == 0)
+		if (device.lightSensor <= 10)
 			intens = 100;
 
 	if (intens>=100)
@@ -145,8 +138,7 @@ void setUDPdata() {
 	int size = 9;
 	byte dataWrite[size];
 	// First three bytes are reserved for device recognized purposes.
-	//BMEs
-	dataWrite[0] = device.lightSensor;
+	dataWrite[0] = 0;
 	dataWrite[1] = (byte)device.lights[ID_ENTRANCE].getPower();
 	dataWrite[2] = (byte)device.lights[ID_DRIVEWAY].getPower();
 	dataWrite[3] = (byte)device.lights[ID_CARPORT].getPower();
@@ -162,7 +154,6 @@ void setUDPdata() {
 void statusUpdate() {
 	String status;
 	status = "PARAMETRY \n";
-	status +="\nSensor œwiat³a="; status +=device.lightSensor; status +="[%]";
 	status +="\nLight[WEJSCIE]="; status +=device.lights[ID_ENTRANCE].getPower(); status +="[%]";
 	status +="\nLight[PODJAZD]="; status +=device.lights[ID_DRIVEWAY].getPower(); status +="[%]";
 	status +="\nLight[CARPORT]="; status +=device.lights[ID_CARPORT].getPower(); status +="[%]";
@@ -170,6 +161,7 @@ void statusUpdate() {
 	status +="\n\nPróg w³¹czenia="; status +=device.turnOnLightLevel; status+="[%]";
 	status +="\nPróg intensywnoœci="; status +=device.standByIntensLevel; status+="[%]";
 	status +="\n\nGodzina wy³¹czenia="; status +=device.offTime.hour; status+=":"; status +=device.offTime.minute;
+	status +="\n\nIntensynoœ œwiat³a [modul_pogodowy]="; status +=device.lightSensor; status+="[%]";
 
 	setStatus(status);
 }
