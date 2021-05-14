@@ -12,7 +12,7 @@
 Basic basic(MODULE_TYPE,MODULE_NO, "modul_osw_zew", SERIAL_BAUD);
 OTA ota(true);
 Status status(true);
-Communication communication(true);
+Communication communication(false);
 
 void setup()
 {

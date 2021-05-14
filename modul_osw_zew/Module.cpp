@@ -27,15 +27,15 @@ void statusUpdate();
 
 void module_init() {
 	//Dimmer declaration
-	device.lights[ID_ENTRANCE].dimmer = dimmer0;
-	device.lights[ID_DRIVEWAY].dimmer = dimmer1;
-	device.lights[ID_CARPORT].dimmer = dimmer2;
-	device.lights[ID_FENCE].dimmer = dimmer3;
+	device.lights[ID_ENTRANCE] = dimmer0;
+	device.lights[ID_DRIVEWAY] = dimmer1;
+	device.lights[ID_CARPORT] = dimmer2;
+	device.lights[ID_FENCE] = dimmer3;
 
-	device.lights[ID_ENTRANCE].dimmer.begin(NORMAL_MODE, ON);
-	device.lights[ID_DRIVEWAY].dimmer.begin(NORMAL_MODE, ON);
-	device.lights[ID_CARPORT].dimmer.begin(NORMAL_MODE, ON);
-	device.lights[ID_FENCE].dimmer.begin(NORMAL_MODE, ON);
+	device.lights[ID_ENTRANCE].begin(NORMAL_MODE, ON);
+	device.lights[ID_DRIVEWAY].begin(NORMAL_MODE, ON);
+	device.lights[ID_CARPORT].begin(NORMAL_MODE, ON);
+	device.lights[ID_FENCE].begin(NORMAL_MODE, ON);
 
 	//EEprom scan
 	firstScan();
@@ -57,8 +57,6 @@ void firstScan() {
 }
 
 void pinDef() {
-	//Light sensor
-	pinMode (pinSENSOR,INPUT_PULLUP);
 }
 
 void module() {
@@ -76,8 +74,8 @@ void module() {
 
 void readSensor() {
 	if (sleep(&sensorReadMillis, DELAY_SENSOR_READ)) return;
-	int value = analogRead(pinSENSOR);
-	device.lightSensor = (byte)((100/255) * value);
+//	int value = analogRead(pinSENSOR);
+//	device.lightSensor = (byte)((100/255) * value);
 }
 
 void readUDPdata() {
@@ -100,36 +98,43 @@ void getMasterDeviceOrder() {
 		device.turnOnLightLevel = UDPdata.data[1];
 		EEpromWrite(0, UDPdata.data[1]);
 	}
-	if (UDPdata.data[0] == 1) {
+	if (UDPdata.data[0] == 6) {
 		device.standByIntensLevel = UDPdata.data[1];
 		EEpromWrite(1, UDPdata.data[1]);
 	}
-	if (UDPdata.data[0] == 2) {
+	if (UDPdata.data[0] == 7) {
 		device.offTime.hour = UDPdata.data[1];
 		EEpromWrite(2, UDPdata.data[1]);
 	}
-	if (UDPdata.data[0] == 3) {
+	if (UDPdata.data[0] == 8) {
 		device.offTime.minute = UDPdata.data[1];
 		EEpromWrite(3, UDPdata.data[1]);
+	}
+
+	//TMP
+	if (UDPdata.data[0] == 9) {
+		device.lightSensor = UDPdata.data[1];
 	}
 }
 
 void dimmers() {
 	//intens = (100-sensor)-próg*100/próg
-	byte intens = 0;
-	if (device.turnOnLightLevel != 0)
-		intens = (100-device.lightSensor-device.turnOnLightLevel)*100/device.turnOnLightLevel;
+	int intens = 0;
+	if ((device.turnOnLightLevel != 0) && (device.standByIntensLevel != 0))
+		intens = ((device.turnOnLightLevel-device.lightSensor)*device.standByIntensLevel)/(device.turnOnLightLevel);
 	else
 		if (device.lightSensor == 0)
 			intens = 100;
 
 	if (intens>=100)
 		intens=99;
+	if (intens<0)
+		intens=0;
 
-	device.lights[ID_ENTRANCE].dimmer.setPower(intens);
-	device.lights[ID_DRIVEWAY].dimmer.setPower(intens);
-	device.lights[ID_CARPORT].dimmer.setPower(intens);
-	device.lights[ID_FENCE].dimmer.setPower(intens);
+	device.lights[ID_ENTRANCE].setPower(intens);
+	device.lights[ID_DRIVEWAY].setPower(intens);
+	device.lights[ID_CARPORT].setPower(intens);
+	device.lights[ID_FENCE].setPower(intens);
 }
 
 void outputs() {
@@ -142,10 +147,10 @@ void setUDPdata() {
 	// First three bytes are reserved for device recognized purposes.
 	//BMEs
 	dataWrite[0] = device.lightSensor;
-	dataWrite[1] = (byte)device.lights[ID_ENTRANCE].dimmer.getPower();
-	dataWrite[2] = (byte)device.lights[ID_DRIVEWAY].dimmer.getPower();
-	dataWrite[3] = (byte)device.lights[ID_CARPORT].dimmer.getPower();
-	dataWrite[4] = (byte)device.lights[ID_FENCE].dimmer.getPower();
+	dataWrite[1] = (byte)device.lights[ID_ENTRANCE].getPower();
+	dataWrite[2] = (byte)device.lights[ID_DRIVEWAY].getPower();
+	dataWrite[3] = (byte)device.lights[ID_CARPORT].getPower();
+	dataWrite[4] = (byte)device.lights[ID_FENCE].getPower();
 	dataWrite[5] = (byte)(device.turnOnLightLevel);
 	dataWrite[6] = (byte)(device.standByIntensLevel);
 	dataWrite[7] = (byte)(device.offTime.hour);
@@ -158,10 +163,10 @@ void statusUpdate() {
 	String status;
 	status = "PARAMETRY \n";
 	status +="\nSensor œwiat³a="; status +=device.lightSensor; status +="[%]";
-	status +="\nLight[WEJSCIE]="; status +=device.lights[ID_ENTRANCE].dimmer.getPower(); status +="[%]";
-	status +="\nLight[PODJAZD]="; status +=device.lights[ID_DRIVEWAY].dimmer.getPower(); status +="[%]";
-	status +="\nLight[CARPORT]="; status +=device.lights[ID_CARPORT].dimmer.getPower(); status +="[%]";
-	status +="\nLight[OGRODZENIE]="; status +=device.lights[ID_FENCE].dimmer.getPower(); status +="[%]";
+	status +="\nLight[WEJSCIE]="; status +=device.lights[ID_ENTRANCE].getPower(); status +="[%]";
+	status +="\nLight[PODJAZD]="; status +=device.lights[ID_DRIVEWAY].getPower(); status +="[%]";
+	status +="\nLight[CARPORT]="; status +=device.lights[ID_CARPORT].getPower(); status +="[%]";
+	status +="\nLight[OGRODZENIE]="; status +=device.lights[ID_FENCE].getPower(); status +="[%]";
 	status +="\n\nPróg w³¹czenia="; status +=device.turnOnLightLevel; status+="[%]";
 	status +="\nPróg intensywnoœci="; status +=device.standByIntensLevel; status+="[%]";
 	status +="\n\nGodzina wy³¹czenia="; status +=device.offTime.hour; status+=":"; status +=device.offTime.minute;

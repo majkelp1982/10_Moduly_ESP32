@@ -10,11 +10,10 @@
 #define ID_MOD_MAIN							1
 
 //PINs
-#define pinSENSOR							0
-#define pinZERO_CROSSING					0
+#define pinZERO_CROSSING					5
 #define pinLIGHT0							0
-#define pinLIGHT1							0
-#define pinLIGHT2							0
+#define pinLIGHT1							22
+#define pinLIGHT2							23
 #define pinLIGHT3							0
 
 //ZONES
@@ -26,20 +25,14 @@
 //DELAYS
 #define DELAY_SENSOR_READ					10
 
-
-struct Light {
-	dimmerLamp dimmer;
-	byte intens = 0;
-};
-
 struct Time {
 	byte hour;
 	byte minute;
 };
 
 struct Device {
-	Light lights[4];
-	byte lightSensor;
+	dimmerLamp lights[4];
+	byte lightSensor = 98;
 	byte turnOnLightLevel;
 	byte standByIntensLevel;
 	Time offTime;

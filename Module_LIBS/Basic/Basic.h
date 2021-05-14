@@ -4,7 +4,7 @@
 #include <esp_task_wdt.h>
 
 #define VERSION				"2021.04.25"
-#define BETA_VERSION		"_osw_zew_first_release2"
+#define BETA_VERSION		"_osw_zew_first_release3"
 
 #define FIRMWARE_VERSION	VERSION BETA_VERSION
 
