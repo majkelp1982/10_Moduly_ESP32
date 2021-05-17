@@ -124,6 +124,21 @@ void dimmers() {
 	if (intens<0)
 		intens=0;
 
+	// Night time reset
+	if (getDateTime().hour==5)
+		device.nightTime = false;
+
+	if ((getDateTime().hour== device.offTime.hour)
+			&& (getDateTime().minute>=device.offTime.minute))
+		device.nightTime = true;
+
+	//force night time off
+	if (device.offTime.hour==12)
+		device.nightTime = false;
+
+	if (device.nightTime)
+		intens=0;
+
 	device.lights[ID_ENTRANCE].setPower(intens);
 	device.lights[ID_DRIVEWAY].setPower(intens);
 	device.lights[ID_CARPORT].setPower(intens);

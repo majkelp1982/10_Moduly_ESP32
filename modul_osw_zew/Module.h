@@ -37,6 +37,7 @@ struct Device {
 	byte turnOnLightLevel;
 	byte standByIntensLevel;
 	Time offTime;
+	boolean nightTime=false;
 };
 
 void module_init();
