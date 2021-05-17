@@ -21,6 +21,8 @@
 #define SERIAL2_RX							16 // Serial2 RX PIN
 #define SERIAL2_TX							17 // Serial2 TX PIN
 
+#define PIN_LIGHT							32 // Light sensor pin
+
 struct SensorBME280 {
 	float temperature = 0.0f;				// [stC]
 	int pressure = 0;						// [hPa]
@@ -42,6 +44,7 @@ struct SensorSDS011 {
 struct Device {
 	SensorBME280 sensorBME280;
 	SensorSDS011 sensorSDS011;
+	int lightSensor;
 };
 
 void module_init();

@@ -7,6 +7,7 @@ DataRead UDPdata;
 void readSensors();
 void readBME280();
 void readSDS011();
+void readLightIntens();
 void readUDPdata();
 void getMasterDeviceOrder();
 
@@ -19,11 +20,16 @@ SDS011 sds011(SERIAL2_RX, SERIAL2_TX);
 
 //Delays
 unsigned long readSensorMillis = 0;
+unsigned long readLightSensorMillis = 0;
 
+int light;
 //TMP
 int lastDutyCycle = 0;
 
 void module_init() {
+	//Light sensor
+	pinMode(PIN_LIGHT, INPUT);
+
 	//Set CS pins
 	device.sensorBME280.interface= bme1;
 	//initialization
@@ -32,6 +38,7 @@ void module_init() {
 	device.sensorSDS011.interface = sds011;
 	device.sensorSDS011.interface.begin();
 	device.sensorSDS011.interface.wakeup();
+
 }
 
 void module() {
@@ -47,6 +54,7 @@ void module() {
 void readSensors() {
 	readBME280();
 	readSDS011();
+	readLightIntens();
 }
 
 void readBME280() {
@@ -97,6 +105,12 @@ void readSDS011() {
 	}
 }
 
+void readLightIntens() {
+	if (sleep(&readLightSensorMillis, 5)) return;
+	light = analogRead(PIN_LIGHT);
+	device.lightSensor = (int)(light*100/4095);
+}
+
 void readUDPdata() {
 	UDPdata = getDataRead();
 	if (!UDPdata.newData) return;
@@ -112,7 +126,7 @@ void getMasterDeviceOrder() {
 }
 
 void setUDPdata() {
-	int size = 9;
+	int size = 10;
 	byte dataWrite[size];
 	// First three bytes are reserved for device recognized purposes.
 	//BMEs
@@ -125,6 +139,7 @@ void setUDPdata() {
 	dataWrite[6] = (byte)(device.sensorSDS011.pm25);
 	dataWrite[7] = (byte)(device.sensorSDS011.pm10>>8);
 	dataWrite[8] = (byte)(device.sensorSDS011.pm10);
+	dataWrite[9] = (byte)(device.lightSensor);
 
 	setUDPdata(0, dataWrite,size);
 }
@@ -136,6 +151,7 @@ void statusUpdate() {
 	status +="[%]\t\tP="; status +=(int)device.sensorBME280.pressure;status +="[hPa]\t\tFaulty="; status +=(int)device.sensorBME280.faultyReadings ;status +="\n";
 	status +="SDS011\t\tMode="; status+= (device.sensorSDS011.interface.mode==MODE_SLEEP)? "SLEEP":"WAKEUP"; status +="\t\tTimeLeft="; status +=device.sensorSDS011.modeTimeLeft; status+="[s]\n";
 	status +="\t\tPM2.5="; status +=device.sensorSDS011.pm25; status +="[ug/m3]\t\tPM10="; status +=(int)device.sensorSDS011.pm10; status +="[ug/m3]\t\tFaulty="; status +=(int)device.sensorSDS011.faultyReadings ;status +="\n";
+	status +="\nLightSensor="; status += device.lightSensor; status +="[%]"; status +=" AnalogVal="; status += light;
 
 	setStatus(status);
 }
