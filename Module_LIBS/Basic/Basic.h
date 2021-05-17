@@ -3,8 +3,8 @@
 #include "Arduino.h"
 #include <esp_task_wdt.h>
 
-#define VERSION				"2021.04.25"
-#define BETA_VERSION		"_modul_pogoda_sensor_swiatla3"
+#define VERSION				"2021.05.17"
+#define BETA_VERSION		""
 
 #define FIRMWARE_VERSION	VERSION BETA_VERSION
 
