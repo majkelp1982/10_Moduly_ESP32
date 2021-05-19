@@ -31,11 +31,21 @@ struct Time {
 	byte minute;
 };
 
+struct Light {
+	bool force0 = false;
+	bool force100 = false;
+	byte isIntens = 0;
+	byte expIntens = 0;
+	byte standByIntens = 0;
+	dimmerLamp interface;
+	unsigned long lastCorrection = 0;
+	int delay = 1000;
+};
+
 struct Device {
-	dimmerLamp lights[4];
+	Light lights[4];
 	byte lightSensor = 20;
-	byte turnOnLightLevel;
-	byte standByIntensLevel;
+	byte startLightLevel;
 	Time offTime;
 	boolean nightTime=false;
 };
