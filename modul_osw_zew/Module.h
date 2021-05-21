@@ -39,7 +39,7 @@ struct Light {
 	byte standByIntens = 0;
 	dimmerLamp interface;
 	unsigned long lastCorrection = 0;
-	int delay = 1000;
+	int delay = 50;
 };
 
 struct Device {

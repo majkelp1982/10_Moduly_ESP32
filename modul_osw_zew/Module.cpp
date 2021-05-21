@@ -96,13 +96,22 @@ void readUDPdata() {
 	resetNewData();
 }
 
+void checkIfForceValid() {
+	for (int i=0; i<4; i++) {
+		if (device.lights[i].force100)
+			device.lights[i].force0 = false;
+		if (device.lights[i].force0)
+			device.lights[i].force100 = false;
+	}
+}
+
 void getMasterDeviceOrder() {
 	String message ="getMasterDeviceOrder data0=";
 	message +=UDPdata.data[0];
 	message +=" data1=";
 	message +=UDPdata.data[1];
 	debug(message);
-	if (UDPdata.data[0] == 0) {
+	if (UDPdata.data[0] == 3) {
 		device.lights[0].force100 = (UDPbitStatus(UDPdata.data[1],7)>0)?true:false;
 		device.lights[1].force100 = (UDPbitStatus(UDPdata.data[1],6)>0)?true:false;
 		device.lights[2].force100 = (UDPbitStatus(UDPdata.data[1],5)>0)?true:false;
@@ -111,6 +120,7 @@ void getMasterDeviceOrder() {
 		device.lights[1].force0 = (UDPbitStatus(UDPdata.data[1],2)>0)?true:false;
 		device.lights[2].force0 = (UDPbitStatus(UDPdata.data[1],1)>0)?true:false;
 		device.lights[3].force0 = (UDPbitStatus(UDPdata.data[1],0)>0)?true:false;
+		checkIfForceValid();
 		EEpromWrite(0, device.lights[0].force100);
 		EEpromWrite(1, device.lights[1].force100);
 		EEpromWrite(2, device.lights[2].force100);
@@ -120,31 +130,31 @@ void getMasterDeviceOrder() {
 		EEpromWrite(6, device.lights[2].force0);
 		EEpromWrite(7, device.lights[3].force0);
 	}
-	if (UDPdata.data[0] == 5) {
+	if (UDPdata.data[0] == 8) {
 		device.startLightLevel= UDPdata.data[1];
 		EEpromWrite(8, UDPdata.data[1]);
 	}
-	if (UDPdata.data[0] == 6) {
+	if (UDPdata.data[0] == 9) {
 		device.lights[0].standByIntens = UDPdata.data[1];
 		EEpromWrite(9, UDPdata.data[1]);
 	}
-	if (UDPdata.data[0] == 7) {
+	if (UDPdata.data[0] == 10) {
 		device.lights[1].standByIntens = UDPdata.data[1];
 		EEpromWrite(10, UDPdata.data[1]);
 	}
-	if (UDPdata.data[0] == 8) {
+	if (UDPdata.data[0] == 11) {
 		device.lights[2].standByIntens = UDPdata.data[1];
 		EEpromWrite(11, UDPdata.data[1]);
 	}
-	if (UDPdata.data[0] == 9) {
+	if (UDPdata.data[0] == 12) {
 		device.lights[3].standByIntens = UDPdata.data[1];
 		EEpromWrite(12, UDPdata.data[1]);
 	}
-	if (UDPdata.data[0] == 10) {
+	if (UDPdata.data[0] == 13) {
 		device.offTime.hour = UDPdata.data[1];
 		EEpromWrite(13, UDPdata.data[1]);
 	}
-	if (UDPdata.data[0] == 11) {
+	if (UDPdata.data[0] == 14) {
 		device.offTime.minute = UDPdata.data[1];
 		EEpromWrite(14, UDPdata.data[1]);
 	}
@@ -209,7 +219,7 @@ void outputs() {
 }
 
 void setUDPdata() {
-	int size = 9;
+	int size = 12;
 	byte dataWrite[size];
 	// First three bytes are reserved for device recognized purposes.
 	dataWrite[0] = 0;
@@ -232,22 +242,23 @@ void setUDPdata() {
 
 String lightStatus(Light light, String name) {
 	String status;
-	status +="\nLight["; status +=name; status +="] force100="; status+=light.force100; status +=" force0="; status+=light.force0;
-	status +=" isIntens=="; status+=light.isIntens; status +="% expIntens=="; status+=light.expIntens;
-	status +="% standByIntens=="; status+=light.standByIntens; status +="% delay="; status+=light.delay;
+	status +="\nLight["; status +=name; status +="]\t\tforce100="; status+=light.force100; status +="\tforce0="; status+=light.force0;
+	status +="\tisIntens=="; status+=light.isIntens; status +="%\texpIntens=="; status+=light.expIntens;
+	status +="%\tstandByIntens=="; status+=light.standByIntens; status +="%\tdelay="; status+=light.delay;
 	return status;
 }
 
 void statusUpdate() {
 	String status;
 	status = "PARAMETRY \n";
-	status += lightStatus(device.lights[0], "ENTRANCE");
-	status += lightStatus(device.lights[0], "DRIVEWAY");
-	status += lightStatus(device.lights[0], "CARPORT");
-	status += lightStatus(device.lights[0], "FENCE");
+	status += lightStatus(device.lights[ID_ENTRANCE], "ENTRANCE");
+	status += lightStatus(device.lights[ID_DRIVEWAY], "DRIVEWAY");
+	status += lightStatus(device.lights[ID_CARPORT], "CARPORT");
+	status += lightStatus(device.lights[ID_FENCE], "FENCE");
 
 	status +="\n\nPróg w³¹czenia="; status +=device.startLightLevel; status+="[%]";
 	status +="\n\nGodzina wy³¹czenia="; status +=device.offTime.hour; status+=":"; status +=device.offTime.minute;
+	status +="\n\Wy³¹czenie nocne ="; device.nightTime?status +="TAK": status +="NIE";
 	status +="\n\nIntensynoœ œwiat³a [modul_pogodowy]="; status +=device.lightSensor; status+="[%]";
 
 	setStatus(status);
