@@ -368,6 +368,15 @@ void humidityAlert() {
 					|| (zones[ID_ZONE_KAROLINA].humidity>=device.humidityAlert.trigger)
 					|| (zones[ID_ZONE_LAZGORA].humidity>=device.humidityAlert.trigger));
 
+	int turboTrigger = device.humidityAlert.trigger + 10;
+	device.humidityAlert.turbo = ((zones[ID_ZONE_SALON].humidity>=turboTrigger)
+					|| (zones[ID_ZONE_PRALNIA].humidity>=turboTrigger)
+					|| (zones[ID_ZONE_LAZDOL].humidity>=turboTrigger)
+					|| (zones[ID_ZONE_RODZICE].humidity>=turboTrigger)
+					|| (zones[ID_ZONE_NATALIA].humidity>=turboTrigger)
+					|| (zones[ID_ZONE_KAROLINA].humidity>=turboTrigger)
+					|| (zones[ID_ZONE_LAZGORA].humidity>=turboTrigger));
+
 	if (device.humidityAlert.req)
 		device.humidityAlert.endMillis = currentMillis+(HUMIDITY_ALERT_PROCESS_TIME*60000);
 	long timeLeftMillis = device.humidityAlert.endMillis - currentMillis;
@@ -436,12 +445,10 @@ void fan() {
 	if (device.normalON)
 		device.fanSpeed = 50;
 	if (device.humidityAlert.timeLeft>0)
-		device.fanSpeed = 70;
+		device.fanSpeed = 75;
 	if (device.defrost.timeLeft>0)
 		device.fanSpeed = 80;
-	if (device.humidityAlert.timeLeft>0)
-		device.fanSpeed = 70;
-	if (device.humidityAlert.req)
+	if (device.humidityAlert.turbo)
 		device.fanSpeed = 100;
 }
 

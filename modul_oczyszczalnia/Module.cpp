@@ -21,6 +21,9 @@ void setUDPdata();
 void statusUpdate();
 void outputs();
 
+//Variables
+bool waterPumpForced = false;
+
 
 //Delays
 unsigned long sensorReadMillis = 0;
@@ -63,7 +66,7 @@ void pinDef() {
 	pinMode (pinTRIG,OUTPUT);
 
 	//LIMIT SENSOR
-	pinMode (pinECHO,INPUT_PULLDOWN);
+	pinMode (pinLIMIT,INPUT_PULLUP);
 }
 
 void module() {
@@ -93,7 +96,7 @@ void readSR04Sensor() {
 	delayMicroseconds(15);
 	digitalWrite(pinTRIG, LOW);
 	digitalWrite(pinECHO, HIGH);
-	long time = pulseIn(pinECHO, HIGH);
+	long time = pulseIn(pinECHO, HIGH, 14500);
 	int calc = -1*(int)(time / 58);
 	if (calc != 0) {
 		device.isWaterLevel = calc;
@@ -101,9 +104,12 @@ void readSR04Sensor() {
 	device.isWaterLevelZeroRef = device.isWaterLevel - device.zeroReference;
 	if (device.isWaterLevelZeroRef>0)
 		device.isWaterLevelZeroRef = 0;
+	if (device.isWaterLevelZeroRef<-250)
+		device.isWaterLevelZeroRef = -250;
 }
 
 void readLimitSensor() {
+	if (sleep(&sensorReadMillis, DELAY_LIMIT_READ)) return;
 	device.limitSensor = digitalRead(pinLIMIT);
 	if (device.limitSensor)
 		addLog("ALARM! Limit sensor aktywny!");
@@ -163,6 +169,14 @@ void pumps() {
 		device.waterPump = true;
 	if (device.isWaterLevelZeroRef<=device.minWaterLevel)
 		device.waterPump = false;
+	if (device.limitSensor) {
+		waterPumpForced = true;
+		device.waterPump = true;
+	}
+	if ((waterPumpForced) && (!device.limitSensor)) {
+		waterPumpForced = false;
+		device.waterPump = false;
+	}
 }
 
 void setUDPdata() {
@@ -188,7 +202,7 @@ void statusUpdate() {
 	status += "\tmaxLevel["; status += device.maxWaterLevel; status+="]cm";
 	status += "\tminLevel["; status += device.minWaterLevel; status+="]cm";
 	status += "\tzeroReference["; status += device.zeroReference; status+="]cm";
-	status += "\tLimitSensor["; device.limitSensor?status += "NIE":status += "TAK"; status+="]cm";
+	status += "\tLimitSensor["; device.limitSensor==true?status += "TAK":status += "NIE"; status+="]";
 	status +="\nNAPOWIETRZANIE";
 	status += "\tinterwal["; status += device.airInterval; status+="]min";
 	status += "\tlastStateChange["; status += (int)((millis() - device.lastStateChange)/1000); status+="]s";
