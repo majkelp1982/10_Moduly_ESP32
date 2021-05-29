@@ -56,6 +56,7 @@
 struct SensorBME280 {
 	float temperature = 0.0f;				// [stC]
 	int pressure = 0;						// [hPa]
+	float pressureHighPrec = 0.0f;
 	int humidity = 0;						// [%]
 	Adafruit_BME280 interface;
 	unsigned int faultyReadings = 0;		// [units]

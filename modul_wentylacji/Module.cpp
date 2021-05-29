@@ -114,7 +114,8 @@ void readSensors() {
 	if (sleep(&readSensorMillis, 5)) return;
 	for (int i=0; i<4; i++) {
 		device.sensorsBME280[i].temperature = device.sensorsBME280[i].interface.readTemperature();
-		device.sensorsBME280[i].pressure = (int)(device.sensorsBME280[i].interface.readPressure()/100);
+		device.sensorsBME280[i].pressureHighPrec = device.sensorsBME280[i].interface.readPressure();
+		device.sensorsBME280[i].pressure = (int)(device.sensorsBME280[i].pressureHighPrec/100);
 		device.sensorsBME280[i].humidity = (int)device.sensorsBME280[i].interface.readHumidity();
 		if (device.sensorsBME280[i].temperature>70
 				|| device.sensorsBME280[i].pressure>1050
@@ -563,13 +564,13 @@ void statusUpdate() {
 	status +="Odmrazanie: "; status += device.defrost.req ? "TAK":"NIE"; status +="\ttime left: "; status += device.defrost.timeLeft; status +="[min]\ttrigger EFF: "; status += device.defrost.trigger; status +="[%]\n";
 	status +="Humidity Alert: "; status += device.humidityAlert.req ? "TAK":"NIE"; status +="\ttime left: "; status += device.humidityAlert.timeLeft; status +="[min]\ttrigger: "; status += device.humidityAlert.trigger; status +="[%]\n";
 	status +="Czerpnia:\t T="; status +=device.sensorsBME280[0].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[0].humidity;
-	status +="[%]\tP="; status +=(int)device.sensorsBME280[0].pressure;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[0].faultyReadings ;status +="\n";
+	status +="[%]\tP="; status +=(int)device.sensorsBME280[0].pressureHighPrec;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[0].faultyReadings ;status +="\n";
 	status +="Wyrzutnia:\t T="; status +=device.sensorsBME280[1].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[1].humidity;
-	status +="[%]\tP="; status +=(int)device.sensorsBME280[1].pressure;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[1].faultyReadings ;status +="\n";
+	status +="[%]\tP="; status +=(int)device.sensorsBME280[1].pressureHighPrec;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[1].faultyReadings ;status +="\n";
 	status +="Nawiew:\t\t T="; status +=device.sensorsBME280[2].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[2].humidity;
-	status +="[%]\tP="; status +=(int)device.sensorsBME280[2].pressure;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[2].faultyReadings ;status +="\n";
+	status +="[%]\tP="; status +=(int)device.sensorsBME280[2].pressureHighPrec;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[2].faultyReadings ;status +="\n";
 	status +="Wywiew:\t\t T="; status +=device.sensorsBME280[3].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[3].humidity;
-	status +="[%]\tP="; status +=(int)device.sensorsBME280[3].pressure;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[3].faultyReadings ;status +="\n";
+	status +="[%]\tP="; status +=(int)device.sensorsBME280[3].pressureHighPrec;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[3].faultyReadings ;status +="\n";
 	for (int i=0; i<7; i++) {
 		status +="Zone["; status +=i; status += "]:\t\t T="; status +=zones[i].isTemp; status +="[stC]\treqT="; status+=zones[i].reqTemp; status +="[stC]\tH="; status +=zones[i].humidity; status +="\n";
 	}
