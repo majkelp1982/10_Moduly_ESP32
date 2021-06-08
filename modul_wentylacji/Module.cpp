@@ -1,6 +1,6 @@
 #include "Module.h"
-
 Device device;
+HandMode handMode;
 Zone zones[7];
 AirPollution airPollution;
 DataRead UDPdata;
@@ -20,6 +20,8 @@ void defrost();
 void bypass();
 void fan();
 void efficency();
+
+void manualMode();
 
 void outputs();
 void setUDPdata();
@@ -85,6 +87,9 @@ void module() {
 	bypass();
 	fan();
 	efficency();
+
+	//Hand mode
+	manualMode();
 
 	//Output settings
 	outputs();
@@ -163,7 +168,22 @@ void getMasterDeviceOrder() {
 	if (UDPdata.data[0] == 35) {
 		device.humidityAlert.trigger = UDPdata.data[1];
 		EEpromWrite(13, UDPdata.data[1]);
-	}	setUDPdata();
+	}
+
+	//Hand Mode
+	//byte 100
+	if (UDPdata.data[0] == 100) {
+		(UDPdata.data[1]>0)?handMode.enabled = true: handMode.enabled = false;
+	}
+	//byte 101
+	if (UDPdata.data[0] == 101) {
+		(UDPdata.data[1]>100)? handMode.fanSpeed = 100: (UDPdata.data[1]<0)? handMode.fanSpeed = 0 : handMode.fanSpeed = UDPdata.data[1];
+	}
+	//byte 102
+	if (UDPdata.data[0] == 102) {
+		(UDPdata.data[1]>0)?handMode.byPassOpen = true: handMode.byPassOpen = false;
+	}
+	setUDPdata();
 	forceStandardUDP();
 }
 
@@ -487,6 +507,13 @@ void efficency() {
 		device.efficency.min = device.efficency.is;
 }
 
+void manualMode() {
+	if (!handMode.enabled)
+		return;
+	device.fanSpeed = handMode.fanSpeed;
+	device.bypassOpen = handMode.byPassOpen;
+}
+
 void outputs() {
 	//Bypass
 	int dutyCycle = 0;
@@ -564,17 +591,20 @@ void statusUpdate() {
 	status +="Odmrazanie: "; status += device.defrost.req ? "TAK":"NIE"; status +="\ttime left: "; status += device.defrost.timeLeft; status +="[min]\ttrigger EFF: "; status += device.defrost.trigger; status +="[%]\n";
 	status +="Humidity Alert: "; status += device.humidityAlert.req ? "TAK":"NIE"; status +="\ttime left: "; status += device.humidityAlert.timeLeft; status +="[min]\ttrigger: "; status += device.humidityAlert.trigger; status +="[%]\n";
 	status +="Czerpnia:\t T="; status +=device.sensorsBME280[0].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[0].humidity;
-	status +="[%]\tP="; status +=(int)device.sensorsBME280[0].pressureHighPrec;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[0].faultyReadings ;status +="\n";
+	status +="[%]\tP="; status +=(int)device.sensorsBME280[0].pressureHighPrec;status +="[hPa*100] Faulty="; status +=(int)device.sensorsBME280[0].faultyReadings ;status +="\n";
 	status +="Wyrzutnia:\t T="; status +=device.sensorsBME280[1].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[1].humidity;
-	status +="[%]\tP="; status +=(int)device.sensorsBME280[1].pressureHighPrec;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[1].faultyReadings ;status +="\n";
+	status +="[%]\tP="; status +=(int)device.sensorsBME280[1].pressureHighPrec;status +="[hPa*100] Faulty="; status +=(int)device.sensorsBME280[1].faultyReadings ;status +="\n";
 	status +="Nawiew:\t\t T="; status +=device.sensorsBME280[2].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[2].humidity;
-	status +="[%]\tP="; status +=(int)device.sensorsBME280[2].pressureHighPrec;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[2].faultyReadings ;status +="\n";
+	status +="[%]\tP="; status +=(int)device.sensorsBME280[2].pressureHighPrec;status +="[hPa*100] Faulty="; status +=(int)device.sensorsBME280[2].faultyReadings ;status +="\n";
 	status +="Wywiew:\t\t T="; status +=device.sensorsBME280[3].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[3].humidity;
-	status +="[%]\tP="; status +=(int)device.sensorsBME280[3].pressureHighPrec;status +="[hPa] Faulty="; status +=(int)device.sensorsBME280[3].faultyReadings ;status +="\n";
+	status +="[%]\tP="; status +=(int)device.sensorsBME280[3].pressureHighPrec;status +="[hPa*100] Faulty="; status +=(int)device.sensorsBME280[3].faultyReadings ;status +="\n";
+
+	status +="\n\nHand mode";
+	status +="\nEnabled="; status +=handMode.enabled;status +="\tfanSpeed="; status +=handMode.fanSpeed;status +="[%]\t bypassOpen="; status +=handMode.byPassOpen;
 	for (int i=0; i<7; i++) {
-		status +="Zone["; status +=i; status += "]:\t\t T="; status +=zones[i].isTemp; status +="[stC]\treqT="; status+=zones[i].reqTemp; status +="[stC]\tH="; status +=zones[i].humidity; status +="\n";
+		status +="\nZone["; status +=i; status += "]:\t\t T="; status +=zones[i].isTemp; status +="[stC]\treqT="; status+=zones[i].reqTemp; status +="[stC]\tH="; status +=zones[i].humidity;
 	}
-	status +="Air\tPM2.5="; status+=airPollution.pm25; status +="[ug/m3]\t PM10="; status +=airPollution.pm10; status+="[ug/m3]\n";
+	status +="\nAir\tPM2.5="; status+=airPollution.pm25; status +="[ug/m3]\t PM10="; status +=airPollution.pm10; status+="[ug/m3]\n";
 	setStatus(status);
 }
 

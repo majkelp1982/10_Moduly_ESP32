@@ -89,6 +89,12 @@ struct Device {
 	Value efficency;
 };
 
+struct HandMode {
+	boolean enabled = false;
+	byte fanSpeed = 0;
+	boolean byPassOpen = false;
+};
+
 struct Zone {
 	int humidity = 0;
 	float isTemp = 0.0f;
