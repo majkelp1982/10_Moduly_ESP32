@@ -39,13 +39,15 @@ boolean release1  = true;
 int fanRev2 = 0;
 boolean release2  = true;
 
+//Bypass
+int lastDutyCycle = -1;
+bool servoAttached = false;
+
 //Delays
 unsigned long readSensorMillis = 0;
 unsigned long lastRevsRead = 0;
 unsigned long efficencyDelayMillis = 0;
-
-//TMP
-int lastDutyCycle = 0;
+unsigned long bypassHoldMillis = 0;
 
 void module_init() {
 	//Set CS pins
@@ -64,7 +66,6 @@ void module_init() {
 
 	//Bypass initialization
 	ledcSetup(SERVO_CHANNEL, SERVO_FREQUENCY, SERVO_RESOUTION);
-	ledcAttachPin(SERVO_PIN, SERVO_CHANNEL);
 
 	//Fan initialization
 	ledcSetup(PWM_CHANNEL, PWM_FREQUENCY, PWM_RESOUTION);
@@ -113,6 +114,8 @@ void firstScan() {
 	device.defrost.trigger = EEpromData[12];
 
 	device.humidityAlert.trigger = EEpromData[13];
+
+	device.bypassForce = UDPbitStatus(EEpromData[14],2);
 }
 
 void readSensors() {
@@ -151,6 +154,12 @@ void readUDPdata() {
 }
 
 void getMasterDeviceOrder() {
+	//bytes 0
+	if (UDPdata.data[0] == 0) {
+		device.bypassForce = UDPbitStatus(UDPdata.data[1],2);
+		EEpromWrite(14, UDPdata.data[1]);
+	}
+
 	//bytes 1-12
 	if ((UDPdata.data[0] >= 1)
 			&& (UDPdata.data[0] <=12)) {
@@ -177,7 +186,7 @@ void getMasterDeviceOrder() {
 	}
 	//byte 101
 	if (UDPdata.data[0] == 101) {
-		(UDPdata.data[1]>100)? handMode.fanSpeed = 100: (UDPdata.data[1]<0)? handMode.fanSpeed = 0 : handMode.fanSpeed = UDPdata.data[1];
+		(UDPdata.data[1]>100)? handMode.fanSpeed = 100:(UDPdata.data[1]<0)? handMode.fanSpeed = 0 : handMode.fanSpeed = UDPdata.data[1];
 	}
 	//byte 102
 	if (UDPdata.data[0] == 102) {
@@ -433,6 +442,8 @@ void defrost() {
 
 void bypass() {
 	device.bypassOpen = device.defrost.timeLeft>0;
+	if (device.bypassForce)
+		device.bypassOpen = true;
 }
 
 void fan() {
@@ -519,7 +530,19 @@ void outputs() {
 	int dutyCycle = 0;
 	if (device.bypassOpen) dutyCycle = 10;
 	else dutyCycle = 17;
-	ledcWrite(SERVO_CHANNEL, dutyCycle);
+	if (lastDutyCycle != dutyCycle) {
+		lastDutyCycle = dutyCycle;
+		ledcAttachPin(SERVO_PIN, SERVO_CHANNEL);
+		servoAttached = true;
+		ledcWrite(SERVO_CHANNEL, dutyCycle);
+		//hold servo for 5s
+		bypassHoldMillis = millis()+5000;
+	}
+
+	if (millis()>bypassHoldMillis) {
+		ledcDetachPin(SERVO_PIN);
+		servoAttached = false;
+	}
 
 	//Fans
 	// parsing 0-100% into 255-0
@@ -587,7 +610,7 @@ void statusUpdate() {
 	status = "PARAMETRY PRACY\n";
 	status +="Wentylatory: "; status += device.fanSpeed; status +="[%]\tObr1: "; status += device.fan1revs; status +="[min-1]\tObr2: "; status += device.fan2revs; status +="[min-1]\n";
 	status +="EFF:"; status += device.efficency.is; status +="[%] MIN:"; status += device.efficency.min; status +="[%] MAX:"; status += device.efficency.max; status +="[%]\n:";
-	status +="NormalON: "; status += device.normalON ? "TAK":"NIE"; status +="\tbypass otwarty: "; status += device.bypassOpen ? "TAK":"NIE"; status +="\n";
+	status +="NormalON: "; status += device.normalON ? "TAK":"NIE"; status +="\tbypass force: "; status += device.bypassForce? "TAK":"NIE"; status +="\tbypass otwarty: "; status += device.bypassOpen ? "TAK":"NIE"; status +="\tservo wysterowane: "; status += servoAttached ? "TAK":"NIE"; status +="\n";
 	status +="Odmrazanie: "; status += device.defrost.req ? "TAK":"NIE"; status +="\ttime left: "; status += device.defrost.timeLeft; status +="[min]\ttrigger EFF: "; status += device.defrost.trigger; status +="[%]\n";
 	status +="Humidity Alert: "; status += device.humidityAlert.req ? "TAK":"NIE"; status +="\ttime left: "; status += device.humidityAlert.timeLeft; status +="[min]\ttrigger: "; status += device.humidityAlert.trigger; status +="[%]\n";
 	status +="Czerpnia:\t T="; status +=device.sensorsBME280[0].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[0].humidity;

@@ -87,6 +87,7 @@ struct Device {
 	int fan2revs = 0;					// revs min-1
 	int hour[12];
 	Value efficency;
+	boolean bypassForce = false;
 };
 
 struct HandMode {
