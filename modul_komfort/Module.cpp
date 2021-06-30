@@ -128,7 +128,7 @@ void DALLAS18b20Read () {
 		if (zone== 2) {a=1.07;		b=(-4.5+2.7);}		// Zone 2 - £azienka dó³,gabinet
 		if (zone== 3) {a=0.98;		b=(2.1+4.4);}		// Zone 3 - rodzice
 		if (zone== 4) {a=0.985; 	b=(0+3.8);}			// Zone 4 - Natalia
-		if (zone== 5) {a=0.975; 	b=(1+2.5);}			// Zone 5 - Karolina
+		if (zone== 5) {a=0.975; 	b=(1+0.8);}			// Zone 5 - Karolina
 		if (zone== 6) {a=0.995; 	b=(-1.2+4.7);}		// Zone 6 - Laz Gora
 		tempC = sensors.getTempC(deviceAddress);
 		if ((tempC<5) || (tempC>100)) {

@@ -70,6 +70,7 @@ void module_init() {
 	//Fan initialization
 	ledcSetup(PWM_CHANNEL, PWM_FREQUENCY, PWM_RESOUTION);
 	ledcAttachPin(PIN_FAN_PWM, PWM_CHANNEL);
+	ledcAttachPin(PIN_FAN_PWM, PWM_CHANNEL);
 	pinMode(PIN_FAN1_REVS, INPUT_PULLUP);
 	digitalWrite(PIN_FAN1_REVS, HIGH);
 	pinMode(PIN_FAN2_REVS, INPUT_PULLUP);

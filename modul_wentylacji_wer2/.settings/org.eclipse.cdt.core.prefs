@@ -445,7 +445,7 @@ environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.PACKAGE_
 environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.PACKAGE_ID/value=esp32
 environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.PROJECT_NAME/delimiter=;
 environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.PROJECT_NAME/operation=replace
-environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.PROJECT_NAME/value=modul_wentylacji
+environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.PROJECT_NAME/value=modul_wentylacji_wer2
 environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.SELECTED.PLATFORM/delimiter=;
 environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.SELECTED.PLATFORM/operation=replace
 environment/project/io.sloeber.core.toolChain.release.1594058020/JANTJE.SELECTED.PLATFORM/value=${eclipse_home}/arduinoPlugin/packages/esp32/hardware/esp32/1.0.0

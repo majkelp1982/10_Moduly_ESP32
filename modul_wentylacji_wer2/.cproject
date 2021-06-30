@@ -36,6 +36,23 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/EEPROM}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/Servo}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/FS/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Adafruit_BME280}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Adafruit_Unified_Sensor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Basic}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Communication}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/EEPROM}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/ESPmDNS/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/FS/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/OTA}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Servo}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/SPI/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Status}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Update/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/WebServer/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/WiFi/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Wire/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.1557751461" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
@@ -58,6 +75,23 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/EEPROM}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/Servo}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/FS/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Adafruit_BME280}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Adafruit_Unified_Sensor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Basic}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Communication}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/EEPROM}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/ESPmDNS/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/FS/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/OTA}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Servo}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/SPI/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Status}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Update/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/WebServer/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/WiFi/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Wire/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.1711104110" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
@@ -80,6 +114,23 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/EEPROM}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/Servo}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji/libraries/FS/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Adafruit_BME280}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Adafruit_Unified_Sensor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Basic}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Communication}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/EEPROM}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/ESPmDNS/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/FS/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/OTA}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Servo}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/SPI/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Status}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Update/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/WebServer/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/WiFi/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_wentylacji_wer2/libraries/Wire/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.259696098" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>
