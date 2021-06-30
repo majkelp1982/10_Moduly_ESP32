@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>modul_oczyszczalnia</name>
+	<name>modul_wentylacji_wer2</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -62,11 +62,6 @@
 			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Communication</location>
 		</link>
 		<link>
-			<name>libraries/DallasTemperature</name>
-			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/DallasTemperature/3.8.0</locationURI>
-		</link>
-		<link>
 			<name>libraries/EEPROM</name>
 			<type>2</type>
 			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/1.0.0/libraries/EEPROM</locationURI>
@@ -82,24 +77,9 @@
 			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/1.0.0/libraries/FS</locationURI>
 		</link>
 		<link>
-			<name>libraries/FreeRTOS</name>
-			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/FreeRTOS/10.4.3-3</locationURI>
-		</link>
-		<link>
 			<name>libraries/OTA</name>
 			<type>2</type>
 			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/OTA</location>
-		</link>
-		<link>
-			<name>libraries/OneWire</name>
-			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/OneWire/2.3.4</locationURI>
-		</link>
-		<link>
-			<name>libraries/SH1106</name>
-			<type>2</type>
-			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/SH1106</location>
 		</link>
 		<link>
 			<name>libraries/SPI</name>
@@ -107,14 +87,14 @@
 			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/1.0.0/libraries/SPI</locationURI>
 		</link>
 		<link>
+			<name>libraries/Servo</name>
+			<type>2</type>
+			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Servo</location>
+		</link>
+		<link>
 			<name>libraries/Status</name>
 			<type>2</type>
 			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Status</location>
-		</link>
-		<link>
-			<name>libraries/UltrasonicSensor</name>
-			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/UltrasonicSensor/1.1.0</locationURI>
 		</link>
 		<link>
 			<name>libraries/Update</name>

@@ -43,14 +43,15 @@
 #define SERVO_PIN							25 		// GPIO to PWM fan input
 //FAN
 #define PWM_FREQUENCY 						1000 	// Hz
-#define PWM_CHANNEL 						1		// this variable is used to select the channel number
 #define PWM_RESOUTION 						8 		// resolution of the signal
-#define PIN_FAN_PWM							33 		// GPIO to PWM fan input
+#define PWM_CHANNEL_CZ						1		// this variable is used to select the channel number
+#define PWM_CHANNEL_WY						1		// this variable is used to select the channel number
+#define PIN_FAN_PWM_CZ						33 		// GPIO to PWM fan input
+#define PIN_FAN_PWM_WY						34 		// GPIO to PWM fan input
 #define PIN_FAN1_REVS						32		// FAN1 TACHO SIGNAL
 #define PIN_FAN2_REVS						12		// FAN2 TACHO SIGNAL
 
 //HUMIDITY ALLERT
-#define HUMIDITY_TO_HIGH					80
 #define HUMIDITY_ALERT_PROCESS_TIME			10
 
 struct SensorBME280 {
