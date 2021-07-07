@@ -23,7 +23,7 @@
 //SPI
 #define SPI_SCK 							18 // BME280 PIN SCL
 #define SPI_MISO 							19 // BME280 PIN SDO
-#define SPI_MOSI							23 // BME280 PIN
+#define SPI_MOSI							23 // BME280 PIN SDA
 
 //BME280 CS PINS(SPI)
 #define CS_BME280_CZERPNIA 					13 // BME280 PIN CSB
@@ -36,22 +36,27 @@
 #define ID_NAWIEW							2
 #define ID_WYWIEW							3
 
+//Fans
+#define FAN_CZERPNIA						0
+#define FAN_WYWIEW							1
+
 //BYPASS
 #define SERVO_FREQUENCY 					50 		// Hz
-#define SERVO_CHANNEL 						2		// this variable is used to select the channel number
+#define SERVO_CHANNEL 						1		// this variable is used to select the channel number
 #define SERVO_RESOUTION 					8 		// resolution of the signal
 #define SERVO_PIN							25 		// GPIO to PWM fan input
 //FAN
 #define PWM_FREQUENCY 						1000 	// Hz
+#define PWM_FAN_CZ_CHANNEL					2		// this variable is used to select the channel number
+#define PWM_FAN_WY_CHANNEL					3		// this variable is used to select the channel number
 #define PWM_RESOUTION 						8 		// resolution of the signal
-#define PWM_CHANNEL_CZ						1		// this variable is used to select the channel number
-#define PWM_CHANNEL_WY						1		// this variable is used to select the channel number
-#define PIN_FAN_PWM_CZ						33 		// GPIO to PWM fan input
-#define PIN_FAN_PWM_WY						34 		// GPIO to PWM fan input
-#define PIN_FAN1_REVS						32		// FAN1 TACHO SIGNAL
-#define PIN_FAN2_REVS						12		// FAN2 TACHO SIGNAL
+#define PIN_FAN_CZ_PWM						0 		// GPIO to PWM fan input
+#define PIN_FAN_WY_PWM						0 		// GPIO to PWM fan input
+#define PIN_FAN_CZ_REVS						0		// FAN1 TACHO SIGNAL
+#define PIN_FAN_WY_REVS						0		// FAN2 TACHO SIGNAL
 
 //HUMIDITY ALLERT
+#define HUMIDITY_TO_HIGH					80
 #define HUMIDITY_ALERT_PROCESS_TIME			10
 
 struct SensorBME280 {
@@ -63,32 +68,86 @@ struct SensorBME280 {
 	unsigned int faultyReadings = 0;		// [units]
 };
 
+struct Fan {
+	int speed = 0;							// 0-100%
+	int rev = 0;							// revs min-1
+	boolean release;						// help var to get revs
+};
+
 struct Mode {
-	boolean req = false;				// req to set defrost mode in case recuperator is frozen
-	boolean turbo = false;
-	int timeLeft = 0;					// time left to finish defrost process [min]
-	int trigger = 0;					// difference between inlet and out pressure to confirm recu stuck because of ice [hPa]
+	boolean trigger = false;				// trigger to turn on mode
+	int triggerInt = 0;						// trigger to turn on mode
+	boolean turbo = false;					// turbo mode required (high fans revs)
+	int delayTime = 0;						// delay time after trigger no more active
+	int timeLeft = 0;
+	unsigned long endMillis = 0;			// when mode triggered, here is store time when mode turns off
+};
+
+struct Matrix {
+	bool salon = false;
+	bool pralnia = false;
+	bool lazDol = false;
+	bool rodzice = false;
+	bool Natalia = false;
+	bool Karolina = false;
+	bool lazGora = false;
+};
+
+struct ServoMotor {
+	Servo interface;
+	bool attached = false;
+	int dutyCycle = 0;
+	int lastDutyCycle = 0;
 	unsigned long endMillis = 0;
 };
 
-struct Value {
-	int is = 0;
-	int min = 0;
-	int max = 0;
-};
-
 struct Device {
-	SensorBME280 sensorsBME280[4];
-	boolean normalON = false;			// normal mode
-	Mode humidityAlert;					// humidity mode structure
-	boolean bypassOpen = false;			// bypass open in case defrost or cooling in summer night
-	Mode defrost;						// defrost mode structure
-	int fanSpeed = 0;					// 0-100 [%]
-	int fan1revs = 0;					// revs min-1
-	int fan2revs = 0;					// revs min-1
-	int hour[12];
-	Value efficency;
-	boolean bypassForce = false;
+	// byte 0
+	boolean humidityAlert = false;
+	boolean bypassOpen = false;
+	boolean circuitPump = false;
+	boolean reqPumpColdWater= false;
+	boolean reqPumpHotWater = false;
+	boolean reqAutoDiagnosis = false;
+	boolean defrostActive;
+
+	// byte 1
+	boolean normalOn = false;
+	boolean activeCooling = false;
+	boolean activeHeating = false;
+	boolean reqLazDol = false;
+	boolean reqLazGora = false;
+	boolean reqKuchnia = false;
+
+	//byte 2-17
+	SensorBME280 sensorsBME280[4];			// sensory wew. reku
+
+	//byte 18-21
+	Fan fan[2];								// silniki
+
+	//byte 22-25
+	float heatExchanger[4];					// wymiennik ciep³a(ch³odnica za reku)
+
+	//byte 26
+	Mode normalMode;						// normal mode structure
+
+	//byte 27-28
+	Mode humidityAlertMode;					// humidity mode structure
+
+	//byte 29-30
+	Mode defrostMode;						// defrost mode structure
+
+	//byte 31-54
+	Matrix activeTempRegByHours[24];		// active cooling/heating according to hours
+	Matrix zoneReqReg;
+
+	//byte 55
+	byte minTemp;							// min temp to trigger active cooling in zones. Priority is normal heating. Only when normal heating is to weak then trigger vent heating system
+
+	//byte 56-79
+	Matrix normalOnByHours[24];				// active cooling/heating according to hours
+
+	ServoMotor byppass;
 };
 
 struct HandMode {
