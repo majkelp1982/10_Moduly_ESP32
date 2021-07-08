@@ -40,6 +40,12 @@
 #define FAN_CZERPNIA						0
 #define FAN_WYWIEW							1
 
+//DS18b20
+#define ID_WATER_INLET						0
+#define ID_WATER_OUTLET						1
+#define ID_AIR_INTAKE						2
+#define ID_AIR_OUTLET						3
+
 //BYPASS
 #define SERVO_FREQUENCY 					50 		// Hz
 #define SERVO_CHANNEL 						1		// this variable is used to select the channel number
@@ -58,6 +64,10 @@
 //HUMIDITY ALLERT
 #define HUMIDITY_TO_HIGH					80
 #define HUMIDITY_ALERT_PROCESS_TIME			10
+
+//CIRCUIT PUMP PIN
+#define PIN_CIRCUIT_PUMP					80
+
 
 struct SensorBME280 {
 	float temperature = 0.0f;				// [stC]
@@ -128,23 +138,23 @@ struct Device {
 	//byte 22-25
 	float heatExchanger[4];					// wymiennik ciep³a(ch³odnica za reku)
 
-	//byte 26
+	//byte 30
 	Mode normalMode;						// normal mode structure
 
-	//byte 27-28
+	//byte 31-32
 	Mode humidityAlertMode;					// humidity mode structure
 
-	//byte 29-30
+	//byte 33-34
 	Mode defrostMode;						// defrost mode structure
 
-	//byte 31-54
+	//byte 35-58
 	Matrix activeTempRegByHours[24];		// active cooling/heating according to hours
 	Matrix zoneReqReg;
 
-	//byte 55
+	//byte 59
 	byte minTemp;							// min temp to trigger active cooling in zones. Priority is normal heating. Only when normal heating is to weak then trigger vent heating system
 
-	//byte 56-79
+	//byte 60-83
 	Matrix normalOnByHours[24];				// active cooling/heating according to hours
 
 	ServoMotor byppass;
@@ -155,6 +165,11 @@ struct HandMode {
 	byte fanSpeed = 0;
 	boolean byPassOpen = false;
 };
+
+struct TestMode {
+	bool enabled = false;
+};
+
 
 struct Zone {
 	int humidity = 0;

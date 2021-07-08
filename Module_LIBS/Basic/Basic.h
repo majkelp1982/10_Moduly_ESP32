@@ -62,4 +62,12 @@ void getPinState(PinInput *pinInput, int pin, bool edge);
 byte get10Temp(float temp);
 byte get01Temp(float temp);
 
+//Help function to addStatus
+String addStatus(String message, String value, String unit);
+String addStatus(String message, int value, String unit);
+String addStatus(String message, unsigned int value, String unit);
+String addStatus(String message,  byte value, String unit);
+String addStatus(String message, bool value);
+String addStatus(String message, float value, String unit);
+
 #endif /* BASIC_H_ */

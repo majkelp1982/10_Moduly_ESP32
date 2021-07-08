@@ -1,6 +1,7 @@
 #include "Module.h"
 Device device;
 HandMode handMode;
+TestMode testMode;
 Zone zones[7];
 AirPollution airPollution;
 DataRead UDPdata;
@@ -17,6 +18,7 @@ void activeCoolingMode();
 void activeHeatingMode();
 void bypass();
 void fan();
+void circuitPump();
 
 void manualMode();
 
@@ -114,42 +116,42 @@ void firstScan() {
 	device.reqLazGora = UDPbitStatus(EEpromData[1],3);
 	device.reqKuchnia = UDPbitStatus(EEpromData[1],2);
 
-	//byte 26
-	device.normalMode.delayTime = EEpromData[26];
-
-	//byte 27
-	device.humidityAlertMode.trigger = EEpromData[27];
-	//byte 28
-	device.humidityAlertMode.delayTime = EEpromData[28];
-
-	//byte 29
-	device.defrostMode.trigger = EEpromData[29];
 	//byte 30
-	device.defrostMode.delayTime = EEpromData[30];
+	device.normalMode.delayTime = EEpromData[30];
 
-	//byte 31-54
+	//byte 31
+	device.humidityAlertMode.triggerInt = EEpromData[31];
+	//byte 32
+	device.humidityAlertMode.delayTime = EEpromData[32];
+
+	//byte 33
+	device.defrostMode.triggerInt = EEpromData[33];
+	//byte 34
+	device.defrostMode.delayTime = EEpromData[34];
+
+	//byte 35-58
 	for (int i=0; i<=24; i++) {
-		device.activeTempRegByHours[i].salon = UDPbitStatus(EEpromData[i+31],7);
-		device.activeTempRegByHours[i].pralnia = UDPbitStatus(EEpromData[i+31],6);
-		device.activeTempRegByHours[i].lazDol = UDPbitStatus(EEpromData[i+31],5);
-		device.activeTempRegByHours[i].rodzice = UDPbitStatus(EEpromData[i+31],4);
-		device.activeTempRegByHours[i].Natalia = UDPbitStatus(EEpromData[i+31],3);
-		device.activeTempRegByHours[i].Karolina = UDPbitStatus(EEpromData[i+31],2);
-		device.activeTempRegByHours[i].lazGora= UDPbitStatus(EEpromData[i+31],1);
+		device.activeTempRegByHours[i].salon = UDPbitStatus(EEpromData[i+35],7);
+		device.activeTempRegByHours[i].pralnia = UDPbitStatus(EEpromData[i+35],6);
+		device.activeTempRegByHours[i].lazDol = UDPbitStatus(EEpromData[i+35],5);
+		device.activeTempRegByHours[i].rodzice = UDPbitStatus(EEpromData[i+35],4);
+		device.activeTempRegByHours[i].Natalia = UDPbitStatus(EEpromData[i+35],3);
+		device.activeTempRegByHours[i].Karolina = UDPbitStatus(EEpromData[i+35],2);
+		device.activeTempRegByHours[i].lazGora= UDPbitStatus(EEpromData[i+35],1);
 	}
 
-	// byte 55
-	device.minTemp = EEpromData[55];
+	// byte 59
+	device.minTemp = EEpromData[59];
 
-	//byte 56-79
+	//byte 60-83
 	for (int i=0; i<=24; i++) {
-		device.normalOnByHours[i].salon = UDPbitStatus(EEpromData[i+56],7);
-		device.normalOnByHours[i].pralnia = UDPbitStatus(EEpromData[i+56],6);
-		device.normalOnByHours[i].lazDol = UDPbitStatus(EEpromData[i+56],5);
-		device.normalOnByHours[i].rodzice = UDPbitStatus(EEpromData[i+56],4);
-		device.normalOnByHours[i].Natalia = UDPbitStatus(EEpromData[i+56],3);
-		device.normalOnByHours[i].Karolina = UDPbitStatus(EEpromData[i+56],2);
-		device.normalOnByHours[i].lazGora= UDPbitStatus(EEpromData[i+65],1);
+		device.normalOnByHours[i].salon = UDPbitStatus(EEpromData[i+60],7);
+		device.normalOnByHours[i].pralnia = UDPbitStatus(EEpromData[i+60],6);
+		device.normalOnByHours[i].lazDol = UDPbitStatus(EEpromData[i+60],5);
+		device.normalOnByHours[i].rodzice = UDPbitStatus(EEpromData[i+60],4);
+		device.normalOnByHours[i].Natalia = UDPbitStatus(EEpromData[i+60],3);
+		device.normalOnByHours[i].Karolina = UDPbitStatus(EEpromData[i+60],2);
+		device.normalOnByHours[i].lazGora= UDPbitStatus(EEpromData[i+60],1);
 	}
 }
 
@@ -195,67 +197,67 @@ void getMasterDeviceOrder() {
 		EEpromWrite(1, UDPdata.data[1]);
 	}
 
-	//byte 26
-	if (UDPdata.data[0] == 26) {
-		device.normalMode.delayTime = UDPdata.data[26];
-		EEpromWrite(26, UDPdata.data[1]);
-	}
-
-	//byte 27
-	if (UDPdata.data[0] == 27) {
-		device.humidityAlertMode.triggerInt = UDPdata.data[27];
-		EEpromWrite(27, UDPdata.data[1]);
-	}
-
-	//byte 28
-	if (UDPdata.data[0] == 28) {
-		device.humidityAlertMode.delayTime = UDPdata.data[28];
-		EEpromWrite(28, UDPdata.data[1]);
-	}
-
-	//byte 29
-	if (UDPdata.data[0] == 29) {
-		device.defrostMode.triggerInt = UDPdata.data[29];
-		EEpromWrite(29, UDPdata.data[1]);
-	}
-
 	//byte 30
 	if (UDPdata.data[0] == 30) {
-		device.defrostMode.delayTime = UDPdata.data[30];
+		device.normalMode.delayTime = UDPdata.data[1];
 		EEpromWrite(30, UDPdata.data[1]);
 	}
 
-	//byte 31-54
-	if ((UDPdata.data[0] >= 31) &&
-			(UDPdata.data[0] <= 54)	) {
-		int hour = UDPdata.data[0]-31;
-		device.activeTempRegByHours[hour].salon   = UDPbitStatus(UDPdata.data[0],7);
-		device.activeTempRegByHours[hour].pralnia = UDPbitStatus(UDPdata.data[0],6);
-		device.activeTempRegByHours[hour].lazDol = UDPbitStatus(UDPdata.data[0],5);
-		device.activeTempRegByHours[hour].rodzice = UDPbitStatus(UDPdata.data[0],4);
-		device.activeTempRegByHours[hour].Natalia = UDPbitStatus(UDPdata.data[0],3);
-		device.activeTempRegByHours[hour].Karolina = UDPbitStatus(UDPdata.data[0],2);
-		device.activeTempRegByHours[hour].lazGora= UDPbitStatus(UDPdata.data[0],1);
+	//byte 31
+	if (UDPdata.data[0] == 31) {
+		device.humidityAlertMode.triggerInt = UDPdata.data[1];
+		EEpromWrite(31, UDPdata.data[1]);
+	}
+
+	//byte 32
+	if (UDPdata.data[0] == 32) {
+		device.humidityAlertMode.delayTime = UDPdata.data[1];
+		EEpromWrite(32, UDPdata.data[1]);
+	}
+
+	//byte 33
+	if (UDPdata.data[0] == 33) {
+		device.defrostMode.triggerInt = UDPdata.data[1];
+		EEpromWrite(33, UDPdata.data[1]);
+	}
+
+	//byte 34
+	if (UDPdata.data[0] == 34) {
+		device.defrostMode.delayTime = UDPdata.data[1];
+		EEpromWrite(34, UDPdata.data[1]);
+	}
+
+	//byte 35-58
+	if ((UDPdata.data[0] >= 35) &&
+			(UDPdata.data[0] <= 58)	) {
+		int hour = UDPdata.data[0]-35;
+		device.activeTempRegByHours[hour].salon   = UDPbitStatus(UDPdata.data[1],7);
+		device.activeTempRegByHours[hour].pralnia = UDPbitStatus(UDPdata.data[1],6);
+		device.activeTempRegByHours[hour].lazDol = UDPbitStatus(UDPdata.data[1],5);
+		device.activeTempRegByHours[hour].rodzice = UDPbitStatus(UDPdata.data[1],4);
+		device.activeTempRegByHours[hour].Natalia = UDPbitStatus(UDPdata.data[1],3);
+		device.activeTempRegByHours[hour].Karolina = UDPbitStatus(UDPdata.data[1],2);
+		device.activeTempRegByHours[hour].lazGora= UDPbitStatus(UDPdata.data[1],1);
 		EEpromWrite(UDPdata.data[0], UDPdata.data[1]);
 	}
 
-	//byte 55
-	if (UDPdata.data[0] == 55) {
-		device.minTemp = UDPdata.data[55];
-		EEpromWrite(55, UDPdata.data[1]);
+	//byte 59
+	if (UDPdata.data[0] == 59) {
+		device.minTemp = UDPdata.data[1];
+		EEpromWrite(59, UDPdata.data[1]);
 	}
 
-	//byte 56-79
-	if ((UDPdata.data[0] >= 56) &&
-			(UDPdata.data[0] <= 79)	) {
-		int hour = UDPdata.data[0]-56;
-		device.normalOnByHours[hour].salon = UDPbitStatus(UDPdata.data[0],7);
-		device.normalOnByHours[hour].pralnia = UDPbitStatus(UDPdata.data[0],6);
-		device.normalOnByHours[hour].lazDol = UDPbitStatus(UDPdata.data[0],5);
-		device.normalOnByHours[hour].rodzice = UDPbitStatus(UDPdata.data[0],4);
-		device.normalOnByHours[hour].Natalia = UDPbitStatus(UDPdata.data[0],3);
-		device.normalOnByHours[hour].Karolina = UDPbitStatus(UDPdata.data[0],2);
-		device.normalOnByHours[hour].lazGora= UDPbitStatus(UDPdata.data[0],1);
+	//byte 60-83
+	if ((UDPdata.data[0] >= 60) &&
+			(UDPdata.data[0] <= 83)	) {
+		int hour = UDPdata.data[0]-60;
+		device.normalOnByHours[hour].salon = UDPbitStatus(UDPdata.data[1],7);
+		device.normalOnByHours[hour].pralnia = UDPbitStatus(UDPdata.data[1],6);
+		device.normalOnByHours[hour].lazDol = UDPbitStatus(UDPdata.data[1],5);
+		device.normalOnByHours[hour].rodzice = UDPbitStatus(UDPdata.data[1],4);
+		device.normalOnByHours[hour].Natalia = UDPbitStatus(UDPdata.data[1],3);
+		device.normalOnByHours[hour].Karolina = UDPbitStatus(UDPdata.data[1],2);
+		device.normalOnByHours[hour].lazGora= UDPbitStatus(UDPdata.data[1],1);
 		EEpromWrite(UDPdata.data[0], UDPdata.data[1]);
 	}
 
@@ -272,6 +274,8 @@ void getMasterDeviceOrder() {
 	if (UDPdata.data[0] == 102) {
 		(UDPdata.data[1]>0)?handMode.byPassOpen = true: handMode.byPassOpen = false;
 	}
+
+	//Test Mode
 	setUDPdata();
 	forceStandardUDP();
 }
@@ -359,8 +363,9 @@ void normalMode() {
 	if ((device.normalMode.trigger) && (getDateTime().minute == 0))
 		device.normalMode.endMillis = millis()+(device.normalMode.delayTime*1000*60);
 
-	device.normalMode.timeLeft = (int)((device.normalMode.endMillis - millis())/1000);
-	if (device.normalMode.timeLeft<0)
+	int time = device.normalMode.endMillis - millis();
+	device.normalMode.timeLeft = (int)(time/60000);
+	if (device.normalMode.timeLeft<=0)
 		device.normalMode.timeLeft = 0;
 
 	if (device.normalMode.timeLeft > 0)
@@ -391,11 +396,13 @@ void humidityAlert() {
 	if (zones[ID_ZONE_LAZGORA].humidity>=device.humidityAlertMode.triggerInt)
 		device.humidityAlertMode.trigger = true;
 
-	if (device.humidityAlertMode.trigger)
-		device.humidityAlertMode.endMillis = millis() + (1000*60*device.humidityAlertMode.delayTime);
-
-	device.humidityAlertMode.timeLeft = (int)((device.humidityAlertMode.endMillis - millis())/1000);
-	if (device.humidityAlertMode.timeLeft<0)
+	if (device.humidityAlertMode.trigger) {
+		addLog("Humidity trigger");
+		device.humidityAlertMode.endMillis = millis() + (device.humidityAlertMode.delayTime*1000*60);
+	}
+	int time = device.humidityAlertMode.endMillis - millis();
+	device.humidityAlertMode.timeLeft = (int)(time/60000);
+	if (device.humidityAlertMode.timeLeft<=0)
 		device.humidityAlertMode.timeLeft = 0;
 
 	if (device.humidityAlertMode.timeLeft > 0)
@@ -420,7 +427,6 @@ void humidityAlert() {
 }
 
 void defrost() {
-	unsigned long currentMillis = millis();
 
 	device.defrostMode.trigger = false;
 	if ((device.sensorsBME280[ID_CZERPNIA].pressureHighPrec-device.sensorsBME280[ID_NAWIEW].pressureHighPrec) >= device.defrostMode.triggerInt)
@@ -428,8 +434,9 @@ void defrost() {
 	if (device.defrostMode.trigger)
 		device.defrostMode.endMillis = millis() + (device.defrostMode.delayTime * 1000 * 60);
 
-	device.defrostMode.timeLeft = (int)((device.defrostMode.endMillis - millis())/1000);
-	if (device.defrostMode.timeLeft<0)
+	int time = device.defrostMode.endMillis - millis();
+	device.defrostMode.timeLeft = (int)(time/60000);
+	if (device.defrostMode.timeLeft<=0)
 		device.defrostMode.timeLeft = 0;
 
 	if (device.defrostMode.timeLeft > 0)
@@ -625,6 +632,25 @@ void fan() {
 	}
 }
 
+void circuitPump() {
+	device.circuitPump = false;
+	if (device.zoneReqReg.salon 		||
+			device.zoneReqReg.pralnia 	||
+			device.zoneReqReg.lazDol 	||
+			device.zoneReqReg.rodzice 	||
+			device.zoneReqReg.Natalia 	||
+			device.zoneReqReg.Karolina 	||
+			device.zoneReqReg.lazGora)
+		device.circuitPump = true;
+
+	device.reqPumpColdWater = false;
+	device.reqPumpHotWater = false;
+	if (device.activeCooling)
+		device.reqPumpColdWater = true;
+	else if (device.activeHeating)
+		device.reqPumpHotWater = true;
+}
+
 void manualMode() {
 	if (!handMode.enabled)
 		return;
@@ -652,6 +678,9 @@ void outputs() {
 		device.byppass.attached = false;
 	}
 
+	//Circuit pump
+	digitalWrite(PIN_CIRCUIT_PUMP, !device.circuitPump);
+
 	//Fans
 	// parsing 0-100% into 255-0
 	int dutyCycle = 255-(int)((device.fan[FAN_CZERPNIA].speed/100.00)*255);
@@ -666,81 +695,192 @@ void outputs() {
 }
 
 void setUDPdata() {
-	int size = 37;
+	int size = 87;
 	byte dataWrite[size];
 	// First three bytes are reserved for device recognized purposes.
-//	dataWrite[0] = (((device.fanSpeed>0)?1:0)<< 7) | (device.normalON << 6) | (device.humidityAlert.req<< 5) | (device.bypassOpen << 4) | (device.defrost.req << 3);
-//	dataWrite[1] = device.hour[0];
-//	dataWrite[2] = device.hour[1];
-//	dataWrite[3] = device.hour[2];
-//	dataWrite[4] = device.hour[3];
-//	dataWrite[5] = device.hour[4];
-//	dataWrite[6] = device.hour[5];
-//	dataWrite[7] = device.hour[6];
-//	dataWrite[8] = device.hour[7];
-//	dataWrite[9] = device.hour[8];
-//	dataWrite[10] = device.hour[9];
-//	dataWrite[11] = device.hour[10];
-//	dataWrite[12] = device.hour[11];
-//	//BMEs
-//	dataWrite[13] = get10Temp(device.sensorsBME280[ID_CZERPNIA].temperature);
-//	dataWrite[14] = get01Temp(device.sensorsBME280[ID_CZERPNIA].temperature);
-//	dataWrite[15] = device.sensorsBME280[ID_CZERPNIA].humidity;
-//	dataWrite[16] = (int)(device.sensorsBME280[ID_CZERPNIA].pressure/10);
-//
-//	dataWrite[17] = get10Temp(device.sensorsBME280[ID_WYRZUTNIA].temperature);
-//	dataWrite[18] = get01Temp(device.sensorsBME280[ID_WYRZUTNIA].temperature);
-//	dataWrite[19] = device.sensorsBME280[ID_WYRZUTNIA].humidity;
-//	dataWrite[20] = (int)(device.sensorsBME280[ID_WYRZUTNIA].pressure/10);
-//
-//	dataWrite[21] = get10Temp(device.sensorsBME280[ID_NAWIEW].temperature);
-//	dataWrite[22] = get01Temp(device.sensorsBME280[ID_NAWIEW].temperature);
-//	dataWrite[23] = device.sensorsBME280[ID_NAWIEW].humidity;
-//	dataWrite[24] = (int)(device.sensorsBME280[ID_NAWIEW].pressure/10);
-//
-//	dataWrite[25] = get10Temp(device.sensorsBME280[ID_WYWIEW].temperature);
-//	dataWrite[26] = get01Temp(device.sensorsBME280[ID_WYWIEW].temperature);
-//	dataWrite[27] = device.sensorsBME280[ID_WYWIEW].humidity;
-//	dataWrite[28] = (int)(device.sensorsBME280[ID_WYWIEW].pressure/10);
-//
-//	dataWrite[29] = device.fanSpeed;
-//	dataWrite[30] = (int)(device.fan1revs/100);
-//	dataWrite[31] = (int)(device.fan2revs/100);
-//
-//	dataWrite[32] = device.defrost.timeLeft;
-//	dataWrite[33] = device.defrost.trigger;
-//
-//	dataWrite[34] = device.humidityAlert.timeLeft;
-//	dataWrite[35] = device.humidityAlert.trigger;
-//
-//	dataWrite[36] = device.efficency.is;
-//
+	dataWrite[0] = (device.humidityAlert<< 7) | (device.bypassOpen << 6) | (device.circuitPump<< 5) | (device.reqPumpColdWater << 4) | (device.reqPumpHotWater << 3) | (device.defrostActive << 2) | (device.reqAutoDiagnosis << 0);
+	dataWrite[1] = (device.normalOn<< 7) | (device.activeCooling << 6) | (device.activeHeating<< 5) | (device.reqLazDol << 4) | (device.reqLazGora << 3) | (device.reqKuchnia << 2);
+	dataWrite[2] = get10Temp(device.sensorsBME280[ID_CZERPNIA].temperature);
+	dataWrite[3] = get01Temp(device.sensorsBME280[ID_CZERPNIA].temperature);
+	dataWrite[4] = device.sensorsBME280[ID_CZERPNIA].humidity;
+	dataWrite[5] = (int)(device.sensorsBME280[ID_CZERPNIA].pressure/10);
+	dataWrite[6] = get10Temp(device.sensorsBME280[ID_WYRZUTNIA].temperature);
+	dataWrite[7] = get01Temp(device.sensorsBME280[ID_WYRZUTNIA].temperature);
+	dataWrite[8] = device.sensorsBME280[ID_WYRZUTNIA].humidity;
+	dataWrite[9] = (int)(device.sensorsBME280[ID_WYRZUTNIA].pressure/10);
+	dataWrite[10] = get10Temp(device.sensorsBME280[ID_NAWIEW].temperature);
+	dataWrite[11] = get01Temp(device.sensorsBME280[ID_NAWIEW].temperature);
+	dataWrite[12] = device.sensorsBME280[ID_NAWIEW].humidity;
+	dataWrite[13] = (int)(device.sensorsBME280[ID_NAWIEW].pressure/10);
+	dataWrite[14] = get10Temp(device.sensorsBME280[ID_WYWIEW].temperature);
+	dataWrite[15] = get01Temp(device.sensorsBME280[ID_WYWIEW].temperature);
+	dataWrite[16] = device.sensorsBME280[ID_WYWIEW].humidity;
+	dataWrite[17] = (int)(device.sensorsBME280[ID_WYWIEW].pressure/10);
+	dataWrite[18] = device.fan[FAN_CZERPNIA].speed;
+	dataWrite[19] = device.fan[FAN_CZERPNIA].rev;
+	dataWrite[20] = device.fan[FAN_WYWIEW].speed;
+	dataWrite[21] = device.fan[FAN_WYWIEW].rev;
+	dataWrite[22] = get10Temp(device.heatExchanger[ID_WATER_INLET]);
+	dataWrite[23] = get01Temp(device.heatExchanger[ID_WATER_INLET]);
+	dataWrite[24] = get10Temp(device.heatExchanger[ID_WATER_OUTLET]);
+	dataWrite[25] = get01Temp(device.heatExchanger[ID_WATER_OUTLET]);
+	dataWrite[26] = get10Temp(device.heatExchanger[ID_AIR_INTAKE]);
+	dataWrite[27] = get01Temp(device.heatExchanger[ID_AIR_INTAKE]);
+	dataWrite[28] = get10Temp(device.heatExchanger[ID_AIR_OUTLET]);
+	dataWrite[29] = get01Temp(device.heatExchanger[ID_AIR_OUTLET]);
+	dataWrite[30] = device.normalMode.delayTime;
+	dataWrite[31] = device.humidityAlertMode.triggerInt;
+	dataWrite[32] = device.humidityAlertMode.delayTime;
+	dataWrite[33] = device.defrostMode.triggerInt;
+	dataWrite[34] = device.defrostMode.delayTime;
+
+	for (int i=35; i<=58; i++) {
+		int hour = i-35;
+		dataWrite[i] = (device.activeTempRegByHours[hour].salon<< 7) | (device.activeTempRegByHours[hour].pralnia << 6) | (device.activeTempRegByHours[hour].lazDol<< 5) |
+				(device.activeTempRegByHours[hour].rodzice << 4) | (device.activeTempRegByHours[hour].Natalia << 3) | (device.activeTempRegByHours[hour].Karolina << 2) | (device.activeTempRegByHours[hour].lazGora << 1);
+	}
+	dataWrite[59] = device.minTemp;
+
+	for (int i=60; i<=83; i++) {
+		int hour = i-60;
+		dataWrite[i] = (device.normalOnByHours[hour].salon<< 7) | (device.normalOnByHours[hour].pralnia << 6) | (device.normalOnByHours[hour].lazDol<< 5) |
+				(device.normalOnByHours[hour].rodzice << 4) | (device.normalOnByHours[hour].Natalia << 3) | (device.normalOnByHours[hour].Karolina << 2) | (device.normalOnByHours[hour].lazGora << 1);
+	}
+	dataWrite[84] = device.normalMode.timeLeft;
+	dataWrite[85] = device.humidityAlertMode.timeLeft;
+	dataWrite[86] = device.defrostMode.timeLeft;
 	setUDPdata(0, dataWrite,size);
 }
 
 void statusUpdate() {
 	String status;
-//	status = "PARAMETRY PRACY\n";
-//	status +="Wentylatory: "; status += device.fanSpeed; status +="[%]\tObr1: "; status += device.fan1revs; status +="[min-1]\tObr2: "; status += device.fan2revs; status +="[min-1]\n";
-//	status +="EFF:"; status += device.efficency.is; status +="[%] MIN:"; status += device.efficency.min; status +="[%] MAX:"; status += device.efficency.max; status +="[%]\n:";
-//	status +="NormalON: "; status += device.normalON ? "TAK":"NIE"; status +="\tbypass force: "; status += device.bypassForce? "TAK":"NIE"; status +="\tbypass otwarty: "; status += device.bypassOpen ? "TAK":"NIE"; status +="\tservo wysterowane: "; status += servoAttached ? "TAK":"NIE"; status +="\n";
-//	status +="Odmrazanie: "; status += device.defrost.req ? "TAK":"NIE"; status +="\ttime left: "; status += device.defrost.timeLeft; status +="[min]\ttrigger EFF: "; status += device.defrost.trigger; status +="[%]\n";
-//	status +="Humidity Alert: "; status += device.humidityAlert.req ? "TAK":"NIE"; status +="\ttime left: "; status += device.humidityAlert.timeLeft; status +="[min]\ttrigger: "; status += device.humidityAlert.trigger; status +="[%]\n";
-//	status +="Czerpnia:\t T="; status +=device.sensorsBME280[0].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[0].humidity;
-//	status +="[%]\tP="; status +=(int)device.sensorsBME280[0].pressureHighPrec;status +="[hPa*100] Faulty="; status +=(int)device.sensorsBME280[0].faultyReadings ;status +="\n";
-//	status +="Wyrzutnia:\t T="; status +=device.sensorsBME280[1].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[1].humidity;
-//	status +="[%]\tP="; status +=(int)device.sensorsBME280[1].pressureHighPrec;status +="[hPa*100] Faulty="; status +=(int)device.sensorsBME280[1].faultyReadings ;status +="\n";
-//	status +="Nawiew:\t\t T="; status +=device.sensorsBME280[2].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[2].humidity;
-//	status +="[%]\tP="; status +=(int)device.sensorsBME280[2].pressureHighPrec;status +="[hPa*100] Faulty="; status +=(int)device.sensorsBME280[2].faultyReadings ;status +="\n";
-//	status +="Wywiew:\t\t T="; status +=device.sensorsBME280[3].temperature; status +="[stC]\tH="; status +=(int)device.sensorsBME280[3].humidity;
-//	status +="[%]\tP="; status +=(int)device.sensorsBME280[3].pressureHighPrec;status +="[hPa*100] Faulty="; status +=(int)device.sensorsBME280[3].faultyReadings ;status +="\n";
-//
-//	status +="\n\nHand mode";
-//	status +="\nEnabled="; status +=handMode.enabled;status +="\tfanSpeed="; status +=handMode.fanSpeed;status +="[%]\t bypassOpen="; status +=handMode.byPassOpen;
-//	for (int i=0; i<7; i++) {
-//		status +="\nZone["; status +=i; status += "]:\t\t T="; status +=zones[i].isTemp; status +="[stC]\treqT="; status+=zones[i].reqTemp; status +="[stC]\tH="; status +=zones[i].humidity;
-//	}
-//	status +="\nAir\tPM2.5="; status+=airPollution.pm25; status +="[ug/m3]\t PM10="; status +=airPollution.pm10; status+="[ug/m3]\n";
+	status = "\nOG粌NE\n";
+	status += addStatus("HumAlert", device.humidityAlert);
+	status += addStatus("BypassOpen", device.bypassOpen);
+	status += addStatus("pompa", device.circuitPump);
+	status += addStatus("reqPumpColdWater", device.reqPumpColdWater);
+	status += addStatus("reqPumpHotWater", device.reqPumpHotWater);
+	status += addStatus("defrostActive", device.defrostActive);
+	status += addStatus("reqAutoDiagnosis", device.reqAutoDiagnosis);
+	status += "\nOG粌NE\n";
+	status += addStatus("normalOn", device.normalOn);
+	status += addStatus("activeCooling", device.activeCooling);
+	status += addStatus("activeHeating", device.activeHeating);
+	status += addStatus("reqLazDol", device.reqLazDol);
+	status += addStatus("reqLazGora", device.reqLazGora);
+	status += addStatus("reqKuchnia", device.reqKuchnia);
+
+	status += "\nBME280";
+	status += "\nCZERPNIA\t";
+	status += addStatus("T", device.sensorsBME280[ID_CZERPNIA].temperature, "stC");
+	status += addStatus("H", device.sensorsBME280[ID_CZERPNIA].humidity, "%");
+	status += addStatus("\tP", device.sensorsBME280[ID_CZERPNIA].pressureHighPrec, "hPa*100");
+	status += addStatus("Fault", device.sensorsBME280[ID_CZERPNIA].faultyReadings, "");
+	status += "\nWYRZUTNIA";
+	status += addStatus("T", device.sensorsBME280[ID_WYRZUTNIA].temperature, "stC");
+	status += addStatus("H", device.sensorsBME280[ID_WYRZUTNIA].humidity, "%");
+	status += addStatus("\tP", device.sensorsBME280[ID_WYRZUTNIA].pressureHighPrec, "hPa*100");
+	status += addStatus("Fault", device.sensorsBME280[ID_WYRZUTNIA].faultyReadings, "");
+	status += "\nNAWIEW\t\t";
+	status += addStatus("T", device.sensorsBME280[ID_NAWIEW].temperature, "stC");
+	status += addStatus("H", device.sensorsBME280[ID_NAWIEW].humidity, "%");
+	status += addStatus("\tP", device.sensorsBME280[ID_NAWIEW].pressureHighPrec, "hPa*100");
+	status += addStatus("Fault", device.sensorsBME280[ID_NAWIEW].faultyReadings, "");
+	status += "\nWYWIEW\t\t";
+	status += addStatus("T", device.sensorsBME280[ID_WYWIEW].temperature, "stC");
+	status += addStatus("H", device.sensorsBME280[ID_WYWIEW].humidity, "%");
+	status += addStatus("\tP", device.sensorsBME280[ID_WYWIEW].pressureHighPrec, "hPa*100");
+	status += addStatus("Fault", device.sensorsBME280[ID_WYWIEW].faultyReadings, "");
+
+	status += "\nWENTYLATORY\n";
+	status += "\nCZERPNIA\t";
+	status += addStatus("Speed", device.fan[FAN_CZERPNIA].speed, "%");
+	status += addStatus("Rev", device.fan[FAN_CZERPNIA].rev, "min-1");
+	status += "\nWYWIEW\t";
+	status += addStatus("Speed", device.fan[FAN_WYWIEW].speed, "%");
+	status += addStatus("Rev", device.fan[FAN_WYWIEW].rev, "min-1");
+
+	status += "\nWYMIENNIK";
+	status += addStatus("Water in", device.heatExchanger[ID_WATER_INLET], "stC");
+	status += addStatus("Water out", device.heatExchanger[ID_WATER_OUTLET], "stC");
+	status += addStatus("Air in", device.heatExchanger[ID_AIR_INTAKE], "stC");
+	status += addStatus("Air out", device.heatExchanger[ID_AIR_OUTLET], "stC");
+
+	status += "\nTRYBY";
+	status += "\nNormalOn\t\t";
+	status += addStatus("trig", device.normalMode.trigger);
+	status += addStatus("trigInt", device.normalMode.triggerInt, "");
+	status += addStatus("turbo", device.normalMode.turbo);
+	status += addStatus("podtrzymanie", device.normalMode.delayTime, "min");
+	status += addStatus("pozosta這", device.normalMode.timeLeft, "min");
+
+	status += "\nHumidity Alert\t";
+	status += addStatus("trig", device.humidityAlertMode.trigger);
+	status += addStatus("trigInt", device.humidityAlertMode.triggerInt, "%");
+	status += addStatus("turbo", device.humidityAlertMode.turbo);
+	status += addStatus("podtrzymanie", device.humidityAlertMode.delayTime, "min");
+	status += addStatus("pozosta這", device.humidityAlertMode.timeLeft, "min");
+
+	status += "\nDefrots\t\t";
+	status += addStatus("trig", device.defrostMode.trigger);
+	status += addStatus("trigInt", device.defrostMode.triggerInt, "hPa");
+	status += addStatus("turbo", device.defrostMode.turbo);
+	status += addStatus("podtrzymanie", device.defrostMode.delayTime, "min");
+	status += addStatus("pozosta這", device.defrostMode.timeLeft, "min");
+
+	status += "\nAktywne ch這dzenie/ogrzewanie";
+	status += "\n\t\tSalon Pralnia LazDol\tRodzice Natalia Karolina LazGora";
+	for (int i=0; i<24; i++) {
+		status +="\nh=";
+		status +=i;
+		status +="\t";
+		status +=device.activeTempRegByHours[i].salon;
+		status +="\t\t\t";
+		status +=device.activeTempRegByHours[i].pralnia;
+		status +="\t\t\t";
+		status +=device.activeTempRegByHours[i].lazDol;
+		status +="\t\t\t";
+		status +=device.activeTempRegByHours[i].rodzice;
+		status +="\t\t\t";
+		status +=device.activeTempRegByHours[i].Natalia;
+		status +="\t\t\t";
+		status +=device.activeTempRegByHours[i].Karolina;
+		status +="\t\t\t";
+		status +=device.activeTempRegByHours[i].lazGora;
+		status +="\t\t\t";
+	}
+
+	status += addStatus("\nHistereza T", device.minTemp, "stC");
+
+	status += "\nNormal On matryca";
+	status += "\n\t\tSalon Pralnia LazDol\tRodzice Natalia Karolina LazGora";
+	for (int i=0; i<24; i++) {
+		status +="\nh=";
+		status +=i;
+		status +="\t";
+		status +=device.normalOnByHours[i].salon;
+		status +="\t\t\t";
+		status +=device.normalOnByHours[i].pralnia;
+		status +="\t\t\t";
+		status +=device.normalOnByHours[i].lazDol;
+		status +="\t\t\t";
+		status +=device.normalOnByHours[i].rodzice;
+		status +="\t\t\t";
+		status +=device.normalOnByHours[i].Natalia;
+		status +="\t\t\t";
+		status +=device.normalOnByHours[i].Karolina;
+		status +="\t\t\t";
+		status +=device.normalOnByHours[i].lazGora;
+		status +="\t\t\t";
+	}
+
+	status +="\n\nHand mode";
+	status +="\nEnabled="; status +=handMode.enabled;status +="\tfanSpeed="; status +=handMode.fanSpeed;status +="[%]\t bypassOpen="; status +=handMode.byPassOpen;
+	for (int i=0; i<7; i++) {
+		status +="\nZone["; status +=i; status += "]:\t\t T="; status +=zones[i].isTemp; status +="[stC]\treqT="; status+=zones[i].reqTemp; status +="[stC]\tH="; status +=zones[i].humidity;
+	}
+
+	status +="\nAir\tPM2.5="; status+=airPollution.pm25; status +="[ug/m3]\t PM10="; status +=airPollution.pm10; status+="[ug/m3]\n";
 	setStatus(status);
 }
 
