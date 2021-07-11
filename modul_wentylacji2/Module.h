@@ -103,6 +103,27 @@ struct Matrix {
 	bool lazGora = false;
 };
 
+struct FlapFresh {
+	bool salon1 = false;
+	bool salon2 = false;
+	bool gabinet = false;
+	bool warsztat = false;
+	bool rodzice = false;
+	bool natalia = false;
+	bool karolina = false;
+};
+
+struct FlapUsed {
+	bool kuchnia = false;
+	bool lazDol1 = false;
+	bool lazDol2 = false;
+	bool pralnia = false;
+	bool przedpokoj = false;
+	bool garderoba = false;
+	bool lazGora1 = false;
+	bool lazGora2 = false;
+};
+
 struct ServoMotor {
 	Servo interface;
 	bool attached = false;
@@ -156,6 +177,9 @@ struct Device {
 
 	//byte 60-83
 	Matrix normalOnByHours[24];				// active cooling/heating according to hours
+
+	FlapFresh flapFresh;
+	FlapUsed flapUsed;
 
 	ServoMotor byppass;
 };

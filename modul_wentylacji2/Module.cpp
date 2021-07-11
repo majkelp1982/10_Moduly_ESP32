@@ -17,6 +17,7 @@ void defrost();
 void activeCoolingMode();
 void activeHeatingMode();
 void bypass();
+void flaps();
 void fan();
 void circuitPump();
 
@@ -35,10 +36,6 @@ Adafruit_BME280 bme4(CS_BME280_WYWIEW, SPI_MOSI, SPI_MISO, SPI_SCK);
 //Fan
 int fanRev1 = 0;
 int fanRev2 = 0;
-
-//Bypass
-//int lastDutyCycle = -1;
-//bool servoAttached = false;
 
 //Delays
 unsigned long readSensorsMillis = 0;
@@ -315,7 +312,6 @@ void getAirParams(){
 	airPollution.pm10 = (UDPdata.data[7]<<8) + (UDPdata.data[8]);
 }
 
-
 void readUDPdata() {
 	UDPdata = getDataRead();
 	if (!UDPdata.newData) return;
@@ -585,6 +581,10 @@ void bypass() {
 	device.bypassOpen = false;
 }
 
+void flaps() {
+	//TODO
+}
+
 void fan() {
 	//revolution counting
 	if ((digitalRead(PIN_FAN_CZ_REVS) == LOW) && (device.fan[FAN_CZERPNIA].release)) {
@@ -695,7 +695,7 @@ void outputs() {
 }
 
 void setUDPdata() {
-	int size = 87;
+	int size = 89;
 	byte dataWrite[size];
 	// First three bytes are reserved for device recognized purposes.
 	dataWrite[0] = (device.humidityAlert<< 7) | (device.bypassOpen << 6) | (device.circuitPump<< 5) | (device.reqPumpColdWater << 4) | (device.reqPumpHotWater << 3) | (device.defrostActive << 2) | (device.reqAutoDiagnosis << 0);
@@ -749,6 +749,8 @@ void setUDPdata() {
 	dataWrite[84] = device.normalMode.timeLeft;
 	dataWrite[85] = device.humidityAlertMode.timeLeft;
 	dataWrite[86] = device.defrostMode.timeLeft;
+	dataWrite[87] = (device.flapFresh.salon1<< 7) | (device.flapFresh.salon2 << 6) | (device.flapFresh.gabinet<< 5) | (device.flapFresh.warsztat << 4) | (device.flapFresh.rodzice << 3) | (device.flapFresh.natalia<< 2) | (device.flapFresh.karolina << 1);
+	dataWrite[88] = (device.flapUsed.kuchnia<< 7) | (device.flapUsed.lazDol1 << 6) | (device.flapUsed.lazDol2<< 5) | (device.flapUsed.pralnia << 4) | (device.flapUsed.przedpokoj << 3) | (device.flapUsed.garderoba<< 2) | (device.flapUsed.lazGora1 << 1)  | (device.flapUsed.lazGora2 << 0);
 	setUDPdata(0, dataWrite,size);
 }
 
@@ -805,6 +807,25 @@ void statusUpdate() {
 	status += addStatus("Water out", device.heatExchanger[ID_WATER_OUTLET], "stC");
 	status += addStatus("Air in", device.heatExchanger[ID_AIR_INTAKE], "stC");
 	status += addStatus("Air out", device.heatExchanger[ID_AIR_OUTLET], "stC");
+
+	status += "\nKLAPY NAWIEW";
+	status += addStatus("salon1", device.flapFresh.salon1);
+	status += addStatus("salon2", device.flapFresh.salon2);
+	status += addStatus("gabinet", device.flapFresh.gabinet);
+	status += addStatus("warsztat", device.flapFresh.warsztat);
+	status += addStatus("rodzice", device.flapFresh.rodzice);
+	status += addStatus("natalia", device.flapFresh.natalia);
+	status += addStatus("karolina", device.flapFresh.karolina);
+
+	status += "\nKLAPY WYWIEW";
+	status += addStatus("kuchnia", device.flapUsed.kuchnia);
+	status += addStatus("lazDol1", device.flapUsed.lazDol1);
+	status += addStatus("lazDol2", device.flapUsed.lazDol2);
+	status += addStatus("pralnia", device.flapUsed.pralnia);
+	status += addStatus("przedpokoj", device.flapUsed.przedpokoj);
+	status += addStatus("garderoba", device.flapUsed.garderoba);
+	status += addStatus("lazGora1", device.flapUsed.lazGora1);
+	status += addStatus("lazGora2", device.flapUsed.lazGora2);
 
 	status += "\nTRYBY";
 	status += "\nNormalOn\t\t";
