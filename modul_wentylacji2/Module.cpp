@@ -64,10 +64,10 @@ void module_init() {
 	pinMode(PIN_FAN_CZ_REVS, INPUT_PULLUP);
 	digitalWrite(PIN_FAN_CZ_REVS, HIGH);
 	//Wyrzutnia
-	ledcSetup(PWM_FAN_CZ_CHANNEL, PWM_FREQUENCY, PWM_RESOUTION);
-	ledcAttachPin(PIN_FAN_CZ_PWM, PWM_FAN_CZ_CHANNEL);
-	pinMode(PIN_FAN_CZ_REVS, INPUT_PULLUP);
-	digitalWrite(PIN_FAN_CZ_REVS, HIGH);
+	ledcSetup(PWM_FAN_WY_CHANNEL, PWM_FREQUENCY, PWM_RESOUTION);
+	ledcAttachPin(PIN_FAN_WY_PWM, PWM_FAN_WY_CHANNEL);
+	pinMode(PIN_FAN_WY_REVS, INPUT_PULLUP);
+	digitalWrite(PIN_FAN_WY_REVS, HIGH);
 }
 
 void module() {
@@ -333,6 +333,7 @@ void readUDPdata() {
 
 void normalMode() {
 	device.normalMode.trigger = false;
+	device.normalOn = false;
 
 	if (device.normalOnByHours[getDateTime().hour].salon) {
 		device.normalMode.trigger = true;
@@ -376,6 +377,7 @@ void normalMode() {
 
 void humidityAlert() {
 	device.humidityAlertMode.trigger = false;
+	device.humidityAlert = false;
 
 	if (zones[ID_ZONE_SALON].humidity>=device.humidityAlertMode.triggerInt)
 		device.humidityAlertMode.trigger = true;
@@ -425,6 +427,7 @@ void humidityAlert() {
 void defrost() {
 
 	device.defrostMode.trigger = false;
+	device.defrostActive = false;
 	if ((device.sensorsBME280[ID_CZERPNIA].pressureHighPrec-device.sensorsBME280[ID_NAWIEW].pressureHighPrec) >= device.defrostMode.triggerInt)
 		device.defrostMode.trigger = true;
 	if (device.defrostMode.trigger)
@@ -570,7 +573,7 @@ void bypass() {
 		device.bypassOpen = true;
 		return;
 	}
-	if (device.activeCooling) {
+	if ((device.activeCooling) && (device.fan[FAN_CZERPNIA].speed>0)) {
 		if (device.sensorsBME280[ID_CZERPNIA].temperature<device.sensorsBME280[ID_WYWIEW].temperature)
 			device.bypassOpen = true;
 		if (device.sensorsBME280[ID_CZERPNIA].temperature>=(device.sensorsBME280[ID_WYWIEW].temperature+0.5f))
@@ -614,7 +617,7 @@ void fan() {
 
 	device.fan[FAN_CZERPNIA].speed = 0;
 	device.fan[FAN_WYWIEW].speed = 0;
-	if (device.normalMode.delayTime>0) {
+	if (device.normalMode.timeLeft>0) {
 		device.fan[FAN_CZERPNIA].speed = 50;
 		device.fan[FAN_WYWIEW].speed = 50;
 	}
@@ -661,8 +664,8 @@ void manualMode() {
 
 void outputs() {
 	//Bypass
-	if (device.bypassOpen) device.byppass.dutyCycle =10;
-	else device.byppass.dutyCycle =17;
+	if (device.bypassOpen) device.byppass.dutyCycle =5;
+	else device.byppass.dutyCycle =25;
 
 	if (device.byppass.lastDutyCycle != device.byppass.dutyCycle) {
 		device.byppass.lastDutyCycle = device.byppass.dutyCycle;
@@ -717,9 +720,9 @@ void setUDPdata() {
 	dataWrite[16] = device.sensorsBME280[ID_WYWIEW].humidity;
 	dataWrite[17] = (int)(device.sensorsBME280[ID_WYWIEW].pressure/10);
 	dataWrite[18] = device.fan[FAN_CZERPNIA].speed;
-	dataWrite[19] = device.fan[FAN_CZERPNIA].rev;
+	dataWrite[19] = (int)(device.fan[FAN_CZERPNIA].rev/100);
 	dataWrite[20] = device.fan[FAN_WYWIEW].speed;
-	dataWrite[21] = device.fan[FAN_WYWIEW].rev;
+	dataWrite[21] = (int)(device.fan[FAN_WYWIEW].rev/100);
 	dataWrite[22] = get10Temp(device.heatExchanger[ID_WATER_INLET]);
 	dataWrite[23] = get01Temp(device.heatExchanger[ID_WATER_INLET]);
 	dataWrite[24] = get10Temp(device.heatExchanger[ID_WATER_OUTLET]);

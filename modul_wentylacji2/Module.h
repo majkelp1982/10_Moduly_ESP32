@@ -56,10 +56,10 @@
 #define PWM_FAN_CZ_CHANNEL					2		// this variable is used to select the channel number
 #define PWM_FAN_WY_CHANNEL					3		// this variable is used to select the channel number
 #define PWM_RESOUTION 						8 		// resolution of the signal
-#define PIN_FAN_CZ_PWM						0 		// GPIO to PWM fan input
-#define PIN_FAN_WY_PWM						0 		// GPIO to PWM fan input
-#define PIN_FAN_CZ_REVS						0		// FAN1 TACHO SIGNAL
-#define PIN_FAN_WY_REVS						0		// FAN2 TACHO SIGNAL
+#define PIN_FAN_CZ_PWM						33 		// GPIO to PWM fan input
+#define PIN_FAN_WY_PWM						2 		// GPIO to PWM fan input
+#define PIN_FAN_CZ_REVS						32		// FAN1 TACHO SIGNAL
+#define PIN_FAN_WY_REVS						15		// FAN2 TACHO SIGNAL
 
 //HUMIDITY ALLERT
 #define HUMIDITY_TO_HIGH					80
@@ -81,13 +81,13 @@ struct SensorBME280 {
 struct Fan {
 	int speed = 0;							// 0-100%
 	int rev = 0;							// revs min-1
-	boolean release;						// help var to get revs
+	bool release=true;						// help var to get revs
 };
 
 struct Mode {
-	boolean trigger = false;				// trigger to turn on mode
+	bool trigger = false;				// trigger to turn on mode
 	int triggerInt = 0;						// trigger to turn on mode
-	boolean turbo = false;					// turbo mode required (high fans revs)
+	bool turbo = false;					// turbo mode required (high fans revs)
 	int delayTime = 0;						// delay time after trigger no more active
 	int timeLeft = 0;
 	unsigned long endMillis = 0;			// when mode triggered, here is store time when mode turns off
@@ -134,21 +134,21 @@ struct ServoMotor {
 
 struct Device {
 	// byte 0
-	boolean humidityAlert = false;
-	boolean bypassOpen = false;
-	boolean circuitPump = false;
-	boolean reqPumpColdWater= false;
-	boolean reqPumpHotWater = false;
-	boolean reqAutoDiagnosis = false;
-	boolean defrostActive;
+	bool humidityAlert = false;
+	bool bypassOpen = false;
+	bool circuitPump = false;
+	bool reqPumpColdWater= false;
+	bool reqPumpHotWater = false;
+	bool reqAutoDiagnosis = false;
+	bool defrostActive;
 
 	// byte 1
-	boolean normalOn = false;
-	boolean activeCooling = false;
-	boolean activeHeating = false;
-	boolean reqLazDol = false;
-	boolean reqLazGora = false;
-	boolean reqKuchnia = false;
+	bool normalOn = false;
+	bool activeCooling = false;
+	bool activeHeating = false;
+	bool reqLazDol = false;
+	bool reqLazGora = false;
+	bool reqKuchnia = false;
 
 	//byte 2-17
 	SensorBME280 sensorsBME280[4];			// sensory wew. reku
@@ -185,9 +185,9 @@ struct Device {
 };
 
 struct HandMode {
-	boolean enabled = false;
+	bool enabled = false;
 	byte fanSpeed = 0;
-	boolean byPassOpen = false;
+	bool byPassOpen = false;
 };
 
 struct TestMode {
