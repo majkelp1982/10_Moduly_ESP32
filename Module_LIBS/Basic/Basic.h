@@ -4,7 +4,7 @@
 #include <esp_task_wdt.h>
 
 #define VERSION				"2021.05.17"
-#define BETA_VERSION		"went2klapy1"
+#define BETA_VERSION		"went2klapy2"
 
 #define FIRMWARE_VERSION	VERSION BETA_VERSION
 

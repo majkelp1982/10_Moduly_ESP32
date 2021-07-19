@@ -5,14 +5,14 @@
 #include <Communication.h>
 #include "Module.h"
 
-#define MODULE_TYPE			130
+#define MODULE_TYPE			13
 #define MODULE_NO			0
 #define SERIAL_BAUD			921600
 
 Basic basic(MODULE_TYPE,MODULE_NO, "modul_wentylacji2", SERIAL_BAUD);
 OTA ota(true);
 Status status(true);
-Communication communication(true);
+Communication communication(false);
 
 void setup()
 {

@@ -81,8 +81,20 @@ void module() {
 	defrost();
 	activeCoolingMode();
 	activeHeatingMode();
+	if (!device.activeCooling
+			&& !device.activeHeating) {
+		device.zoneReqReg.salon = false;
+		device.zoneReqReg.pralnia = false;
+		device.zoneReqReg.lazDol = false;
+		device.zoneReqReg.rodzice = false;
+		device.zoneReqReg.Natalia = false;
+		device.zoneReqReg.Karolina= false;
+		device.zoneReqReg.lazGora = false;
+	}
 	bypass();
 	fan();
+	circuitPump();
+	flaps();
 
 	//Hand mode
 	manualMode();
@@ -279,31 +291,31 @@ void getMasterDeviceOrder() {
 
 void getComfortParams(){
 	zones[ID_ZONE_SALON].isTemp = UDPdata.data[0]+(UDPdata.data[1]/10.0);
-	zones[ID_ZONE_SALON].reqTemp = UDPdata.data[2]/2;
+	zones[ID_ZONE_SALON].reqTemp = UDPdata.data[2]/2.0;
 	zones[ID_ZONE_SALON].humidity = UDPdata.data[3];
 
 	zones[ID_ZONE_LAZDOL].isTemp = UDPdata.data[4]+(UDPdata.data[5]/10.0);
-	zones[ID_ZONE_LAZDOL].reqTemp = UDPdata.data[6]/2;
+	zones[ID_ZONE_LAZDOL].reqTemp = UDPdata.data[6]/2.0;
 	zones[ID_ZONE_LAZDOL].humidity = UDPdata.data[7];
 
 	zones[ID_ZONE_PRALNIA].isTemp = UDPdata.data[8]+(UDPdata.data[9]/10.0);
-	zones[ID_ZONE_PRALNIA].reqTemp = UDPdata.data[10]/2;
+	zones[ID_ZONE_PRALNIA].reqTemp = UDPdata.data[10]/2.0;
 	zones[ID_ZONE_PRALNIA].humidity = UDPdata.data[11];
 
 	zones[ID_ZONE_RODZICE].isTemp = UDPdata.data[12]+(UDPdata.data[13]/10.0);
-	zones[ID_ZONE_RODZICE].reqTemp = UDPdata.data[14]/2;
+	zones[ID_ZONE_RODZICE].reqTemp = UDPdata.data[14]/2.0;
 	zones[ID_ZONE_RODZICE].humidity = UDPdata.data[15];
 
 	zones[ID_ZONE_NATALIA].isTemp = UDPdata.data[16]+(UDPdata.data[17]/10.0);
-	zones[ID_ZONE_NATALIA].reqTemp = UDPdata.data[18]/2;
+	zones[ID_ZONE_NATALIA].reqTemp = UDPdata.data[18]/2.0;
 	zones[ID_ZONE_NATALIA].humidity = UDPdata.data[19];
 
 	zones[ID_ZONE_KAROLINA].isTemp = UDPdata.data[20]+(UDPdata.data[21]/10.0);
-	zones[ID_ZONE_KAROLINA].reqTemp = UDPdata.data[22]/2;
+	zones[ID_ZONE_KAROLINA].reqTemp = UDPdata.data[22]/2.0;
 	zones[ID_ZONE_KAROLINA].humidity = UDPdata.data[23];
 
 	zones[ID_ZONE_LAZGORA].isTemp = UDPdata.data[24]+(UDPdata.data[25]/10.0);
-	zones[ID_ZONE_LAZGORA].reqTemp = UDPdata.data[26]/2;
+	zones[ID_ZONE_LAZGORA].reqTemp = UDPdata.data[26]/2.0;
 	zones[ID_ZONE_LAZGORA].humidity = UDPdata.data[27];
 }
 
@@ -453,6 +465,7 @@ void activeCoolingMode() {
 		if (zones[ID_ZONE_SALON].isTemp>=(zones[ID_ZONE_SALON].reqTemp+hist))
 			device.zoneReqReg.salon = true;
 	}
+	else device.zoneReqReg.salon = false;
 	if (zones[ID_ZONE_SALON].isTemp<=(zones[ID_ZONE_SALON].reqTemp))
 		device.zoneReqReg.salon = false;
 
@@ -461,6 +474,7 @@ void activeCoolingMode() {
 		if (zones[ID_ZONE_PRALNIA].isTemp>=(zones[ID_ZONE_PRALNIA].reqTemp+hist))
 			device.zoneReqReg.pralnia = true;
 	}
+	else device.zoneReqReg.pralnia = false;
 	if (zones[ID_ZONE_PRALNIA].isTemp<=(zones[ID_ZONE_PRALNIA].reqTemp))
 		device.zoneReqReg.pralnia = false;
 
@@ -469,6 +483,7 @@ void activeCoolingMode() {
 		if (zones[ID_ZONE_LAZDOL].isTemp>=(zones[ID_ZONE_LAZDOL].reqTemp+hist))
 			device.zoneReqReg.lazDol = true;
 	}
+	else device.zoneReqReg.lazDol = false;
 	if (zones[ID_ZONE_LAZDOL].isTemp<=(zones[ID_ZONE_LAZDOL].reqTemp))
 		device.zoneReqReg.lazDol = false;
 
@@ -477,6 +492,7 @@ void activeCoolingMode() {
 		if (zones[ID_ZONE_RODZICE].isTemp>=(zones[ID_ZONE_RODZICE].reqTemp+hist))
 			device.zoneReqReg.rodzice = true;
 	}
+	else device.zoneReqReg.rodzice = false;
 	if (zones[ID_ZONE_RODZICE].isTemp<=(zones[ID_ZONE_RODZICE].reqTemp))
 		device.zoneReqReg.rodzice = false;
 
@@ -485,6 +501,7 @@ void activeCoolingMode() {
 		if (zones[ID_ZONE_NATALIA].isTemp>=(zones[ID_ZONE_NATALIA].reqTemp+hist))
 			device.zoneReqReg.Natalia = true;
 	}
+	else device.zoneReqReg.Natalia = false;
 	if (zones[ID_ZONE_NATALIA].isTemp<=(zones[ID_ZONE_NATALIA].reqTemp))
 		device.zoneReqReg.Natalia = false;
 
@@ -493,6 +510,7 @@ void activeCoolingMode() {
 		if (zones[ID_ZONE_KAROLINA].isTemp>=(zones[ID_ZONE_KAROLINA].reqTemp+hist))
 			device.zoneReqReg.Karolina = true;
 	}
+	else device.zoneReqReg.Karolina = false;
 	if (zones[ID_ZONE_KAROLINA].isTemp<=(zones[ID_ZONE_KAROLINA].reqTemp))
 		device.zoneReqReg.Karolina = false;
 
@@ -501,6 +519,7 @@ void activeCoolingMode() {
 		if (zones[ID_ZONE_LAZGORA].isTemp>=(zones[ID_ZONE_LAZGORA].reqTemp+hist))
 			device.zoneReqReg.lazGora = true;
 	}
+	else device.zoneReqReg.lazGora = false;
 	if (zones[ID_ZONE_LAZGORA].isTemp<=(zones[ID_ZONE_LAZGORA].reqTemp))
 		device.zoneReqReg.lazGora = false;
 }
@@ -509,13 +528,14 @@ void activeHeatingMode() {
 	if (!device.activeHeating)
 		return;
 
-	//histeresis
+	//Hysteresis
 	float hist = device.minTemp;
 	//SALON
 	if (device.activeTempRegByHours[getDateTime().hour].salon) {
 		if (zones[ID_ZONE_SALON].isTemp<=(zones[ID_ZONE_SALON].reqTemp-hist))
 			device.zoneReqReg.salon = true;
 	}
+	else device.zoneReqReg.salon = false;
 	if (zones[ID_ZONE_SALON].isTemp>=(zones[ID_ZONE_SALON].reqTemp))
 		device.zoneReqReg.salon = false;
 
@@ -524,6 +544,7 @@ void activeHeatingMode() {
 		if (zones[ID_ZONE_PRALNIA].isTemp<=(zones[ID_ZONE_PRALNIA].reqTemp-hist))
 			device.zoneReqReg.pralnia = true;
 	}
+	else device.zoneReqReg.pralnia = false;
 	if (zones[ID_ZONE_PRALNIA].isTemp>=(zones[ID_ZONE_PRALNIA].reqTemp))
 		device.zoneReqReg.pralnia = false;
 
@@ -532,6 +553,7 @@ void activeHeatingMode() {
 		if (zones[ID_ZONE_LAZDOL].isTemp<=(zones[ID_ZONE_LAZDOL].reqTemp-hist))
 			device.zoneReqReg.lazDol = true;
 	}
+	else device.zoneReqReg.lazDol = false;
 	if (zones[ID_ZONE_LAZDOL].isTemp>=(zones[ID_ZONE_LAZDOL].reqTemp))
 		device.zoneReqReg.lazDol = false;
 
@@ -540,6 +562,7 @@ void activeHeatingMode() {
 		if (zones[ID_ZONE_RODZICE].isTemp<=(zones[ID_ZONE_RODZICE].reqTemp-hist))
 			device.zoneReqReg.rodzice = true;
 	}
+	else device.zoneReqReg.rodzice = false;
 	if (zones[ID_ZONE_RODZICE].isTemp>=(zones[ID_ZONE_RODZICE].reqTemp))
 		device.zoneReqReg.rodzice = false;
 
@@ -548,6 +571,7 @@ void activeHeatingMode() {
 		if (zones[ID_ZONE_NATALIA].isTemp<=(zones[ID_ZONE_NATALIA].reqTemp-hist))
 			device.zoneReqReg.Natalia = true;
 	}
+	else device.zoneReqReg.Natalia = false;
 	if (zones[ID_ZONE_NATALIA].isTemp>=(zones[ID_ZONE_NATALIA].reqTemp))
 		device.zoneReqReg.Natalia = false;
 
@@ -556,6 +580,7 @@ void activeHeatingMode() {
 		if (zones[ID_ZONE_KAROLINA].isTemp<=(zones[ID_ZONE_KAROLINA].reqTemp-hist))
 			device.zoneReqReg.Karolina = true;
 	}
+	else device.zoneReqReg.Karolina = false;
 	if (zones[ID_ZONE_KAROLINA].isTemp>=(zones[ID_ZONE_KAROLINA].reqTemp))
 		device.zoneReqReg.Karolina = false;
 
@@ -564,6 +589,7 @@ void activeHeatingMode() {
 		if (zones[ID_ZONE_LAZGORA].isTemp<=(zones[ID_ZONE_LAZGORA].reqTemp-hist))
 			device.zoneReqReg.lazGora = true;
 	}
+	else device.zoneReqReg.lazGora = false;
 	if (zones[ID_ZONE_LAZGORA].isTemp>=(zones[ID_ZONE_LAZGORA].reqTemp))
 		device.zoneReqReg.lazGora = false;
 }
@@ -586,6 +612,64 @@ void bypass() {
 
 void flaps() {
 	//TODO
+	device.flapFresh.salon1 = false;
+	device.flapFresh.salon2 = false;
+	device.flapFresh.gabinet = false;
+	device.flapFresh.warsztat = false;
+	device.flapFresh.rodzice = false;
+	device.flapFresh.natalia = false;
+	device.flapFresh.karolina = false;
+
+	device.flapUsed.kuchnia = false;
+	device.flapUsed.pralnia = false;
+	device.flapUsed.przedpokoj = false;
+	device.flapUsed.lazDol1 = false;
+	device.flapUsed.lazDol2 = false;
+	device.flapUsed.garderoba = false;
+	device.flapUsed.lazGora1 = false;
+	device.flapUsed.lazGora2 = false;
+
+	if (device.zoneReqReg.salon) {
+		device.flapFresh.salon1 = true;
+		device.flapFresh.salon2 = true;
+		device.flapUsed.kuchnia = true;
+	}
+	if (device.zoneReqReg.pralnia) {
+		device.flapFresh.warsztat = true;
+		device.flapUsed.pralnia= true;
+	}
+	if (device.zoneReqReg.lazDol) {
+		device.flapFresh.salon1 = true;
+		device.flapFresh.salon2 = true;
+		device.flapFresh.gabinet = true;
+		device.flapUsed.lazDol1= true;
+		device.flapUsed.lazDol2= true;
+	}
+	if (device.zoneReqReg.pralnia) {
+		device.flapFresh.warsztat = true;
+		device.flapUsed.pralnia= true;
+	}
+	if (device.zoneReqReg.rodzice) {
+		device.flapFresh.rodzice = true;
+		device.flapUsed.garderoba= true;
+
+	}
+	if (device.zoneReqReg.Natalia) {
+		device.flapFresh.natalia = true;
+		device.flapUsed.lazGora1= true;
+		device.flapUsed.lazGora2= true;
+	}
+	if (device.zoneReqReg.Karolina) {
+		device.flapFresh.karolina = true;
+		device.flapUsed.lazGora1= true;
+		device.flapUsed.lazGora2= true;
+	}
+	if (device.zoneReqReg.lazGora) {
+		device.flapFresh.natalia = true;
+		device.flapFresh.karolina = true;
+		device.flapUsed.lazGora1= true;
+		device.flapUsed.lazGora2= true;
+	}
 }
 
 void fan() {
@@ -625,6 +709,10 @@ void fan() {
 		device.fan[FAN_CZERPNIA].speed = 75;
 		device.fan[FAN_WYWIEW].speed = 75;
 	}
+	if (device.circuitPump) {
+		device.fan[FAN_CZERPNIA].speed = 75;
+		device.fan[FAN_WYWIEW].speed = 75;
+	}
 	if (device.defrostMode.timeLeft>0) {
 		device.fan[FAN_CZERPNIA].speed = 80;
 		device.fan[FAN_WYWIEW].speed = 80;
@@ -648,10 +736,12 @@ void circuitPump() {
 
 	device.reqPumpColdWater = false;
 	device.reqPumpHotWater = false;
-	if (device.activeCooling)
-		device.reqPumpColdWater = true;
-	else if (device.activeHeating)
-		device.reqPumpHotWater = true;
+	if (device.circuitPump) {
+		if (device.activeCooling)
+			device.reqPumpColdWater = true;
+		else if (device.activeHeating)
+			device.reqPumpHotWater = true;
+	}
 }
 
 void manualMode() {
@@ -845,7 +935,7 @@ void statusUpdate() {
 	status += addStatus("podtrzymanie", device.humidityAlertMode.delayTime, "min");
 	status += addStatus("pozosta³o", device.humidityAlertMode.timeLeft, "min");
 
-	status += "\nDefrots\t\t";
+	status += "\nDefrost\t\t";
 	status += addStatus("trig", device.defrostMode.trigger);
 	status += addStatus("trigInt", device.defrostMode.triggerInt, "hPa");
 	status += addStatus("turbo", device.defrostMode.turbo);
