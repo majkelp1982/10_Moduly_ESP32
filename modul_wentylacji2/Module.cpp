@@ -28,10 +28,10 @@ void setUDPdata();
 void statusUpdate();
 
 //Variables
-Adafruit_BME280 bme1(CS_BME280_CZERPNIA, SPI_MOSI, SPI_MISO, SPI_SCK);
-Adafruit_BME280 bme2(CS_BME280_WYRZUTNIA, SPI_MOSI, SPI_MISO, SPI_SCK);
-Adafruit_BME280 bme3(CS_BME280_NAWIEW, SPI_MOSI, SPI_MISO, SPI_SCK);
-Adafruit_BME280 bme4(CS_BME280_WYWIEW, SPI_MOSI, SPI_MISO, SPI_SCK);
+Adafruit_BME280 bme1(PIN_CS_BME280_CZERPNIA, PIN_SPI_MOSI, PIN_SPI_MISO, PIN_SPI_SCK);
+Adafruit_BME280 bme2(PIN_CS_BME280_WYRZUTNIA, PIN_SPI_MOSI, PIN_SPI_MISO, PIN_SPI_SCK);
+Adafruit_BME280 bme3(PIN_CS_BME280_NAWIEW, PIN_SPI_MOSI, PIN_SPI_MISO, PIN_SPI_SCK);
+Adafruit_BME280 bme4(PIN_CS_BME280_WYWIEW, PIN_SPI_MOSI, PIN_SPI_MISO, PIN_SPI_SCK);
 
 //Fan
 int fanRev1 = 0;
@@ -68,6 +68,10 @@ void module_init() {
 	ledcAttachPin(PIN_FAN_WY_PWM, PWM_FAN_WY_CHANNEL);
 	pinMode(PIN_FAN_WY_REVS, INPUT_PULLUP);
 	digitalWrite(PIN_FAN_WY_REVS, HIGH);
+
+	//relays
+	pinMode(PIN_CIRCUIT_PUMP, OUTPUT); digitalWrite(PIN_CIRCUIT_PUMP, HIGH);
+	pinMode(PIN_RELAY_RES, OUTPUT);  digitalWrite(PIN_RELAY_RES, HIGH);
 }
 
 void module() {
@@ -759,7 +763,7 @@ void outputs() {
 
 	if (device.byppass.lastDutyCycle != device.byppass.dutyCycle) {
 		device.byppass.lastDutyCycle = device.byppass.dutyCycle;
-		ledcAttachPin(SERVO_PIN, SERVO_CHANNEL);
+		ledcAttachPin(PIN_SERVO, SERVO_CHANNEL);
 		device.byppass.attached = true;
 		ledcWrite(SERVO_CHANNEL, device.byppass.dutyCycle);
 		//hold servo for 5s
@@ -767,7 +771,7 @@ void outputs() {
 	}
 
 	if ((millis()>device.byppass.endMillis) && (device.byppass.attached)) {
-		ledcDetachPin(SERVO_PIN);
+		ledcDetachPin(PIN_SERVO);
 		device.byppass.attached = false;
 	}
 

@@ -21,15 +21,15 @@
 #define ID_ZONE_LAZGORA						6
 
 //SPI
-#define SPI_SCK 							18 // BME280 PIN SCL
-#define SPI_MISO 							19 // BME280 PIN SDO
-#define SPI_MOSI							23 // BME280 PIN SDA
+#define PIN_SPI_SCK 						18 // BME280 PIN SCL
+#define PIN_SPI_MISO 						19 // BME280 PIN SDO
+#define PIN_SPI_MOSI						23 // BME280 PIN SDA
 
 //BME280 CS PINS(SPI)
-#define CS_BME280_CZERPNIA 					13 // BME280 PIN CSB
-#define CS_BME280_WYRZUTNIA 				14 // BME280 PIN CSB
-#define CS_BME280_NAWIEW	 				27 // BME280 PIN CSB
-#define CS_BME280_WYWIEW	 				26 // BME280 PIN CSB
+#define PIN_CS_BME280_CZERPNIA 				13 // BME280 PIN CSB
+#define PIN_CS_BME280_WYRZUTNIA 			14 // BME280 PIN CSB
+#define PIN_CS_BME280_NAWIEW	 			27 // BME280 PIN CSB
+#define PIN_CS_BME280_WYWIEW	 			26 // BME280 PIN CSB
 //BME280 IDs according to array declaration
 #define ID_CZERPNIA							0
 #define ID_WYRZUTNIA						1
@@ -50,7 +50,7 @@
 #define SERVO_FREQUENCY 					50 		// Hz
 #define SERVO_CHANNEL 						1		// this variable is used to select the channel number
 #define SERVO_RESOUTION 					8 		// resolution of the signal
-#define SERVO_PIN							25 		// GPIO to PWM fan input
+#define PIN_SERVO							25 		// GPIO to PWM fan input
 //FAN
 #define PWM_FREQUENCY 						1000 	// Hz
 #define PWM_FAN_CZ_CHANNEL					2		// this variable is used to select the channel number
@@ -62,7 +62,12 @@
 #define PIN_FAN_WY_REVS						15		// FAN2 TACHO SIGNAL
 
 //CIRCUIT PUMP PIN
-#define PIN_CIRCUIT_PUMP					34
+#define PIN_CIRCUIT_PUMP					17
+#define PIN_RELAY_RES						16
+
+//I2C Servo Driver
+#define PIN_I2C_SDA							21
+#define PIN_I2C_SCL							22
 
 
 struct SensorBME280 {
