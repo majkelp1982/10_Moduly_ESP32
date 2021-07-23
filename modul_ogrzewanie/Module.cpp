@@ -643,9 +643,9 @@ void buffers() {
 		reqCWUload = true;
 	}
 	//Sprawdzanie temperatury tylko na gorze przy warunku ze na dole przekroczyla pewna stala wartosc
-	if (((device.tBuffCWUdol.isTemp>=43) || (device.tBuffCWUdol.isTemp>=device.reqTempBuforCWU))
-			&& (device.tBuffCWUsrodek.isTemp>=device.reqTempBuforCWU)
-			&& (device.tBuffCWUgora.isTemp>=device.reqTempBuforCWU))
+	if (((device.tBuffCWUdol.isTemp>=39) || (device.tBuffCWUdol.isTemp>=device.reqTempBuforCWU))
+			&& ((device.tBuffCWUsrodek.isTemp>=device.reqTempBuforCWU)
+			|| (device.tBuffCWUgora.isTemp>=device.reqTempBuforCWU)))
 	{
 		if (reqCWUload) {
 			String temp;
