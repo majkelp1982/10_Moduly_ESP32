@@ -12,7 +12,7 @@
 Basic basic(MODULE_TYPE,MODULE_NO,"modul_komfort", SERIAL_BAUD);
 OTA ota(true);
 Status status(true);
-Communication communication(true);
+Communication communication(false);
 
 void setup()
 {

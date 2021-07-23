@@ -42,6 +42,11 @@
 			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/1.0.0/variants/nodemcu-32s</locationURI>
 		</link>
 		<link>
+			<name>libraries/Adafruit_BME280</name>
+			<type>2</type>
+			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Adafruit_BME280</location>
+		</link>
+		<link>
 			<name>libraries/Basic</name>
 			<type>2</type>
 			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Basic</location>
@@ -87,6 +92,11 @@
 			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/OneWire/2.3.4</locationURI>
 		</link>
 		<link>
+			<name>libraries/SPI</name>
+			<type>2</type>
+			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/1.0.0/libraries/SPI</locationURI>
+		</link>
+		<link>
 			<name>libraries/Status</name>
 			<type>2</type>
 			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Status</location>
@@ -105,6 +115,11 @@
 			<name>libraries/WiFi</name>
 			<type>2</type>
 			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/1.0.0/libraries/WiFi</locationURI>
+		</link>
+		<link>
+			<name>libraries/Wire</name>
+			<type>2</type>
+			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/1.0.0/libraries/Wire</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

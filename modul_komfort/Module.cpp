@@ -14,11 +14,12 @@ DHT dhtNatalia(PIN_DHT_NATALIA, DHTTYPE);
 DHT dhtKarloina(PIN_DHT_KAROLINA, DHTTYPE);
 DHT dhtLazGora(PIN_DHT_LAZ_GORA, DHTTYPE);
 
+//Variables
+Adafruit_BME280 bme4(PIN_CS_BME280_NATALIA, PIN_SPI_MOSI, PIN_SPI_MISO, PIN_SPI_SCK);
+
 //Functions
 void firstScan();
 void readSensors();
-void DALLAS18b20Read ();
-void DHT22Read ();
 void readUDPdata();
 void getMasterDeviceOrder();
 
@@ -62,6 +63,12 @@ void module_init() {
 	device.dhtSensor[ID_KAROLINA].begin();
 	device.dhtSensor[ID_LAZ_GORA].begin();
 
+	//Set interfaces
+	device.sensorsBME280[ID_NATALIA].interface= bme4;
+
+	//Begin
+	device.sensorsBME280[ID_NATALIA].interface.begin();
+
 }
 
 void module() {
@@ -102,13 +109,6 @@ void firstScan() {
 
 	//TEMP
 	//TMPWritteValuesToEEprom();
-}
-
-void readSensors() {
-	if ((sleep(&dallasSensorReadMillis, DELAY_SENSORS_READ)) && (millis()>5000)) return;
-
-	DALLAS18b20Read();
-	DHT22Read();
 }
 
 void DALLAS18b20Read () {
@@ -181,6 +181,35 @@ void DHT22Read() {
 	getHumidity(ID_NATALIA);
 	getHumidity(ID_RODZICE);
 	//TODO list to extend
+}
+
+void readBME280() {
+//	for (int i=0; i<4; i++) {
+	int i=4;
+		device.sensorsBME280[i].temperature = device.sensorsBME280[i].interface.readTemperature();
+		device.sensorsBME280[i].pressureHighPrec = device.sensorsBME280[i].interface.readPressure();
+		device.sensorsBME280[i].pressure = (int)(device.sensorsBME280[i].pressureHighPrec/100);
+		device.sensorsBME280[i].humidity = (int)device.sensorsBME280[i].interface.readHumidity();
+		if (device.sensorsBME280[i].temperature>70
+				|| device.sensorsBME280[i].pressure>1050
+				|| device.sensorsBME280[i].pressure<800
+				|| device.sensorsBME280[i].humidity>100
+				|| device.sensorsBME280[i].humidity<15)
+			device.sensorsBME280[i].faultyReadings++;
+//	}
+
+		//
+		Serial.print(addStatus("\nTEMP", device.sensorsBME280[ID_NATALIA].temperature, "stC"));
+
+		device.zone[ID_NATALIA].isTemp = device.sensorsBME280[ID_NATALIA].temperature;
+		device.zone[ID_NATALIA].humidity = device.sensorsBME280[ID_NATALIA].humidity;
+}
+
+void readSensors() {
+	if ((sleep(&dallasSensorReadMillis, DELAY_SENSORS_READ)) && (millis()>5000)) return;
+	DALLAS18b20Read();
+	DHT22Read();
+	readBME280();
 }
 
 void readUDPdata() {
