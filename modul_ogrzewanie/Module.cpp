@@ -770,7 +770,7 @@ void heatingAndPumps() {
 
 	if ((device.pump_UnderGround) && (!heatPumpDelayActiv)) {
 		heatPumpDelay = millis()+DELAY_HEAT_PUMP;
-		heatPumpDelayActiv = true;
+		heatPumpDelayActiv = true;;
 	}
 
 	currentMillis = millis();
