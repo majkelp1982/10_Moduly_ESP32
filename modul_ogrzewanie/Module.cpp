@@ -779,7 +779,7 @@ void heatingAndPumps() {
 			&& (currentMillis>heatPumpDelay)) {
 		device.reqHeatPumpOn = true;
 	}
-	if ((!device.pump_UnderGround) || ((device.tZasilanie.isTemp>=device.heatPumpAlarmTemperature) && (device.tZasilanie.isTemp<100))) {
+	if (!device.pump_UnderGround || !device.pump_InHouse || ((device.tZasilanie.isTemp>=device.heatPumpAlarmTemperature) && (device.tZasilanie.isTemp<100))) {
 		device.reqHeatPumpOn = false;
 		heatPumpDelayActiv = false;
 	}
