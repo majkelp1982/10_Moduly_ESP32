@@ -760,7 +760,7 @@ void heatingAndPumps() {
 
 	//Request pump underGround if heat pump is required
 	if ((device.pump_InHouse) && (device.heatSourceActive == HEAT_PUMP)) {
-		if ((reqCOload) || (reqCWUload))
+		if (((reqCOload) && (device.valve_3way == CO)) || ((reqCWUload) && (device.valve_3way == CWU)))
 			device.pump_UnderGround= true;
 	}
 
