@@ -34,6 +34,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_komfort/libraries/Update/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_komfort/libraries/WebServer/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_komfort/libraries/WiFi/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_komfort/libraries/ArduinoJson/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.362984373" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
@@ -54,6 +55,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_komfort/libraries/Update/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_komfort/libraries/WebServer/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_komfort/libraries/WiFi/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_komfort/libraries/ArduinoJson/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.1215839616" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
@@ -74,6 +76,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_komfort/libraries/Update/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_komfort/libraries/WebServer/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_komfort/libraries/WiFi/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/modul_komfort/libraries/ArduinoJson/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.590979503" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>

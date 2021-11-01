@@ -49,6 +49,8 @@ struct Zone {
 	float reqTemp=0;
 	int humidity=0;
 	float dhtTemp = 0.0f;
+	float isTempFromService = 0.0f;
+	float humidityFromService = 0;
 };
 
 struct Device {
@@ -58,4 +60,5 @@ struct Device {
 
 void module_init();
 void module();
+Device getDevice();
 

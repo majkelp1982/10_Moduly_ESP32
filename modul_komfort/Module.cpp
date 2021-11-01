@@ -141,6 +141,9 @@ void DALLAS18b20Read () {
 			device.zone[zone].dallasErrorCount = 0;
 			device.zone[zone].isTemp = tempC;
 		}
+
+		if (device.zone[zone].isTempFromService != 0)
+			device.zone[zone].isTemp = device.zone[zone].isTempFromService;
 	}
 	sensors.requestTemperatures();						// Request temperature
 }
@@ -168,6 +171,8 @@ void getHumidity(int zone) {
 	if (device.zone[zone].dhtMaxErrorCount<device.zone[zone].dhtErrorCount)
 		device.zone[zone].dhtMaxErrorCount=device.zone[zone].dhtErrorCount;
 
+	if (device.zone[zone].humidityFromService != 0)
+		device.zone[zone].humidity = device.zone[zone].humidityFromService;
 	//second temperature to compare
 	device.zone[zone].dhtTemp = device.dhtSensor[zone].readTemperature();
 }
@@ -315,6 +320,11 @@ void statusUpdate() {
 			status +=device.zone[i].deviceAddress[j];
 			status +="]";
 		}
+		status +="\ttempFromSerive[";
+		status +=device.zone[i].isTempFromService;
+		status +="]";
+		status +="\thumidFromService[";
+		status +=device.zone[i].humidityFromService;
 		status +="\n";
 	}
 	setStatus(status);
@@ -350,4 +360,8 @@ void TMPWritteValuesToEEprom() {
 		}
 	delay(100);
 	}
+}
+
+Device getDevice() {
+	return device;
 }
