@@ -615,7 +615,7 @@ void buffers() {
 	}
 
 	// jesli temperatura w srodku spadnie lub dol bedzie ponizej 20st wlacz grzanie CWU
-	if (((device.tBuffCWUsrodek.isTemp<(device.reqTempBuforCWU-TEMP_CWU_HYSTERESIS)) && (device.tBuffCWUsrodek.isTemp<48)) || (device.tBuffCWUdol.isTemp<15)) {
+	if ((device.tBuffCWUgora.isTemp<(device.reqTempBuforCWU-TEMP_CWU_HYSTERESIS)) || (device.tBuffCWUdol.isTemp<15)) {
 		if (!reqCWUload) {
 			String temp;
 			temp = "CWU - dogrzewanie -";
@@ -760,7 +760,7 @@ void heatingAndPumps() {
 
 	//Request pump underGround if heat pump is required
 	if ((device.pump_InHouse) && (device.heatSourceActive == HEAT_PUMP)) {
-		if (((reqCOload) && (device.valve_3way == CO)) || ((reqCWUload) && (device.valve_3way == CWU)))
+		if (((reqCOload) || (reqCWUload)) && device.pump_InHouse)
 			device.pump_UnderGround= true;
 	}
 
