@@ -12,10 +12,10 @@
 
 //PINs
 #define pinZERO_CROSSING					5
-#define pinLIGHT0							0
+#define pinLIGHT0							19
 #define pinLIGHT1							22
 #define pinLIGHT2							23
-#define pinLIGHT3							0
+#define pinLIGHT3							21
 
 //ZONES
 #define ID_ENTRANCE							0

@@ -4,8 +4,7 @@
 #include <esp_task_wdt.h>
 
 #define VERSION				"2021.05.17"
-#define BETA_VERSION		"went2klapy9"
-
+#define BETA_VERSION		"nowy_pin_oswietlenie"
 #define FIRMWARE_VERSION	VERSION BETA_VERSION
 
 
