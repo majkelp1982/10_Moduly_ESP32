@@ -60,5 +60,6 @@ struct Device {
 
 void module_init();
 void module();
-Device getDevice();
+void setTemperatureFromService(int zone, float temp);
+void setHumidityFromService(int zone, int humidity);
 

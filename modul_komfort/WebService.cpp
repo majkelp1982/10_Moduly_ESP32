@@ -40,7 +40,10 @@ void webServerSetup() {
 			server2.send(404, "text/plain", "JSON NOT FOUND");
 			return;
 		}
-		jsonDeserialization(server2.arg("plain"));
+		String resp = jsonDeserialization(server2.arg("plain"));
+	    if (resp=="OK") server2.send(200, "text/plain", resp);
+	    else server2.send(400, "text/plain", "FAULTY COMMAND");
+
 	   });
 	  server2.begin();
 }
@@ -67,7 +70,8 @@ String jsonDeserialization(String json) {
 	  Serial.print(temperature);
 	  Serial.print(" humidity:");
 	  Serial.println(humidity);
-	  getDevice().zone[zoneNumber].isTempFromService = temperature;
-	  getDevice().zone[zoneNumber].humidityFromService = humidity;
+	  setTemperatureFromService(zoneNumber, temperature);
+	  setHumidityFromService(zoneNumber, humidity);
+
 	  return "OK";
 }

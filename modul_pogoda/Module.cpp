@@ -109,6 +109,12 @@ void readLightIntens() {
 	if (sleep(&readLightSensorMillis, 5)) return;
 	light = analogRead(PIN_LIGHT);
 	device.lightSensor = (int)(light*100/4095);
+
+	//Fault strategy
+	//fixme
+	int hour = getDateTime().hour;
+	if ((hour >=15) || (hour <8))
+		device.lightSensor = 0;
 }
 
 void readUDPdata() {

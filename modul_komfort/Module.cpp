@@ -325,6 +325,7 @@ void statusUpdate() {
 		status +="]";
 		status +="\thumidFromService[";
 		status +=device.zone[i].humidityFromService;
+		status +="]";
 		status +="\n";
 	}
 	setStatus(status);
@@ -362,6 +363,9 @@ void TMPWritteValuesToEEprom() {
 	}
 }
 
-Device getDevice() {
-	return device;
+void setTemperatureFromService(int zone, float temp) {
+	device.zone[zone].isTempFromService = temp;
+}
+void setHumidityFromService(int zone, int humidity) {
+	device.zone[zone].humidityFromService = humidity;
 }

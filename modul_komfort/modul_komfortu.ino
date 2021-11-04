@@ -1,6 +1,7 @@
 #include "Arduino.h"
 #include <Basic.h>
 #include <Status.h>
+#include <OTA.h>
 #include <Communication.h>
 #include "Module.h"
 #include "WebService.h"
@@ -12,11 +13,12 @@
 Basic basic(MODULE_TYPE,MODULE_NO,"modul_komfort", SERIAL_BAUD);
 Status status(true);
 Communication communication(true);
-
+OTA ota(true);
 void setup()
 {
-	communication.WiFi_init();
 
+	communication.WiFi_init();
+	ota.init();
 	webService_setup();
 	module_init();
 	addLog("Inicjalizacja zakoñczona");
@@ -30,4 +32,5 @@ void loop()
 	status.printStatus(10);
 	module();
 	webService_run();
+	ota.client();
 }
