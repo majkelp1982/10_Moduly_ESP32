@@ -135,3 +135,37 @@ void getPinState(PinInput *pinInput, int pin, bool edge) {
 	pinInput->lastRead = currentMillis;
 }
 
+String addStatus(String message, String value, String unit) {
+	String status;
+	status += "\t";
+	status += message;
+	status += ":";
+	status += value;
+	if (unit != "") {
+		status += "[";
+		status += unit;
+		status += "]";
+	}
+	return status;
+}
+
+String addStatus(String message, int value, String unit) {
+	return addStatus(message, (String)value, unit);
+}
+
+String addStatus(String message, unsigned int value, String unit) {
+	return addStatus(message, (String)value, unit);
+}
+
+String addStatus(String message,  byte value, String unit) {
+	return addStatus(message, (String)value, unit);
+}
+
+String addStatus(String message, bool value) {
+	return addStatus(message, (value)?"TAK":"NIE", "");
+}
+
+String addStatus(String message, float value, String unit) {
+	return addStatus(message, (String)value, unit);
+}
+

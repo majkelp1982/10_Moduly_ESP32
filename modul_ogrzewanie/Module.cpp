@@ -3,6 +3,7 @@
 // Variables
 Device device;
 DataRead UDPdata;
+VentData ventData;
 
 //Buffers
 bool reqCOload = false;
@@ -36,6 +37,7 @@ void dallas18b20Read (Thermometer *thermometer);
 void readUDPdata();
 void getMasterDeviceOrder();
 void getComfortParams();
+void getVentParams();
 
 void valves();
 void buffers();
@@ -341,6 +343,10 @@ void readUDPdata() {
 			&& (UDPdata.deviceNo == 0)
 			&& (UDPdata.frameNo == 0))
 		getComfortParams();
+	if ((UDPdata.deviceType == ID_MOD_VENT)
+			&& (UDPdata.deviceNo == 0)
+			&& (UDPdata.frameNo == 0))
+		getVentParams();
 
 	resetNewData();
 }
@@ -410,6 +416,11 @@ void getComfortParams(){
 		device.zone[5].reqTemp += 0.5;
 		device.zone[6].reqTemp += 0.5;
 	}
+}
+
+void getVentParams() {
+	ventData.reqColdWater = UDPbitStatus(UDPdata.data[0],4);
+	ventData.reqHotWater = UDPbitStatus(UDPdata.data[0],3);
 }
 
 void valves() {
@@ -632,9 +643,9 @@ void buffers() {
 		reqCWUload = true;
 	}
 	//Sprawdzanie temperatury tylko na gorze przy warunku ze na dole przekroczyla pewna stala wartosc
-	if (((device.tBuffCWUdol.isTemp>=43) || (device.tBuffCWUdol.isTemp>=device.reqTempBuforCWU))
-			&& (device.tBuffCWUsrodek.isTemp>=device.reqTempBuforCWU)
-			&& (device.tBuffCWUgora.isTemp>=device.reqTempBuforCWU))
+	if (((device.tBuffCWUdol.isTemp>=39) || (device.tBuffCWUdol.isTemp>=device.reqTempBuforCWU))
+			&& ((device.tBuffCWUsrodek.isTemp>=device.reqTempBuforCWU)
+			|| (device.tBuffCWUgora.isTemp>=device.reqTempBuforCWU)))
 	{
 		if (reqCWUload) {
 			String temp;
@@ -733,6 +744,10 @@ void heatingAndPumps() {
 			(device.heatSourceActive == FIREPLACE))
 				device.pump_InHouse = true;
 
+	//If vent system required hot water
+	if (ventData.reqHotWater)
+		device.pump_InHouse = true;
+
 	//CWU
 	if ((reqCWUload) && (device.valve_3way == CWU) && (device.heatSourceActive != BUFFER_CO)) {
 			device.pump_InHouse = true;
@@ -740,19 +755,22 @@ void heatingAndPumps() {
 
 	//PC Over heated . pumpInhouse working time extend
 	if ((heatPumpOverheat) && (millis() < (heatPumpOverheatDelay + 60000))) {
-		device . pump_InHouse = true;
+		device.pump_InHouse = true;
 	}
 
-
-	//Request to turn pump underGround if heat pump is required
+	//Request pump underGround if heat pump is required
 	if ((device.pump_InHouse) && (device.heatSourceActive == HEAT_PUMP)) {
-		if ((reqCOload) || (reqCWUload))
+		if (((reqCOload) && (device.valve_3way == CO)) || ((reqCWUload) && (device.valve_3way == CWU)))
 			device.pump_UnderGround= true;
 	}
 
+	//If vent system required cold water
+	if (ventData.reqColdWater)
+		device.pump_UnderGround = true;
+
 	if ((device.pump_UnderGround) && (!heatPumpDelayActiv)) {
 		heatPumpDelay = millis()+DELAY_HEAT_PUMP;
-		heatPumpDelayActiv = true;
+		heatPumpDelayActiv = true;;
 	}
 
 	currentMillis = millis();
@@ -761,7 +779,7 @@ void heatingAndPumps() {
 			&& (currentMillis>heatPumpDelay)) {
 		device.reqHeatPumpOn = true;
 	}
-	if ((!device.pump_UnderGround) || ((device.tZasilanie.isTemp>=device.heatPumpAlarmTemperature) && (device.tZasilanie.isTemp<100))) {
+	if (!device.pump_UnderGround || !device.pump_InHouse || ((device.tZasilanie.isTemp>=device.heatPumpAlarmTemperature) && (device.tZasilanie.isTemp<100))) {
 		device.reqHeatPumpOn = false;
 		heatPumpDelayActiv = false;
 	}
@@ -987,6 +1005,10 @@ void statusUpdate() {
 	for (int i=0; i<7; i++) {
 		status +="\nZone["; status +=i; status += "]:\t\t T="; status +=device.zone[i].isTemp; status +="[stC]\treqT="; status+=device.zone[i].reqTemp; status +="[stC]";
 	}
+
+	status += "\nVent Params";
+	status += addStatus("\nreqColdWater", ventData.reqColdWater);
+	status += addStatus("\nreqHotWater", ventData.reqHotWater);
 
 	setStatus(status);
 }

@@ -4,7 +4,7 @@
 #include <esp_task_wdt.h>
 
 #define VERSION				"2021.05.17"
-#define BETA_VERSION		"komfortDHT14"
+#define BETA_VERSION		"went2klapy9"
 
 #define FIRMWARE_VERSION	VERSION BETA_VERSION
 
@@ -61,5 +61,13 @@ void getPinState(PinInput *pinInput, int pin, bool edge);
 //Help functions get byte from float number
 byte get10Temp(float temp);
 byte get01Temp(float temp);
+
+//Help function to addStatus
+String addStatus(String message, String value, String unit);
+String addStatus(String message, int value, String unit);
+String addStatus(String message, unsigned int value, String unit);
+String addStatus(String message,  byte value, String unit);
+String addStatus(String message, bool value);
+String addStatus(String message, float value, String unit);
 
 #endif /* BASIC_H_ */

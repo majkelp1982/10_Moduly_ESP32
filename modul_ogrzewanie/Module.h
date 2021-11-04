@@ -9,6 +9,7 @@
 //MODULES ID
 #define ID_MOD_MAIN							1
 #define ID_MOD_COMFORT						10
+#define ID_MOD_VENT							13
 
 //PIN DECLARATION
 //ONE WIRE
@@ -106,6 +107,12 @@ struct Zone {
 	float isTemp		=0;					// measured temperature
 	float reqTemp		=0;					// required temperature
 	bool circuit		=false;				// circuit state (true is on)
+};
+
+//Vent
+struct VentData {
+	bool reqColdWater = false;
+	bool reqHotWater = false;
 };
 
 struct Device {

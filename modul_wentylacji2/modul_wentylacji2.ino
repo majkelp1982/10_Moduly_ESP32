@@ -9,10 +9,10 @@
 #define MODULE_NO			0
 #define SERIAL_BAUD			921600
 
-Basic basic(MODULE_TYPE,MODULE_NO, "modul_wentylacji", SERIAL_BAUD);
+Basic basic(MODULE_TYPE,MODULE_NO, "modul_wentylacji2", SERIAL_BAUD);
 OTA ota(true);
 Status status(true);
-Communication communication(true);
+Communication communication(false);
 
 void setup()
 {
