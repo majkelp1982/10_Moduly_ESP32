@@ -3,8 +3,8 @@
 #include "Arduino.h"
 #include <esp_task_wdt.h>
 
-#define VERSION				"2021.05.17"
-#define BETA_VERSION		"nowy_pin_oswietlenie"
+#define VERSION				"2021.11.04"
+#define BETA_VERSION		""
 #define FIRMWARE_VERSION	VERSION BETA_VERSION
 
 
