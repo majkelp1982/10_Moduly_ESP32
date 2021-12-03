@@ -4,7 +4,7 @@
 #include <esp_task_wdt.h>
 
 #define VERSION				"2021.11.04"
-#define BETA_VERSION		"poprawaReqHeatingPump"
+#define BETA_VERSION		"poprawaCzasuNocnego"
 #define FIRMWARE_VERSION	VERSION BETA_VERSION
 
 
