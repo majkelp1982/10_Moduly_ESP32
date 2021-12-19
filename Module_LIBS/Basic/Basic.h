@@ -3,8 +3,8 @@
 #include "Arduino.h"
 #include <esp_task_wdt.h>
 
-#define VERSION				"2021.11.04"
-#define BETA_VERSION		"poprawaCzasuNocnego"
+#define VERSION				"2021.12.03"
+#define BETA_VERSION		"wentylatorCzerpnia"
 #define FIRMWARE_VERSION	VERSION BETA_VERSION
 
 

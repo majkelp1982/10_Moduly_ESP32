@@ -705,15 +705,14 @@ void fan() {
 
 	device.fan[FAN_CZERPNIA].speed = 0;
 	device.fan[FAN_WYWIEW].speed = 0;
+	if (device.circuitPump) {
+		device.fan[FAN_CZERPNIA].speed = 40;
+	}
 	if (device.normalMode.timeLeft>0) {
 		device.fan[FAN_CZERPNIA].speed = 50;
 		device.fan[FAN_WYWIEW].speed = 50;
 	}
 	if (device.humidityAlertMode.timeLeft>0) {
-		device.fan[FAN_CZERPNIA].speed = 75;
-		device.fan[FAN_WYWIEW].speed = 75;
-	}
-	if (device.circuitPump) {
 		device.fan[FAN_CZERPNIA].speed = 75;
 		device.fan[FAN_WYWIEW].speed = 75;
 	}
