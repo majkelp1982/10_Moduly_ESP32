@@ -22,7 +22,7 @@ void Basic::run() {
 }
 
 void Basic::WDT_init() {
-	esp_task_wdt_init(30, true); //enable panic so ESP32 restarts
+	esp_task_wdt_init(45, true); //enable panic so ESP32 restarts
 	esp_task_wdt_add(NULL); //add current thread to WDT watch
 }
 
