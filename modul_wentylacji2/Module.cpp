@@ -721,7 +721,7 @@ void fan() {
 //		device.fan[FAN_WYWIEW].speed = 80;
 //	}
 	if (device.humidityAlertMode.turbo) {
-		device.fan[FAN_CZERPNIA].speed = 100;
+//		device.fan[FAN_CZERPNIA].speed = 100;
 		device.fan[FAN_WYWIEW].speed = 100;
 	}
 }
