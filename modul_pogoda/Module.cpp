@@ -113,7 +113,7 @@ void readLightIntens() {
 	//Fault strategy
 	//fixme
 	int hour = getDateTime().hour;
-	if ((hour >=16) || (hour <7))
+	if ((hour >=18) || (hour <6))
 		device.lightSensor = 0;
 }
 
