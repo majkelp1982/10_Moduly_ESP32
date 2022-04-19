@@ -3,7 +3,7 @@
 #include "Arduino.h"
 #include <esp_task_wdt.h>
 
-#define VERSION				"2022.03.03"
+#define VERSION				"2022.04.19"
 #define BETA_VERSION		"pogodaZmianaCzasu"
 #define FIRMWARE_VERSION	VERSION BETA_VERSION
 
