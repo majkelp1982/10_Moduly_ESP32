@@ -615,7 +615,7 @@ void buffers() {
 	}
 
 	// jesli temperatura w srodku spadnie lub dol bedzie ponizej 20st wlacz grzanie CWU
-	if ((device.tBuffCWUgora.isTemp<(device.reqTempBuforCWU-TEMP_CWU_HYSTERESIS)) || (device.tBuffCWUdol.isTemp<15)) {
+	if ((device.tBuffCWUgora.isTemp<(device.reqTempBuforCWU)) || (device.tBuffCWUdol.isTemp<15)) {
 		if (!reqCWUload) {
 			String temp;
 			temp = "CWU - dogrzewanie -";
@@ -632,7 +632,7 @@ void buffers() {
 		reqCWUload = true;
 	}
 	// force to load CWU during day in cheap tariff
-	if ((getDateTime().hour == 14) && (getDateTime().minute == 30)) {
+	if ((getDateTime().hour == 14) && (getDateTime().minute == 0)) {
 		if (!reqCWUload) addLog("CWU - dogrzewanie poludniowe");
 		reqCWUload = true;
 	}
@@ -643,9 +643,9 @@ void buffers() {
 		reqCWUload = true;
 	}
 	//Sprawdzanie temperatury tylko na gorze przy warunku ze na dole przekroczyla pewna stala wartosc
-	if (((device.tBuffCWUdol.isTemp>=39) || (device.tBuffCWUdol.isTemp>=device.reqTempBuforCWU))
-			&& ((device.tBuffCWUsrodek.isTemp>=device.reqTempBuforCWU)
-			|| (device.tBuffCWUgora.isTemp>=device.reqTempBuforCWU)))
+	if ((!cheapTariffHoursActive && device.tBuffCWUgora.isTemp>=(device.reqTempBuforCWU+2))
+		|| (cheapTariffHoursActive && (device.tBuffCWUgora.isTemp>=device.heatPumpAlarmTemperature-0.5))
+		|| (device.tZasilanie.isTemp==device.heatPumpAlarmTemperature))
 	{
 		if (reqCWUload) {
 			String temp;
@@ -664,20 +664,20 @@ void buffers() {
 	}
 
 	//Antylegionellia
-	if ((getDateTime().weekDay==6) && (getDateTime().hour==1) && (getDateTime().minute==1)) {
-		if (!device.antyLegionellia) addLog("Antylegionellia - Start");
-		device.antyLegionellia = true;
-	}
-
-	if ((getDateTime().weekDay==6) && (getDateTime().hour==12) && (getDateTime().minute<20)) {
-		if (device.antyLegionellia) addLog("Antylegionellia - Koniec");
-		device.antyLegionellia = false;
-	}
-
-	if ((getDateTime().weekDay < 6) && (getDateTime().hour==5) && (getDateTime().minute==59)) {
-		if (device.antyLegionellia) addLog("Antylegionellia - Wy³¹czenie przed koñcem taryfy nocnej");
-		device.antyLegionellia = false;
-	}
+//	if ((getDateTime().weekDay==6) && (getDateTime().hour==1) && (getDateTime().minute==1)) {
+//		if (!device.antyLegionellia) addLog("Antylegionellia - Start");
+//		device.antyLegionellia = true;
+//	}
+//
+//	if ((getDateTime().weekDay==6) && (getDateTime().hour==12) && (getDateTime().minute<20)) {
+//		if (device.antyLegionellia) addLog("Antylegionellia - Koniec");
+//		device.antyLegionellia = false;
+//	}
+//
+//	if ((getDateTime().weekDay < 6) && (getDateTime().hour==5) && (getDateTime().minute==59)) {
+//		if (device.antyLegionellia) addLog("Antylegionellia - Wy³¹czenie przed koñcem taryfy nocnej");
+//		device.antyLegionellia = false;
+//	}
 
 	// in case when heat pump temperature is too high, reset buffers heat requirements
 	if ((device.tZasilanie.isTemp >= device.heatPumpAlarmTemperature) && (device.tZasilanie.isTemp<100)) {
