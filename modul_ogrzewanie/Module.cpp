@@ -980,11 +980,19 @@ void statusUpdate() {
 	status += "\tpompa inHouse["; status += device.pump_InHouse; status += "]";
 	status +="\tpompa underGround["; status += device.pump_UnderGround; status += "]\n";
 
-	status +="\tcheap hours["; status += cheapTariffHoursActive; status += "]";
+	status +="\tBOOLS\n";
+				status +="\treqCOload["; status += reqCOload; status += "]";
+	status +="\treqCOloadToCold["; status += reqCOloadToCold; status += "]";
+	status +="\treqCOloadByNight["; status += reqCOloadByNight; status += "]";
+	status +="\treqCWUload["; status += reqCWUload; status += "]";
+	status +="\treqCWUloadByNight["; status += reqCWUloadByNight; status += "]";
+	status +="\tcheapTariffHoursActive["; status += cheapTariffHoursActive; status += "]";
+	status +="\theatPumpIsHeating["; status += heatPumpIsHeating; status += "]";
+	status +="\theatPumpDelayActiv["; status += heatPumpDelayActiv; status += "]";
 	status +="\tisInHousePumpDelay["; status += isInHousePumpDelay; status += "]";
-	status +="\tinHousePumpDelay["; status += inHousePumpDelay; status += "]\n";
 
-	status += "IItaryfa["; status += device.cheapTariffOnly; status += "]";
+	status +="\n";
+
 	status += "\tOgrz.Aktyw["; status += device.heatingActivated; status += "]";
 	status += "\treqPCi["; status += device.reqHeatPumpOn; status += "]";
 	status += "\tantyLegio["; status += device.antyLegionellia; status += "]";
