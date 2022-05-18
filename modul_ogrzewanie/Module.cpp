@@ -17,7 +17,8 @@ bool reqCWUloadByNight = false;
 bool cheapTariffHoursActive = false;
 bool heatPumpIsHeating = false;
 bool heatPumpDelayActiv = false;
-bool heatPumpOverheat = false;
+bool isInHousePumpDelay = false;
+float offCWUTemp;
 
 int lastCircuitOnAmount = 0;
 bool valve_bypass_CloseDelayActive = false;
@@ -56,7 +57,7 @@ unsigned long lastCorrectReadTempZrodla = 0;
 unsigned long heatPumpDelay = 0;
 unsigned long valve_3way_activatedMillis = 0;
 unsigned long valve_bypass_inMove = 0;
-unsigned long heatPumpOverheatDelay = 0;
+unsigned long inHousePumpDelay= 0;
 
 void module_init() {
 	//EEprom Scan
@@ -538,6 +539,26 @@ void valves() {
 	}
 }
 
+void extraLoadingCWU() {
+	// don't load if to hot
+	if ((device.tBuffCWUgora.isTemp>=53)
+			|| (device.tBuffCOdol.isTemp>=49))
+		return;
+
+	// force to load CWU during day in cheap tariff
+	if ((getDateTime().hour == 14) && (getDateTime().minute == 0)) {
+		if (!reqCWUload) addLog("CWU - dogrzewanie poludniowe");
+		reqCWUload = true;
+	}
+
+	// force to load CWU during night in cheap tariff
+	if ((getDateTime().hour == 4) && (getDateTime().minute == 30)) {
+		if (!reqCWUload) addLog("CWU - dogrzewanie nocne");
+		reqCWUload = true;
+	}
+
+}
+
 void buffers() {
 	// Requirements to load CO and CWU buffers include hysteresis.
 
@@ -547,7 +568,7 @@ void buffers() {
 	if (getDateTime().hour == 5) timeLeft = (int)((60 - getDateTime().minute) / 10);
 	// difference between setTemperature and temperature in buffer
 	float temperatureDiff = device.reqTempBuforCO - device.tBuffCOsrodek.isTemp;
-	if ((timeLeft != 0) && (temperatureDiff >= timeLeft)) {
+	if ((device.heatingActivated) && ((timeLeft != 0) && (temperatureDiff >= timeLeft))) {
 
 		if (!reqCOloadByNight) addLog("CO - dogrzewanie przed koncem nocy");
 		reqCOloadByNight = true;
@@ -556,7 +577,7 @@ void buffers() {
 		reqCOload = true;
 	}
 
-	if ((device.tBuffCOgora.isTemp<device.reqTempBuforCO-(TEMP_CO_HYSTERESIS/2)) || (device.tBuffCOsrodek.isTemp<=device.reqTempBuforCO-TEMP_CO_HYSTERESIS)) {
+	if ((device.heatingActivated) && ((device.tBuffCOgora.isTemp<device.reqTempBuforCO-(TEMP_CO_HYSTERESIS/2)) || (device.tBuffCOsrodek.isTemp<=device.reqTempBuforCO-TEMP_CO_HYSTERESIS))) {
 		//TMP
 		if (!reqCOload) {
 			String temp;
@@ -575,12 +596,13 @@ void buffers() {
 		reqCOload = true;
 	}
 	// force to load CO during day in cheap tariff
-	if ((getDateTime().hour == 13) && (getDateTime().minute <1)) {
+	if ((device.heatingActivated) && ((getDateTime().hour == 13) && (getDateTime().minute <1))) {
 		if (!reqCOload) addLog("CO - dogrzewanie poludniowe");
 
 		reqCOload = true;
 	}
-	if ((device.tBuffCOdol.isTemp>=device.reqTempBuforCO) && (device.tBuffCOsrodek.isTemp>device.reqTempBuforCO) && (device.tBuffCOgora.isTemp>device.reqTempBuforCO)) {
+
+	if ((!device.heatingActivated) || ((device.tBuffCOdol.isTemp>=device.reqTempBuforCO) && (device.tBuffCOsrodek.isTemp>device.reqTempBuforCO) && (device.tBuffCOgora.isTemp>device.reqTempBuforCO))) {
 		if (reqCOload) {
 			String temp;
 			temp = "CO - dogrzewanie KONIEC -";
@@ -603,7 +625,7 @@ void buffers() {
 	}
 
 	//Emergency load when more heating required and time not within Tariff II hours
-	if (device.tBuffCOgora.isTemp<TEMP_MIN_ON_DISTRIBUTOR) {
+	if ((device.heatingActivated) && (device.tBuffCOgora.isTemp<TEMP_MIN_ON_DISTRIBUTOR)) {
 		if (!reqCOloadToCold) addLog("CO - dogrzewanie - Za niska temperatura");
 
 		reqCOloadToCold = true;
@@ -631,21 +653,14 @@ void buffers() {
 		}
 		reqCWUload = true;
 	}
-	// force to load CWU during day in cheap tariff
-	if ((getDateTime().hour == 14) && (getDateTime().minute == 0)) {
-		if (!reqCWUload) addLog("CWU - dogrzewanie poludniowe");
-		reqCWUload = true;
-	}
 
-	// force to load CWU during night in cheap tariff
-	if ((getDateTime().hour == 4) && (getDateTime().minute == 30)) {
-		if (!reqCWUload) addLog("CWU - dogrzewanie nocne");
-		reqCWUload = true;
-	}
+	extraLoadingCWU();
+
+	offCWUTemp = ((device.heatPumpAlarmTemperature) * 1.00f) - 0.5f;
 	//Sprawdzanie temperatury tylko na gorze przy warunku ze na dole przekroczyla pewna stala wartosc
-	if ((!cheapTariffHoursActive && device.tBuffCWUgora.isTemp>=(device.reqTempBuforCWU+2))
-		|| (cheapTariffHoursActive && (device.tBuffCWUgora.isTemp>=device.heatPumpAlarmTemperature-0.5))
-		|| (device.tZasilanie.isTemp==device.heatPumpAlarmTemperature))
+	if (((!cheapTariffHoursActive) && (device.tBuffCWUgora.isTemp>=(device.reqTempBuforCWU+2)))
+		|| ((cheapTariffHoursActive) && (device.tZasilanie.isTemp>=offCWUTemp))
+		|| (device.tZasilanie.isTemp>=device.heatPumpAlarmTemperature))
 	{
 		if (reqCWUload) {
 			String temp;
@@ -660,7 +675,10 @@ void buffers() {
 			temp+= device.reqTempBuforCWU;
 			addLog(temp);
 		}
+		addLog("inHouse pump delay active");
 		reqCWUload = false;
+		isInHousePumpDelay = true;
+		inHousePumpDelay = millis();
 	}
 
 	//Antylegionellia
@@ -682,21 +700,21 @@ void buffers() {
 	// in case when heat pump temperature is too high, reset buffers heat requirements
 	if ((device.tZasilanie.isTemp >= device.heatPumpAlarmTemperature) && (device.tZasilanie.isTemp<100)) {
 		//TMP
-		if ((reqCOload || reqCWUload) && (!heatPumpOverheat)) addLog("ALARM OVERHEAT ");
+		if ((reqCOload || reqCWUload) && (!isInHousePumpDelay)) addLog("ALARM OVERHEAT ");
 
 		reqCOload = false;
 		reqCWUload = false;
 
 		//heat pump reach alarm temperature
-		heatPumpOverheat = true;
+		isInHousePumpDelay = true;
 		// 15 minutes break when heat pump has over-heated
-		heatPumpOverheatDelay = millis();
+		inHousePumpDelay = millis();
 	}
 
 	// after delay alarm off
-	if ((millis() > (heatPumpOverheatDelay + 150000)) && (heatPumpOverheat)) {
-		if (heatPumpOverheat) addLog("OVERHEAT Koniec");
-		heatPumpOverheat = false;
+	if ((millis() > (inHousePumpDelay + 30000)) && (isInHousePumpDelay)) {
+		if (isInHousePumpDelay) addLog("inHousePump delay finished");
+		isInHousePumpDelay = false;
 	}
 }
 
@@ -754,7 +772,7 @@ void heatingAndPumps() {
 	}
 
 	//PC Over heated . pumpInhouse working time extend
-	if ((heatPumpOverheat) && (millis() < (heatPumpOverheatDelay + 60000))) {
+	if (isInHousePumpDelay) {
 		device.pump_InHouse = true;
 	}
 
@@ -962,6 +980,10 @@ void statusUpdate() {
 	status += "\tpompa inHouse["; status += device.pump_InHouse; status += "]";
 	status +="\tpompa underGround["; status += device.pump_UnderGround; status += "]\n";
 
+	status +="\tcheap hours["; status += cheapTariffHoursActive; status += "]";
+	status +="\tisInHousePumpDelay["; status += isInHousePumpDelay; status += "]";
+	status +="\tinHousePumpDelay["; status += inHousePumpDelay; status += "]\n";
+
 	status += "IItaryfa["; status += device.cheapTariffOnly; status += "]";
 	status += "\tOgrz.Aktyw["; status += device.heatingActivated; status += "]";
 	status += "\treqPCi["; status += device.reqHeatPumpOn; status += "]";
@@ -1001,6 +1023,7 @@ void statusUpdate() {
 	status += "\nBUFOR SET";
 	status +="\treqCO["; status +=device.reqTempBuforCO; status +="]";
 	status +="\treqCWU["; status +=device.reqTempBuforCWU; status +="]";
+	status +="\toffCWUTemp["; status +=offCWUTemp; status +="]";
 
 	for (int i=0; i<7; i++) {
 		status +="\nZone["; status +=i; status += "]:\t\t T="; status +=device.zone[i].isTemp; status +="[stC]\treqT="; status+=device.zone[i].reqTemp; status +="[stC]";
