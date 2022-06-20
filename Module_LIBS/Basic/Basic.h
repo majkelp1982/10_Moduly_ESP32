@@ -3,8 +3,8 @@
 #include "Arduino.h"
 #include <esp_task_wdt.h>
 
-#define VERSION				"2022.05.18"
-#define BETA_VERSION		" inHousePumpDelay2"
+#define VERSION				"2022.06.20"
+#define BETA_VERSION		" activeCoolFanTo60"
 #define FIRMWARE_VERSION	VERSION BETA_VERSION
 
 

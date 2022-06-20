@@ -706,7 +706,7 @@ void fan() {
 	device.fan[FAN_CZERPNIA].speed = 0;
 	device.fan[FAN_WYWIEW].speed = 0;
 	if (device.circuitPump) {
-		device.fan[FAN_CZERPNIA].speed = 40;
+		device.fan[FAN_CZERPNIA].speed = 60;
 	}
 	if (device.normalMode.timeLeft>0) {
 		device.fan[FAN_CZERPNIA].speed = 50;
