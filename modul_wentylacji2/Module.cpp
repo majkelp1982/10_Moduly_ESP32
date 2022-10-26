@@ -166,6 +166,10 @@ void firstScan() {
 		device.normalOnByHours[i].Karolina = UDPbitStatus(EEpromData[i+60],2);
 		device.normalOnByHours[i].lazGora= UDPbitStatus(EEpromData[i+60],1);
 	}
+
+	// byte 89
+	device.activeCoolingFanSpeed = EEpromData[89];
+
 }
 
 void readBME280() {
@@ -272,6 +276,16 @@ void getMasterDeviceOrder() {
 		device.normalOnByHours[hour].Karolina = UDPbitStatus(UDPdata.data[1],2);
 		device.normalOnByHours[hour].lazGora= UDPbitStatus(UDPdata.data[1],1);
 		EEpromWrite(UDPdata.data[0], UDPdata.data[1]);
+	}
+
+	//byte 59
+	if (UDPdata.data[0] == 89) {
+		device.activeCoolingFanSpeed = UDPdata.data[1];
+		if (device.activeCoolingFanSpeed<10)
+			device.activeCoolingFanSpeed = 10;
+		if (device.activeCoolingFanSpeed>100)
+			device.activeCoolingFanSpeed = 100;
+		EEpromWrite(89, device.activeCoolingFanSpeed);
 	}
 
 	//Hand Mode
@@ -706,22 +720,16 @@ void fan() {
 	device.fan[FAN_CZERPNIA].speed = 0;
 	device.fan[FAN_WYWIEW].speed = 0;
 	if (device.circuitPump) {
-		device.fan[FAN_CZERPNIA].speed = 80;
+		device.fan[FAN_CZERPNIA].speed = device.activeCoolingFanSpeed;
 	}
 	if (device.normalMode.timeLeft>0) {
 		device.fan[FAN_CZERPNIA].speed = 50;
 		device.fan[FAN_WYWIEW].speed = 50;
 	}
 	if (device.humidityAlertMode.timeLeft>0) {
-//		device.fan[FAN_CZERPNIA].speed = 75;
 		device.fan[FAN_WYWIEW].speed = 75;
 	}
-//	if (device.defrostMode.timeLeft>0) {
-//		device.fan[FAN_CZERPNIA].speed = 80;
-//		device.fan[FAN_WYWIEW].speed = 80;
-//	}
 	if (device.humidityAlertMode.turbo) {
-//		device.fan[FAN_CZERPNIA].speed = 100;
 		device.fan[FAN_WYWIEW].speed = 100;
 	}
 }
@@ -791,7 +799,7 @@ void outputs() {
 }
 
 void setUDPdata() {
-	int size = 89;
+	int size = 90;
 	byte dataWrite[size];
 	// First three bytes are reserved for device recognized purposes.
 	dataWrite[0] = (device.humidityAlert<< 7) | (device.bypassOpen << 6) | (device.circuitPump<< 5) | (device.reqPumpColdWater << 4) | (device.reqPumpHotWater << 3) | (device.defrostActive << 2) | (device.reqAutoDiagnosis << 0);
@@ -847,6 +855,7 @@ void setUDPdata() {
 	dataWrite[86] = device.defrostMode.timeLeft;
 	dataWrite[87] = (device.flapFresh.salon1<< 7) | (device.flapFresh.salon2 << 6) | (device.flapFresh.gabinet<< 5) | (device.flapFresh.warsztat << 4) | (device.flapFresh.rodzice << 3) | (device.flapFresh.natalia<< 2) | (device.flapFresh.karolina << 1);
 	dataWrite[88] = (device.flapUsed.kuchnia<< 7) | (device.flapUsed.lazDol1 << 6) | (device.flapUsed.lazDol2<< 5) | (device.flapUsed.pralnia << 4) | (device.flapUsed.przedpokoj << 3) | (device.flapUsed.garderoba<< 2) | (device.flapUsed.lazGora1 << 1)  | (device.flapUsed.lazGora2 << 0);
+	dataWrite[89] = device.activeCoolingFanSpeed;
 	setUDPdata(0, dataWrite,size);
 }
 
@@ -894,6 +903,7 @@ void statusUpdate() {
 	status += "\nCZERPNIA\t";
 	status += addStatus("Speed", device.fan[FAN_CZERPNIA].speed, "%");
 	status += addStatus("Rev", device.fan[FAN_CZERPNIA].rev, "min-1");
+	status += addStatus("ActiveCoolingFanSpeed", device.activeCoolingFanSpeed, "%");
 	status += "\nWYWIEW\t";
 	status += addStatus("Speed", device.fan[FAN_WYWIEW].speed, "%");
 	status += addStatus("Rev", device.fan[FAN_WYWIEW].rev, "min-1");

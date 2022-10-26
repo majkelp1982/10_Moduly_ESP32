@@ -179,6 +179,9 @@ struct Device {
 	//byte 60-83
 	Matrix normalOnByHours[24];				// active cooling/heating according to hours
 
+	//byte 89
+	byte activeCoolingFanSpeed = 50;				// active cooling CZERPNIA fan speed
+
 	FlapFresh flapFresh;
 	FlapUsed flapUsed;
 
