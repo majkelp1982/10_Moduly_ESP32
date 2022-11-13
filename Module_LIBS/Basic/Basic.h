@@ -3,8 +3,8 @@
 #include "Arduino.h"
 #include <esp_task_wdt.h>
 
-#define VERSION				"2022.09.19"
-#define BETA_VERSION		" light0on17"
+#define VERSION				"2022.11.13"
+#define BETA_VERSION		" intakeFanOnWhenFireplace"
 #define FIRMWARE_VERSION	VERSION BETA_VERSION
 
 

@@ -11,6 +11,7 @@
 #define ID_MOD_MAIN							1
 #define ID_MOD_COMFORT						10
 #define ID_MOD_WEATHER						11
+#define ID_MOD_HEATING						14
 //ZONES ID
 #define ID_ZONE_SALON						0
 #define ID_ZONE_LAZDOL						1
@@ -208,6 +209,10 @@ struct Zone {
 struct AirPollution {
 	int pm25=0;
 	int pm10=0;
+};
+
+struct HeatingModule {
+	int heatingSource = 0;
 };
 
 void module_init();

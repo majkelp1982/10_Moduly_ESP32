@@ -4,6 +4,7 @@ HandMode handMode;
 TestMode testMode;
 Zone zones[7];
 AirPollution airPollution;
+HeatingModule heatingModule;
 DataRead UDPdata;
 
 //Functions
@@ -342,6 +343,10 @@ void getAirParams(){
 	airPollution.pm10 = (UDPdata.data[7]<<8) + (UDPdata.data[8]);
 }
 
+void getHeatingParams() {
+	heatingModule.heatingSource = UDPdata.data[0]>>6;
+}
+
 void readUDPdata() {
 	UDPdata = getDataRead();
 	if (!UDPdata.newData) return;
@@ -357,6 +362,10 @@ void readUDPdata() {
 			&& (UDPdata.deviceNo == 0)
 			&& (UDPdata.frameNo == 0))
 		getAirParams();
+	if ((UDPdata.deviceType == ID_MOD_HEATING)
+			&& (UDPdata.deviceNo == 0)
+			&& (UDPdata.frameNo == 0))
+		getHeatingParams();
 
 	resetNewData();
 }
@@ -732,6 +741,19 @@ void fan() {
 	if (device.humidityAlertMode.turbo) {
 		device.fan[FAN_WYWIEW].speed = 100;
 	}
+
+	//kominek activated
+	if (heatingModule.heatingSource == 3) {
+		device.fan[FAN_CZERPNIA].speed = device.fan[FAN_WYWIEW].speed + 40;
+		if (device.fan[FAN_WYWIEW].speed > 60) {
+			device.fan[FAN_WYWIEW].speed = 60;
+		}
+	}
+
+	if (device.fan[FAN_CZERPNIA].speed>100) device.fan[FAN_CZERPNIA].speed = 100;
+	if (device.fan[FAN_CZERPNIA].speed<0) device.fan[FAN_CZERPNIA].speed = 0;
+	if (device.fan[FAN_WYWIEW].speed>100) device.fan[FAN_WYWIEW].speed = 100;
+	if (device.fan[FAN_WYWIEW].speed<0) device.fan[FAN_WYWIEW].speed = 0;
 }
 
 void circuitPump() {
@@ -1008,6 +1030,16 @@ void statusUpdate() {
 	}
 
 	status +="\nAir\tPM2.5="; status+=airPollution.pm25; status +="[ug/m3]\t PM10="; status +=airPollution.pm10; status+="[ug/m3]\n";
+
+	status +="\nHeating module";
+	status +="\nheating source:";
+	switch(heatingModule.heatingSource) {
+		case 0: status +="\tNieznany"; break;
+		case 1: status +="\tPompa ciep³a"; break;
+		case 2: status +="\tBufor CO"; break;
+		case 3: status +="\tKominek"; break;
+	}
+
 	setStatus(status);
 }
 
