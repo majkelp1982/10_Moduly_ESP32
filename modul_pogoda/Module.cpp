@@ -108,12 +108,17 @@ void readSDS011() {
 void readLightIntens() {
 	if (sleep(&readLightSensorMillis, 5)) return;
 	light = analogRead(PIN_LIGHT);
-	device.lightSensor = (int)(light*100/4095);
+
+	//limit to 1000 = 100%
+	device.lightSensor = (int)(light*100/(1000));
+	if (device.lightSensor > 100) {
+		device.lightSensor = 100;
+	}
 
 	//Fault strategy
 	//fixme
 	int hour = getDateTime().hour;
-	if ((hour >=17) || (hour <5))
+	if ((hour >=18) || (hour <5))
 		device.lightSensor = 0;
 }
 

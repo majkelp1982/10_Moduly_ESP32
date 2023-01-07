@@ -44,7 +44,7 @@
 		<link>
 			<name>libraries/Adafruit_BME280</name>
 			<type>2</type>
-			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Adafruit_BME280</location>
+			<location>D:/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Adafruit_BME280</location>
 		</link>
 		<link>
 			<name>libraries/Adafruit_Unified_Sensor</name>
@@ -54,12 +54,12 @@
 		<link>
 			<name>libraries/Basic</name>
 			<type>2</type>
-			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Basic</location>
+			<location>D:/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Basic</location>
 		</link>
 		<link>
 			<name>libraries/Communication</name>
 			<type>2</type>
-			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Communication</location>
+			<location>D:/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Communication</location>
 		</link>
 		<link>
 			<name>libraries/EEPROM</name>
@@ -79,7 +79,7 @@
 		<link>
 			<name>libraries/OTA</name>
 			<type>2</type>
-			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/OTA</location>
+			<location>D:/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/OTA</location>
 		</link>
 		<link>
 			<name>libraries/SPI</name>
@@ -89,12 +89,12 @@
 		<link>
 			<name>libraries/Sds011</name>
 			<type>2</type>
-			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Sds011</location>
+			<location>D:/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Sds011</location>
 		</link>
 		<link>
 			<name>libraries/Status</name>
 			<type>2</type>
-			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Status</location>
+			<location>D:/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Status</location>
 		</link>
 		<link>
 			<name>libraries/Update</name>
