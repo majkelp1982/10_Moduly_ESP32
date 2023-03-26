@@ -117,9 +117,9 @@ void readLightIntens() {
 
 	//Fault strategy
 	//fixme
-	int hour = getDateTime().hour;
-	if ((hour >=18) || (hour <5))
-		device.lightSensor = 0;
+//	int hour = getDateTime().hour;
+//	if ((hour >=18) || (hour <5))
+//		device.lightSensor = 0;
 }
 
 void readUDPdata() {
