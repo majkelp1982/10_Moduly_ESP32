@@ -3,8 +3,8 @@
 #include "Arduino.h"
 #include <esp_task_wdt.h>
 
-#define VERSION				"2023.01.07"
-#define BETA_VERSION		" noForceLight"
+#define VERSION				"2023.06.16"
+#define BETA_VERSION		" reload"
 #define FIRMWARE_VERSION	VERSION BETA_VERSION
 
 

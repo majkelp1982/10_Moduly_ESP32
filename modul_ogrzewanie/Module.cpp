@@ -38,7 +38,7 @@ void dallas18b20Read (Thermometer *thermometer);
 void readUDPdata();
 void getMasterDeviceOrder();
 void getComfortParams();
-void getVentParams();
+void checkVentParams();
 
 void valves();
 void buffers();
@@ -135,6 +135,7 @@ void module() {
 	valves();
 	buffers();
 	heatingAndPumps();
+	checkVentParams();
 
 	//Output settings
 	outputs();
@@ -167,6 +168,7 @@ void firstScan() {
 	EEpromScan(EEpromData, size);
 	Serial.println("\nFirst scan");
 
+
 	device.cheapTariffOnly = (EEpromData[1] != 0);
 	device.heatingActivated  = (EEpromData[2] != 0);
 	device.reqTempBuforCO = EEpromData[3]/2.0;
@@ -175,7 +177,140 @@ void firstScan() {
 
 	// Get 18b20 device addresses
 	int offset = 10;
-	for (int i=0; i<8; i++) {
+
+	//WORKAROUND !!! EPROM WAS DELETED
+	// 10 - 17		:   Bufor CO dol 18b20 device address
+	EEpromData[10] = 40;
+	EEpromData[11] = 2;
+	EEpromData[12] = 0;
+	EEpromData[13] = 7;
+	EEpromData[14] = 47;
+	EEpromData[15] = 39;
+	EEpromData[16] = 1;
+	EEpromData[17] = 204;
+
+	// 18 - 25		:   Bufor CO srodek 18b20 device address
+	EEpromData[18] = 40;
+	EEpromData[19] = 7;
+	EEpromData[20] = 0;
+	EEpromData[21] = 7;
+	EEpromData[22] = 205;
+	EEpromData[23] = 124;
+	EEpromData[24] = 1;
+	EEpromData[25] = 251;
+
+	// 26 - 33		:   Bufor CO gora 18b20 device address
+	EEpromData[26] = 40;
+	EEpromData[27] = 12;
+	EEpromData[28] = 1;
+	EEpromData[29] = 7;
+	EEpromData[30] = 112;
+	EEpromData[31] = 170;
+	EEpromData[32] = 1;
+	EEpromData[33] = 144;
+
+	// 34 - 41		:   Bufor CWU dol 18b20 device address
+	EEpromData[34] = 40;
+	EEpromData[35] = 12;
+	EEpromData[36] = 1;
+	EEpromData[37] = 7;
+	EEpromData[38] = 67;
+	EEpromData[39] = 166;
+	EEpromData[40] = 1;
+	EEpromData[41] = 231;
+
+	// 42 - 49		:   Bufor CWU srodek 18b20 device address
+	EEpromData[42] = 40;
+	EEpromData[43] = 12;
+	EEpromData[44] = 1;
+	EEpromData[45] = 7;
+	EEpromData[46] = 194;
+	EEpromData[47] = 103;
+	EEpromData[48] = 1;
+	EEpromData[49] = 94;
+
+	// 50 - 57		:   Bufor CWU gora 18b20 device address
+	EEpromData[50] = 40;
+	EEpromData[51] = 12;
+	EEpromData[52] = 1;
+	EEpromData[53] = 7;
+	EEpromData[54] = 225;
+	EEpromData[55] = 170;
+	EEpromData[56] = 1;
+	EEpromData[57] = 19;
+
+	// 58 - 65		:   zasilanie 18b20 device address
+	EEpromData[58] = 40;
+	EEpromData[59] = 12;
+	EEpromData[60] = 1;
+	EEpromData[61] = 7;
+	EEpromData[62] = 159;
+	EEpromData[63] = 197;
+	EEpromData[64] = 1;
+	EEpromData[65] = 74;
+
+	// 66 - 73		:   powrot 18b20 device address
+	EEpromData[66] = 40;
+	EEpromData[67] = 255;
+	EEpromData[68] = 161;
+	EEpromData[69] = 100;
+	EEpromData[70] = 96;
+	EEpromData[71] = 23;
+	EEpromData[72] = 5;
+	EEpromData[73] = 48;
+
+	// 74 - 81		:   dolneZrodlo 18b20 device address
+	EEpromData[74] = 0;
+	EEpromData[75] = 0;
+	EEpromData[76] = 0;
+	EEpromData[77] = 0;
+	EEpromData[78] = 0;
+	EEpromData[79] = 0;
+	EEpromData[80] = 0;
+	EEpromData[81] = 0;
+
+	// 82 - 89		:   Kominek 18b20 device address
+	EEpromData[82] = 40;
+	EEpromData[83] = 255;
+	EEpromData[84] = 21;
+	EEpromData[85] = 68;
+	EEpromData[86] = 96;
+	EEpromData[87] = 23;
+	EEpromData[88] = 5;
+	EEpromData[89] = 16;
+
+	// 90 - 97		:   Rozdzielacze 18b20 device address
+	EEpromData[90] = 40;
+	EEpromData[91] = 255;
+	EEpromData[92] = 154;
+	EEpromData[93] = 228;
+	EEpromData[94] = 161;
+	EEpromData[95] = 22;
+	EEpromData[96] = 3;
+	EEpromData[97] = 252;
+
+	// 98 - 105		:   PowrotParter 18b20 device address
+	EEpromData[98] = 0;
+	EEpromData[99] = 0;
+	EEpromData[100] = 0;
+	EEpromData[101] = 0;
+	EEpromData[102] = 0;
+	EEpromData[103] = 0;
+	EEpromData[104] = 0;
+	EEpromData[105] = 0;
+
+	// 106 - 113	:   PowrotPietro 18b20 device address
+	EEpromData[106] = 0;
+	EEpromData[107] = 0;
+	EEpromData[108] = 0;
+	EEpromData[109] = 0;
+	EEpromData[110] = 0;
+	EEpromData[111] = 0;
+	EEpromData[112] = 0;
+	EEpromData[113] = 0;
+
+
+			   for (int i=0; i<8; i++) {
 		device.tBuffCOdol.deviceAddress[i] = EEpromData[offset+i];
 		Serial.printf("[%d]",device.tBuffCOdol.deviceAddress[i]);
 	}
@@ -344,10 +479,6 @@ void readUDPdata() {
 			&& (UDPdata.deviceNo == 0)
 			&& (UDPdata.frameNo == 0))
 		getComfortParams();
-	if ((UDPdata.deviceType == ID_MOD_VENT)
-			&& (UDPdata.deviceNo == 0)
-			&& (UDPdata.frameNo == 0))
-		getVentParams();
 
 	resetNewData();
 }
@@ -419,9 +550,28 @@ void getComfortParams(){
 	}
 }
 
-void getVentParams() {
-	ventData.reqColdWater = UDPbitStatus(UDPdata.data[0],4);
-	ventData.reqHotWater = UDPbitStatus(UDPdata.data[0],3);
+void checkVentParams() {
+	unsigned long currentMillis = millis();
+	if (ventData.reqColdWater && currentMillis>(ventData.reqColdWaterMillis+60000)) {
+		Serial.println("RESET reqColdWater");
+		ventData.reqColdWater = false;
+	}
+	if (ventData.reqHotWater && currentMillis>(ventData.reqHotWaterMillis+60000)) {
+		Serial.println("RESET reqHotWater");
+		ventData.reqHotWater= false;
+	}
+}
+
+void setReqColdWater() {
+	Serial.println("Set reqColdWater");
+	ventData.reqColdWater = true;
+	ventData.reqColdWaterMillis = millis();
+}
+
+void setReqWarmWater() {
+	Serial.println("Set reqHotWater");
+	ventData.reqHotWater= true;
+	ventData.reqHotWaterMillis = millis();
 }
 
 void valves() {

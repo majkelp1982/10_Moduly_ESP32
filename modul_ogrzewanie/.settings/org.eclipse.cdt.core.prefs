@@ -403,10 +403,10 @@ environment/project/io.sloeber.core.toolChain.release.1913007315/JANTJE.BOARD_NA
 environment/project/io.sloeber.core.toolChain.release.1913007315/JANTJE.BOARD_NAME/value=NodeMCU-32S
 environment/project/io.sloeber.core.toolChain.release.1913007315/JANTJE.COM_PORT/delimiter=;
 environment/project/io.sloeber.core.toolChain.release.1913007315/JANTJE.COM_PORT/operation=replace
-environment/project/io.sloeber.core.toolChain.release.1913007315/JANTJE.COM_PORT/value=COM9
+environment/project/io.sloeber.core.toolChain.release.1913007315/JANTJE.COM_PORT/value=COM3
 environment/project/io.sloeber.core.toolChain.release.1913007315/JANTJE.ECLIPSE_LOCATION/delimiter=;
 environment/project/io.sloeber.core.toolChain.release.1913007315/JANTJE.ECLIPSE_LOCATION/operation=replace
-environment/project/io.sloeber.core.toolChain.release.1913007315/JANTJE.ECLIPSE_LOCATION/value=${eclipse_home}
+environment/project/io.sloeber.core.toolChain.release.1913007315/JANTJE.ECLIPSE_LOCATION/value=C\:\\Sloeber-ESP\\
 environment/project/io.sloeber.core.toolChain.release.1913007315/JANTJE.EXTRA.ALL/delimiter=;
 environment/project/io.sloeber.core.toolChain.release.1913007315/JANTJE.EXTRA.ALL/operation=replace
 environment/project/io.sloeber.core.toolChain.release.1913007315/JANTJE.EXTRA.ALL/value=

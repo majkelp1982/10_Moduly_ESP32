@@ -112,7 +112,9 @@ struct Zone {
 //Vent
 struct VentData {
 	bool reqColdWater = false;
+	unsigned long reqColdWaterMillis;
 	bool reqHotWater = false;
+	unsigned long reqHotWaterMillis;
 };
 
 struct Device {
@@ -155,5 +157,6 @@ struct Device {
 
 void module_init();
 void module();
-
+void setReqColdWater();
+void setReqWarmWater();
 

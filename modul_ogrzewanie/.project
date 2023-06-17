@@ -42,14 +42,19 @@
 			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp32/hardware/esp32/1.0.0/variants/nodemcu-32s</locationURI>
 		</link>
 		<link>
+			<name>libraries/ArduinoJson</name>
+			<type>2</type>
+			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/ArduinoJson/6.18.5</locationURI>
+		</link>
+		<link>
 			<name>libraries/Basic</name>
 			<type>2</type>
-			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Basic</location>
+			<location>D:/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Basic</location>
 		</link>
 		<link>
 			<name>libraries/Communication</name>
 			<type>2</type>
-			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Communication</location>
+			<location>D:/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Communication</location>
 		</link>
 		<link>
 			<name>libraries/DallasTemperature</name>
@@ -74,7 +79,7 @@
 		<link>
 			<name>libraries/OTA</name>
 			<type>2</type>
-			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/OTA</location>
+			<location>D:/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/OTA</location>
 		</link>
 		<link>
 			<name>libraries/OneWire</name>
@@ -84,7 +89,7 @@
 		<link>
 			<name>libraries/Status</name>
 			<type>2</type>
-			<location>C:/Users/spoma/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Status</location>
+			<location>D:/OneDrive/Dom/SmartHouse/10_Moduly-ESP32/Module_LIBS/Status</location>
 		</link>
 		<link>
 			<name>libraries/Update</name>
