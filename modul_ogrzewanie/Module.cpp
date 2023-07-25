@@ -827,8 +827,10 @@ void buffers() {
 		}
 		addLog("inHouse pump delay active");
 		reqCWUload = false;
+		if (!isInHousePumpDelay) {
+			inHousePumpDelay = millis();
+		}
 		isInHousePumpDelay = true;
-		inHousePumpDelay = millis();
 	}
 
 	//Antylegionellia
@@ -1140,6 +1142,11 @@ void statusUpdate() {
 	status +="\theatPumpIsHeating["; status += heatPumpIsHeating; status += "]";
 	status +="\theatPumpDelayActiv["; status += heatPumpDelayActiv; status += "]";
 	status +="\tisInHousePumpDelay["; status += isInHousePumpDelay; status += "]";
+
+	status +="\n";
+
+	status +="\tcurrentMillis["; status += millis(); status += "]";
+	status +="\tinHousePumpDelayMillis["; status += inHousePumpDelay; status += "]";
 
 	status +="\n";
 
