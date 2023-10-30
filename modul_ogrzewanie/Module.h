@@ -159,4 +159,4 @@ void module_init();
 void module();
 void setReqColdWater();
 void setReqWarmWater();
-
+void setComfortParams(int zone, float isTemp, float reqTemp);

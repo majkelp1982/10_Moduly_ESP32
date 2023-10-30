@@ -4,7 +4,8 @@
 
 WebServer server2(9090);
 StaticJsonDocument<2500> doc;
-String jsonDeserialization(String json);
+String jsonPumpActionDeserialization(String json);
+String jsonTempDeserialization(String json);
 void webServerStart();
 void webServerSetup();
 
@@ -42,7 +43,18 @@ void webServerSetup() {
 			server2.send(404, "text/plain", "JSON NOT FOUND");
 			return;
 		}
-		String resp = jsonDeserialization(server2.arg("plain"));
+		String resp = jsonPumpActionDeserialization(server2.arg("plain"));
+	    if (resp=="OK") server2.send(200, "text/plain", resp);
+	    else server2.send(400, "text/plain", "FAULTY COMMAND");
+
+	   });
+	   server2.on("/comfort", HTTP_POST, []() {
+		   Serial.println("Enter comfort endpoint");
+		if (server2.hasArg("plain") == false) {
+			server2.send(404, "text/plain", "JSON NOT FOUND");
+			return;
+		}
+		String resp = jsonTempDeserialization(server2.arg("plain"));
 	    if (resp=="OK") server2.send(200, "text/plain", resp);
 	    else server2.send(400, "text/plain", "FAULTY COMMAND");
 
@@ -54,7 +66,7 @@ void webService_run() {
     server2.handleClient();
 }
 
-String jsonDeserialization(String json) {
+String jsonPumpActionDeserialization(String json) {
 	  doc.clear();
 	  doc.garbageCollect();
 	  DeserializationError error = deserializeJson(doc, json);
@@ -75,3 +87,21 @@ String jsonDeserialization(String json) {
 	  }
 	  return "OK";
 }
+
+String jsonTempDeserialization(String json) {
+	  doc.clear();
+	  doc.garbageCollect();
+	  DeserializationError error = deserializeJson(doc, json);
+	  if (error) {
+	    Serial.print(F("deserializeJson() failed: "));
+	    Serial.println(error.f_str());
+	    return "Deserialization failed";
+	  }
+	  int zoneNumber = doc["zoneNumber"];
+	  float temperature = doc["temperature"];
+	  float reqTemperature = doc["reqTemperature"];
+	  setComfortParams(zoneNumber, temperature, reqTemperature);
+
+	  return "OK";
+}
+

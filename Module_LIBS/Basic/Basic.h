@@ -3,8 +3,8 @@
 #include "Arduino.h"
 #include <esp_task_wdt.h>
 
-#define VERSION				"2023.07.25"
-#define BETA_VERSION		" millis6"
+#define VERSION				"2023.10.10"
+#define BETA_VERSION		" add POST comfort"
 #define FIRMWARE_VERSION	VERSION BETA_VERSION
 
 

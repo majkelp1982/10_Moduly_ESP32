@@ -514,6 +514,11 @@ void getMasterDeviceOrder() {
 	forceStandardUDP();
 }
 
+void setComfortParams(int zone, float isTemp, float reqTemp) {
+	device.zone[zone].isTemp = isTemp;
+	device.zone[zone].reqTemp = reqTemp;
+}
+
 void getComfortParams(){
 	device.zone[ID_SALON].isTemp = UDPdata.data[0]+(UDPdata.data[1]/10.0);
 	device.zone[ID_SALON].reqTemp = UDPdata.data[2]/2;
@@ -826,28 +831,25 @@ void buffers() {
 			addLog(temp);
 		}
 		addLog("inHouse pump delay active");
-		reqCWUload = false;
 		if (!isInHousePumpDelay) {
 			inHousePumpDelay = millis();
 		}
-		isInHousePumpDelay = true;
+		if (reqCWUload) {
+			isInHousePumpDelay = true;
+		}
+		reqCWUload = false;
 	}
 
 	//Antylegionellia
-//	if ((getDateTime().weekDay==6) && (getDateTime().hour==1) && (getDateTime().minute==1)) {
-//		if (!device.antyLegionellia) addLog("Antylegionellia - Start");
-//		device.antyLegionellia = true;
-//	}
-//
-//	if ((getDateTime().weekDay==6) && (getDateTime().hour==12) && (getDateTime().minute<20)) {
-//		if (device.antyLegionellia) addLog("Antylegionellia - Koniec");
-//		device.antyLegionellia = false;
-//	}
-//
-//	if ((getDateTime().weekDay < 6) && (getDateTime().hour==5) && (getDateTime().minute==59)) {
-//		if (device.antyLegionellia) addLog("Antylegionellia - Wy³¹czenie przed koñcem taryfy nocnej");
-//		device.antyLegionellia = false;
-//	}
+	if ((getDateTime().weekDay==6) && (getDateTime().hour==0) && (getDateTime().minute==1)) {
+		if (!device.antyLegionellia) addLog("Antylegionellia - Start");
+		device.antyLegionellia = true;
+	}
+
+	if ((getDateTime().hour==5) && (getDateTime().minute==59)) {
+		if (device.antyLegionellia) addLog("Antylegionellia - Koniec");
+		device.antyLegionellia = false;
+	}
 
 	// in case when heat pump temperature is too high, reset buffers heat requirements
 	if ((device.tZasilanie.isTemp >= device.heatPumpAlarmTemperature) && (device.tZasilanie.isTemp<100)) {
